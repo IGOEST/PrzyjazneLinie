@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Przyjazne Linie</string>
+    <string name="title_therapist">Terapeuta</string>
+    <string name="title_child">Dziecko</string>
+    <string name="active_learning_step">Aktywny krok uczenia: </string>
+    <string name="example">Przykład</string>
+    <string name="play_button_description">Graj</string>
+
+    <string name="change_app_DEVEL">Zmień moduł</string>
+</resources>

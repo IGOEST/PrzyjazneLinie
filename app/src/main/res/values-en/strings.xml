@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Friendly Lines</string>
+    <string name="title_therapist">Therapist</string>
+    <string name="title_child">Child</string>
+    <string name="active_learning_step">Active learning step:</string>
+    <string name="example">Example</string>
+    <string name="play_button_description">Play</string>
+
+    <string name="change_app_DEVEL">Change module</string>
+</resources>
