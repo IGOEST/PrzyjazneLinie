@@ -13,6 +13,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
@@ -20,6 +21,7 @@ import androidx.compose.ui.unit.sp
 import com.example.friendlylines.R
 import com.example.friendlylines.theme.AppTextStyles
 import com.example.friendlylines.therapist_app.main.TherapistActivity
+import com.example.friendlylines.therapist_app.ui.theme.*
 
 class ChildActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
