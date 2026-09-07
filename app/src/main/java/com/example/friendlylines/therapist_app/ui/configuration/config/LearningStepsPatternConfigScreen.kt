@@ -44,12 +44,17 @@ import com.example.friendlylines.therapist_app.ui.components.TemplateInfoDialog
 import com.example.friendlylines.therapist_app.ui.components.TemplateSlider
 import com.example.friendlylines.therapist_app.ui.components.TemplateToggleSwitch
 import com.example.friendlylines.therapist_app.ui.components.TemplateTopAppBar
-import com.example.friendlylines.therapist_app.ui.configuration.config.PatternConfigOptions.toDp
+//import com.example.friendlylines.therapist_app.ui.configuration.config.PatternConfigOptions.toDp
 import com.example.friendlylines.therapist_app.ui.configuration.patterns.LearningStepsPatternsScreenViewModel
 import com.example.friendlylines.therapist_app.ui.main.ExitDestination
 import com.example.friendlylines.therapist_app.ui.main.NavRoutes
 import com.example.friendlylines.therapist_app.ui.materials.models.PatternPreview
 import com.example.friendlylines.therapist_app.ui.theme.*
+import com.example.shared.data.drafts.ColorOption
+import com.example.shared.data.drafts.PatternWidth
+import com.example.shared.data.drafts.PatternConfigOptions.toDp
+import com.example.shared.data.drafts.PatternConfigOptions
+import com.example.shared.data.drafts.LearningStepsPatternConfigDraft
 
 @Composable
 fun LearningStepPatternConfigScreen(

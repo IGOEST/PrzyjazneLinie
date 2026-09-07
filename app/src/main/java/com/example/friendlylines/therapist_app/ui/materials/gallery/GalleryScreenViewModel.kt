@@ -3,8 +3,8 @@ package com.example.friendlylines.therapist_app.ui.materials.gallery
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.friendlylines.therapist_app.ui.materials.models.PatternItem
-import com.example.friendlylines.therapist_app.ui.materials.models.toPatternDrawing
+//import com.example.friendlylines.therapist_app.ui.materials.models.PatternItem
+//import com.example.friendlylines.therapist_app.ui.materials.models.toPatternDrawing
 import com.example.shared.data.repositories.PatternRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,6 +13,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.example.shared.data.models.PatternItem
+import com.example.shared.data.models.toPatternDrawing
 
 @HiltViewModel
 class GalleryScreenViewModel @Inject constructor(

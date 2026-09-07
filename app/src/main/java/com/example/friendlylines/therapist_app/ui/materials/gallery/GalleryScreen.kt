@@ -40,9 +40,10 @@ import com.example.friendlylines.therapist_app.ui.components.TemplateAlertDialog
 import com.example.friendlylines.therapist_app.ui.components.TemplateCheckbox
 import com.example.friendlylines.therapist_app.ui.components.TemplateNotification
 import com.example.friendlylines.therapist_app.ui.components.TemplateTopAppBar
-import com.example.friendlylines.therapist_app.ui.materials.models.PatternItem
+//import com.example.friendlylines.therapist_app.ui.materials.models.PatternItem
 import com.example.friendlylines.therapist_app.ui.theme.Primary50
 import com.example.friendlylines.therapist_app.ui.theme.Primary900
+import com.example.shared.data.models.PatternItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

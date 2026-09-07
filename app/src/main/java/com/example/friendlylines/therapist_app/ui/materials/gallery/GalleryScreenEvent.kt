@@ -1,6 +1,7 @@
 package com.example.friendlylines.therapist_app.ui.materials.gallery
 
-import com.example.friendlylines.therapist_app.ui.materials.models.PatternItem
+//import com.example.friendlylines.therapist_app.ui.materials.models.PatternItem
+import com.example.shared.data.models.PatternItem
 
 sealed class GalleryScreenEvent {
     data class HideExamplePatternsChanged(val hide: Boolean) : GalleryScreenEvent()
