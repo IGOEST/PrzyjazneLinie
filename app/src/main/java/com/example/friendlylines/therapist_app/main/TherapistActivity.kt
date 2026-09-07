@@ -20,29 +20,31 @@ import androidx.compose.ui.unit.sp
 import com.example.friendlylines.R
 import com.example.friendlylines.child_app.main.ChildActivity
 import com.example.friendlylines.theme.AppTextStyles
+import com.example.friendlylines.therapist_app.ui.main.MainScreen
 
 class TherapistActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            MaterialTheme {
-                Surface(color = MaterialTheme.colorScheme.background) {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text(text = stringResource(R.string.title_therapist),
-                            style = AppTextStyles.h3Medium,
-                            color = colorResource(R.color.green_1000))
-                    }
-                }
-            }
-
-            val context = LocalContext.current
-            Button(onClick = {
-                val intent = Intent(context, ChildActivity::class.java)
-                context.startActivity(intent)
-            }) {
-                Text(text = stringResource(R.string.change_app_DEVEL))
-            }
+//            MaterialTheme {
+//                Surface(color = MaterialTheme.colorScheme.background) {
+//                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+//                        Text(text = stringResource(R.string.title_therapist),
+//                            style = AppTextStyles.h3Medium,
+//                            color = colorResource(R.color.green_1000))
+//                    }
+//                }
+//            }
+//
+//            val context = LocalContext.current
+//            Button(onClick = {
+//                val intent = Intent(context, ChildActivity::class.java)
+//                context.startActivity(intent)
+//            }) {
+//                Text(text = stringResource(R.string.change_app_DEVEL))
+//            }
+            MainScreen()
         }
     }
 }

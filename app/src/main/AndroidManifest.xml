@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <application
+        android:name = ".therapist_app.ui.main.FriendlyLinesApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -13,7 +14,7 @@
         android:theme="@style/Theme.FriendlyLines">
 
         <activity
-            android:name=".therapist_app.main.TherapistActivity"
+            android:name=".therapist_app.ui.main.MainActivity"
             android:exported="true"
             android:label="@string/title_therapist"
             android:screenOrientation="landscape"

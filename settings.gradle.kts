@@ -24,4 +24,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "FriendlyLines"
 include(":app")
- 
+include(":shared")
