@@ -115,4 +115,14 @@
 <string name="starting_point">Punkt startowy</string>
 <string name="random_pattern_order">Losowa kolejność wzorów</string>
 
+
+    <string name="num_of_repetitions_info">Ile razy wzór pojawi się podczas przechodzenia danego poziomu uczenia.</string>
+    <string name="num_of_attempts_info">Ile razy można narysować wzór ponownie po błędnej próbie. Pierwsza poprawna próba zalicza wzór.</string>
+    <string name="time_limit_info">Ile sekund jest dane na narysowanie wzoru. Przy kształtach złożonych czas resetuje się po narysowaniu każdej części składowej. Po upływie czasu próba się kończy.</string>
+    <string name="level_of_accuracy_info">Poziom poprawności wzoru wymagany, aby zaliczyć próbę.</string>
+    <string name="starting_point_info">Jeśli punkt startowy jest włączony, niemożliwe będzie rozpoczęcie rysowania z żadnego innego punktu.</string>
+    <string name="random_pattern_order_info">Jeśli losowa kolejność wzorów jest włączona, wzory i ich powtórzenia będą się pojawiać w kroku uczenia w losowej kolejności.</string>
+    <string name="easy_label_text">Łatwy</string>
+    <string name="hard_label_text">Trudny</string>
+
 </resources>

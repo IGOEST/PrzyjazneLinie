@@ -101,6 +101,15 @@
     <string name="starting_point">Starting point</string>
     <string name="random_pattern_order">Random pattern order</string>
 
+    <string name="num_of_repetitions_info">The number of times the pattern will appear while going through the given learning level.</string>
+    <string name="num_of_attempts_info">The number of times the pattern can be redrawn after an incorrect attempt. The first correct attempt completes the pattern.</string>
+    <string name="time_limit_info">The number of seconds given to draw the pattern. For complex shapes, the timer resets after each component is drawn. When the time runs out, the attempt ends.</string>
+    <string name="level_of_accuracy_info">The level of correctness required for the attempt to be completed successfully.</string>
+    <string name="starting_point_info">If the starting point is enabled, it will not be possible to start drawing from any other point.</string>
+    <string name="random_pattern_order_info">If random pattern order is enabled, patterns and their repetitions will appear in a random order during the learning step.</string>
+    <string name="easy_label_text">Easy</string>
+    <string name="hard_label_text">Hard</string>
+
 </resources>
 
 
