@@ -15,5 +15,6 @@
     <color name="grey_darker">#BFBDBD</color>
 
     <color name="info_blue">#7ED8FF</color>
+    <color name="loading_screen_blue">#FF2EB2D6</color>
     <color name="start_button_green">#83D0AB</color>
 </resources>

@@ -101,6 +101,19 @@
     <string name="starting_point">Starting point</string>
     <string name="random_pattern_order">Random pattern order</string>
 
+    <string name="loading_screen_1">Fine motor skills training through tracing a pattern on the screen</string>
+    <string name="loading_screen_2">The applications are developed as part of a joint non-profit and open-source project</string>
+    <string name="loading_screen_3">of Gdańsk University of Technology and the Institute for Child Development foundation in Gdańsk (http://iwrd.pl/).</string>
+    <string name="loading_screen_4">Neither the Institute for Child Development, Gdańsk University of Technology, nor any participant in the project receives any financial benefit from developing the applications.</string>
+    <string name="loading_screen_5">For more information, visit: https://tiapps.org/</string>
+
+    <string name="child_play">Play</string>
+    <string name="child_back">Back</string>
+    <string name="child_close_options">Close options</string>
+    <string name="child_options">Options</string>
+    <string name="child_start_again">Start again</string>
+    <string name="chosen_mode">Mode</string>
+
 </resources>
 
 

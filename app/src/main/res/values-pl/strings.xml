@@ -1,118 +1,132 @@
 <resources>
-<string name="app_name">Przyjazne Linie</string>
-<string name="title_therapist">Terapeuta</string>
-<string name="title_child">Dziecko</string>
-<string name="active_learning_step">Aktywny krok uczenia: </string>
-<string name="example">Przykład</string>
-<string name="play_button_description">Graj</string>
+    <string name="app_name">Przyjazne Linie</string>
+    <string name="title_therapist">Terapeuta</string>
+    <string name="title_child">Dziecko</string>
+    <string name="active_learning_step">Aktywny krok uczenia: </string>
+    <string name="example">Przykład</string>
+    <string name="play_button_description">Graj</string>
 
-<string name="change_app_DEVEL">Zmień moduł</string>
+    <string name="change_app_DEVEL">Zmień moduł</string>
 
-<string name="main_screen_header">Przyjazne Linie - Ustawienia</string>
-<string name="pattern_gallery_button_text">GALERIA WZORÓW</string>
-<string name="learning_steps_button_text">KROKI UCZENIA</string>
-<string name="main_screen_info">“Jeśli chcesz konfigurować zadania dla uczniów, wybierz kroki uczenia - podstawowe wzory będą już dostępne.
-                                        W galerii wzorów możesz stworzyć własny wzór.”</string>
+    <string name="main_screen_header">Przyjazne Linie - Ustawienia</string>
+    <string name="pattern_gallery_button_text">GALERIA WZORÓW</string>
+    <string name="learning_steps_button_text">KROKI UCZENIA</string>
+    <string name="main_screen_info">“Jeśli chcesz konfigurować zadania dla uczniów, wybierz kroki uczenia - podstawowe wzory będą już dostępne.
+                                            W galerii wzorów możesz stworzyć własny wzór.”</string>
 
-<string name="pattern_gallery_header">Galeria Wzorów</string>
-<string name="hide_exemplary_patterns">Ukryj przykładowe wzory</string>
-<string name="add_pattern_text">Dodaj własny wzór</string>
-<string name="delete_dialog_title">Usunąć?</string>
-<string name="delete_pattern_dialog_message">Czy na pewno chcesz usunąć ten wzór? Tej akcji nie można cofnąć.</string>
-<string name="delete_confirm_button_text">USUŃ</string>
-<string name="dismiss_button_text">ANULUJ</string>
-<string name="saved_pop_up_message">Wzór został zapisany.</string>
+    <string name="pattern_gallery_header">Galeria Wzorów</string>
+    <string name="hide_exemplary_patterns">Ukryj przykładowe wzory</string>
+    <string name="add_pattern_text">Dodaj własny wzór</string>
+    <string name="delete_dialog_title">Usunąć?</string>
+    <string name="delete_pattern_dialog_message">Czy na pewno chcesz usunąć ten wzór? Tej akcji nie można cofnąć.</string>
+    <string name="delete_confirm_button_text">USUŃ</string>
+    <string name="dismiss_button_text">ANULUJ</string>
+    <string name="saved_pop_up_message">Wzór został zapisany.</string>
 
-<string name="draw_start_info">Miejsce, w którym zaczniesz rysować, będzie punktem startowym.</string>
-<string name="simple_pattern_info">Prosty wzór to wzór, który narysowany jest bez odrywania palca od ekranu.</string>
-<string name="complex_pattern_info">Złożony wzór to wzór, który narysowany jest przy co najmniej jednym oderwaniu palca.</string>
-<string name="smooth_info">Opcja wygładzenie wyrówna linie narysowanego wzoru. </string>
-<string name="clear_drawing_button_text">WYCZYŚĆ</string>
-<string name="smooth_drawing_text">Wygładzenie</string>
-<string name="straight_line_text">Prosta linia</string>
-<string name="complex_pattern_alert_message">Wykryto wzór złożony.</string>
-<string name="save_button_text">ZAPISZ</string>
+    <string name="draw_start_info">Miejsce, w którym zaczniesz rysować, będzie punktem startowym.</string>
+    <string name="simple_pattern_info">Prosty wzór to wzór, który narysowany jest bez odrywania palca od ekranu.</string>
+    <string name="complex_pattern_info">Złożony wzór to wzór, który narysowany jest przy co najmniej jednym oderwaniu palca.</string>
+    <string name="smooth_info">Opcja wygładzenie wyrówna linie narysowanego wzoru. </string>
+    <string name="clear_drawing_button_text">WYCZYŚĆ</string>
+    <string name="smooth_drawing_text">Wygładzenie</string>
+    <string name="straight_line_text">Prosta linia</string>
+    <string name="complex_pattern_alert_message">Wykryto wzór złożony.</string>
+    <string name="save_button_text">ZAPISZ</string>
 
-<string name="save_pattern_dialog_title">Zapisz wzór</string>
-<string name="save_name_field_title">Wpisz nazwę wzoru:</string>
-<string name="name_blank_error">Nazwa nie może być pusta.</string>
-<string name="name_exists_error">Ta nazwa już istnieje.</string>
-<string name="exit_dialog_title">Wyjść?</string>
-<string name="exit_dialog_message">Zmiany nie zostaną zapisane.</string>
-<string name="exit_confirm_button_text">WYJDŹ</string>
+    <string name="save_pattern_dialog_title">Zapisz wzór</string>
+    <string name="save_name_field_title">Wpisz nazwę wzoru:</string>
+    <string name="name_blank_error">Nazwa nie może być pusta.</string>
+    <string name="name_exists_error">Ta nazwa już istnieje.</string>
+    <string name="exit_dialog_title">Wyjść?</string>
+    <string name="exit_dialog_message">Zmiany nie zostaną zapisane.</string>
+    <string name="exit_confirm_button_text">WYJDŹ</string>
 
-<string name="learning_steps_header">Kroki Uczenia</string>
-<string name="search_box_text">Wyszukaj</string>
-<string name="learning_steps_info">Przejrzyj przykłady lub utwórz nowy krok uczenia korzystając z przycisku obok.</string>
-<string name="create_button_text">UTWÓRZ</string>
-<string name="info_dialog_title">Informacje</string>
-<string name="steps_list_header_name">Nazwa kroku uczenia</string>
-<string name="hide_exemplary_steps">Ukryj przykładowe kroki</string>
-<string name="list_header_actions">Akcje</string>
+    <string name="learning_steps_header">Kroki Uczenia</string>
+    <string name="search_box_text">Wyszukaj</string>
+    <string name="learning_steps_info">Przejrzyj przykłady lub utwórz nowy krok uczenia korzystając z przycisku obok.</string>
+    <string name="create_button_text">UTWÓRZ</string>
+    <string name="info_dialog_title">Informacje</string>
+    <string name="steps_list_header_name">Nazwa kroku uczenia</string>
+    <string name="hide_exemplary_steps">Ukryj przykładowe kroki</string>
+    <string name="list_header_actions">Akcje</string>
 
-<string name="patterns_tab_text">WZORY</string>
-<string name="learning_tab_text">SPOSÓB UCZENIA</string>
-<string name="test_tab_text">TEST</string>
-<string name="reinforcements_tab_text">WZMOCNIENIA</string>
-<string name="summary_tab_text">PODSUMOWANIE</string>
-<string name="add_pattern_button_text">DODAJ WZÓR</string>
-<string name="next_button_text">DALEJ</string>
-<string name="pattern_list_header_name">Nazwa wzoru</string>
+    <string name="patterns_tab_text">WZORY</string>
+    <string name="learning_tab_text">SPOSÓB UCZENIA</string>
+    <string name="test_tab_text">TEST</string>
+    <string name="reinforcements_tab_text">WZMOCNIENIA</string>
+    <string name="summary_tab_text">PODSUMOWANIE</string>
+    <string name="add_pattern_button_text">DODAJ WZÓR</string>
+    <string name="next_button_text">DALEJ</string>
+    <string name="pattern_list_header_name">Nazwa wzoru</string>
 
-<string name="select_pattern_text">Wybierz wzór:</string>
-<string name="selected_pattern_text">Wybrano:</string>
+    <string name="select_pattern_text">Wybierz wzór:</string>
+    <string name="selected_pattern_text">Wybrano:</string>
 
-<string name="pattern_thickness_text">Szerokość wzoru</string>
-<string name="pattern_thickness_info">Grubość linii wzoru, powinna być dostosowana do grubości palca.</string>
-<string name="thin_label_text">Cienki</string>
-<string name="medium_label_text">Średni</string>
-<string name="thick_label_text">Gruby</string>
-<string name="pattern_color_text">Kolor wzoru</string>
-<string name="drawing_color_text">Kolor pisania</string>
-<string name="background_color_text">Kolor tła</string>
-<string name="pattern_variety_text">Różnorodność wzoru</string>
-<string name="pattern_variety_info">Wzór może zmieniać warianty wielkości, długości i pochylenia.</string>
-<string name="save_config_dialog_title">Zapisać?</string>
+    <string name="pattern_thickness_text">Szerokość wzoru</string>
+    <string name="pattern_thickness_info">Grubość linii wzoru, powinna być dostosowana do grubości palca.</string>
+    <string name="thin_label_text">Cienki</string>
+    <string name="medium_label_text">Średni</string>
+    <string name="thick_label_text">Gruby</string>
+    <string name="pattern_color_text">Kolor wzoru</string>
+    <string name="drawing_color_text">Kolor pisania</string>
+    <string name="background_color_text">Kolor tła</string>
+    <string name="pattern_variety_text">Różnorodność wzoru</string>
+    <string name="pattern_variety_info">Wzór może zmieniać warianty wielkości, długości i pochylenia.</string>
+    <string name="save_config_dialog_title">Zapisać?</string>
 
-<string name="pattern_text">Wzór</string>
+    <string name="pattern_text">Wzór</string>
 
-<string name="delete_pattern_config_dialog_message">Czy na pewno chcesz usunąć tę konfigurację wzoru? Tej akcji nie można cofnąć.</string>
+    <string name="delete_pattern_config_dialog_message">Czy na pewno chcesz usunąć tę konfigurację wzoru? Tej akcji nie można cofnąć.</string>
 
-<string name="copy_dialog_title">Utworzyć kopię?</string>
-<string name="copy_dialog_message">Czy na pewno chcesz utworzyć kopię tej konfiguracji wzoru?</string>
-<string name="copy_button_text">KOPIUJ</string>
+    <string name="copy_dialog_title">Utworzyć kopię?</string>
+    <string name="copy_dialog_message">Czy na pewno chcesz utworzyć kopię tej konfiguracji wzoru?</string>
+    <string name="copy_button_text">KOPIUJ</string>
 
-<string name="edit_dialog_title">Edytować?</string>
-<string name="edit_dialog_message">Czy na pewno chcesz edytować tę konfigurację wzoru?</string>
-<string name="edit_button_text">EDYTUJ</string>
+    <string name="edit_dialog_title">Edytować?</string>
+    <string name="edit_dialog_message">Czy na pewno chcesz edytować tę konfigurację wzoru?</string>
+    <string name="edit_button_text">EDYTUJ</string>
 
-<string name="new_learning_step_header">Nowy krok uczenia</string>
+    <string name="new_learning_step_header">Nowy krok uczenia</string>
 
-<string name="pattern_preview_info">Wizualizacja różni się wielkością od realnego wzoru – odwzorowana jest szerokość wzoru.</string>
+    <string name="pattern_preview_info">Wizualizacja różni się wielkością od realnego wzoru – odwzorowana jest szerokość wzoru.</string>
 
-<string name="color_red">Czerwony</string>
-<string name="color_orange">Pomarańczowy</string>
-<string name="color_yellow">Żółty</string>
-<string name="color_green">Zielony</string>
-<string name="color_blue">Niebieski</string>
-<string name="color_purple">Fioletowy</string>
-<string name="color_pink">Różowy</string>
+    <string name="color_red">Czerwony</string>
+    <string name="color_orange">Pomarańczowy</string>
+    <string name="color_yellow">Żółty</string>
+    <string name="color_green">Zielony</string>
+    <string name="color_blue">Niebieski</string>
+    <string name="color_purple">Fioletowy</string>
+    <string name="color_pink">Różowy</string>
 
-<string name="color_black">Czarny</string>
-<string name="color_white">Biały</string>
-<string name="color_pas_red">Pastelowy czerwony</string>
-<string name="color_pas_orange">Pastelowy pomarańczowy</string>
-<string name="color_pas_yellow">Pastelowy żółty</string>
-<string name="color_pas_green">Pastelowy zielony</string>
-<string name="color_pas_blue">Pastelowy niebieski</string>
-<string name="color_pas_purple">Pastelowy fioletowy</string>
-<string name="color_pas_pink">Pastelowy różowy</string>
+    <string name="color_black">Czarny</string>
+    <string name="color_white">Biały</string>
+    <string name="color_pas_red">Pastelowy czerwony</string>
+    <string name="color_pas_orange">Pastelowy pomarańczowy</string>
+    <string name="color_pas_yellow">Pastelowy żółty</string>
+    <string name="color_pas_green">Pastelowy zielony</string>
+    <string name="color_pas_blue">Pastelowy niebieski</string>
+    <string name="color_pas_purple">Pastelowy fioletowy</string>
+    <string name="color_pas_pink">Pastelowy różowy</string>
 
-<string name="num_of_repetitions">Liczba powtórzeń</string>
-<string name="num_of_attempts">Liczba prób</string>
-<string name="time_limit">Limit czasu</string>
-<string name="level_of_accuracy">Poziom dokładności</string>
-<string name="starting_point">Punkt startowy</string>
-<string name="random_pattern_order">Losowa kolejność wzorów</string>
+    <string name="num_of_repetitions">Liczba powtórzeń</string>
+    <string name="num_of_attempts">Liczba prób</string>
+    <string name="time_limit">Limit czasu</string>
+    <string name="level_of_accuracy">Poziom dokładności</string>
+    <string name="starting_point">Punkt startowy</string>
+    <string name="random_pattern_order">Losowa kolejność wzorów</string>
+
+    <string name="loading_screen_1">Trening motoryki małej poprzez powtarzanie śladu na ekranie</string>
+    <string name="loading_screen_2">Aplikacje powstają w ramach wspólnego projektu "non-profit" i "open-source" </string>
+    <string name="loading_screen_3">Politechniki Gdańskiej i fundacji Instytut Wspomagania Rozwoju Dziecka w Gdańsku (http://iwrd.pl/).</string>
+    <string name="loading_screen_4">IWRD, Politechnika Gdańska, ani żaden uczestnik projektu nie odnosi korzyści materialnych z udziału w wytwarzaniu aplikacji.</string>
+    <string name="loading_screen_5">Więcej informacji na stronie: https://tiapps.org/</string>
+
+    <string name="child_play">Graj</string>
+    <string name="child_back">Powrót</string>
+    <string name="child_close_options">Zamknij Opcje</string>
+    <string name="child_options">Opcje</string>
+    <string name="child_start_again">Zacznij od nowa</string>
+    <string name="chosen_mode">Tryb</string>
+
 
 </resources>

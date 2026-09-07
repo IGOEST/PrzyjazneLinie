@@ -1,4 +1,4 @@
-package com.example.friendlylines.therapist_app.ui.theme
+package com.example.friendlylines.child_app.theme
 
 import androidx.compose.ui.graphics.Color
 
@@ -19,13 +19,5 @@ val Success = Color(0xFF83D0AB)
 val Warning = Color(0xFFD0C200)
 val Error = Color(0xFFD85676)
 
-val IconDefaultBG = Color(0xFFFFFFFF)
-val IconActiveBG = Color(0xFFE2FBFB)
-
-val InfoDefault = Color(0xFF7ED8FF)
-val InfoActive = Color(0xFF70C2E5)
-
-val SliderBG = Color(0xFFD4E6D7)
-val SliderGlow = Color(0xFFE0EDE2)
-
+val White = Color(0xFFFFFFFF)
 val LoadingScreenBlue = Color(0xFF2EB2D6)
