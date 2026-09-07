@@ -48,12 +48,13 @@ import com.example.friendlylines.therapist_app.ui.components.LearningStepsPatter
 import com.example.friendlylines.therapist_app.ui.components.TemplateAlertDialog
 import com.example.friendlylines.therapist_app.ui.components.TemplateButton
 import com.example.friendlylines.therapist_app.ui.components.TemplateSearchBox
-import com.example.friendlylines.therapist_app.ui.configuration.config.LearningStepsPatternConfigDraft
+//import com.example.friendlylines.therapist_app.ui.configuration.config.LearningStepsPatternConfigDraft
 import com.example.friendlylines.therapist_app.ui.configuration.settings.LearningStepTab
 import com.example.friendlylines.therapist_app.ui.main.NavRoutes
 import com.example.friendlylines.therapist_app.ui.theme.Primary50
 import com.example.friendlylines.therapist_app.ui.theme.Primary700
 import com.example.friendlylines.therapist_app.ui.theme.Primary900
+import com.example.shared.data.drafts.LearningStepsPatternConfigDraft
 
 enum class MoveDirection {
     UP,

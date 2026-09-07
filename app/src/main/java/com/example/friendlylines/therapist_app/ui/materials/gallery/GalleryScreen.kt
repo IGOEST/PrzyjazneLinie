@@ -40,9 +40,10 @@ import com.example.friendlylines.therapist_app.ui.components.TemplateAlertDialog
 import com.example.friendlylines.therapist_app.ui.components.TemplateCheckbox
 import com.example.friendlylines.therapist_app.ui.components.TemplateNotification
 import com.example.friendlylines.therapist_app.ui.components.TemplateTopAppBar
-import com.example.friendlylines.therapist_app.ui.materials.models.PatternItem
+//import com.example.friendlylines.therapist_app.ui.materials.models.PatternItem
 import com.example.friendlylines.therapist_app.ui.theme.Primary50
 import com.example.friendlylines.therapist_app.ui.theme.Primary900
+import com.example.shared.data.models.PatternItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,33 +54,46 @@ fun GalleryScreen(
     onCreateClick: () -> Unit
 ) {
     val viewModel: GalleryScreenViewModel = hiltViewModel()
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
-    LaunchedEffect(Unit) {
-        viewModel.initializePatterns()
-    }
+//    LaunchedEffect(Unit) {
+//        viewModel.onEvent(GalleryScreenEvent.Initialize)
+//    }
 
-    var hideExamplePatterns by remember {
-        mutableStateOf(false)
-    }
-
-    val patternItems by viewModel.patterns.collectAsStateWithLifecycle()
+//    val viewModel: GalleryScreenViewModel = hiltViewModel()
+//
+//    LaunchedEffect(Unit) {
+//        viewModel.initializePatterns()
+//    }
+//
+//    var hideExamplePatterns by remember {
+//        mutableStateOf(false)
+//    }
+//
+//    val patternItems by viewModel.patterns.collectAsStateWithLifecycle()
 
     val gridState = rememberLazyGridState()
     val scrollAreaState = rememberScrollAreaState(gridState)
 
-    val visiblePatterns = if (hideExamplePatterns) {
-        patternItems.filter {!it.pattern.isExample}
+    val visiblePatterns = if (state.hideExamplePatterns) {
+        state.patterns.filter { !it.pattern.isExample }
     } else {
-        patternItems
+        state.patterns
     }
 
-    var patternToDelete by remember {
-        mutableStateOf<PatternItem?>(null)
-    }
+//    val visiblePatterns = if (hideExamplePatterns) {
+//        patternItems.filter {!it.pattern.isExample}
+//    } else {
+//        patternItems
+//    }
+//
+//    var patternToDelete by remember {
+//        mutableStateOf<PatternItem?>(null)
+//    }
 
-    var scrollToPatternId by remember {
-        mutableStateOf<Long?>(null)
-    }
+//    var scrollToPatternId by remember {
+//        mutableStateOf<Long?>(null)
+//    }
 
     val snackbarHostState = remember {
         SnackbarHostState()
@@ -99,7 +113,10 @@ fun GalleryScreen(
     val savedPopUpMessage = stringResource(R.string.saved_pop_up_message)
     LaunchedEffect(newPatternId) {
         if (newPatternId != null) {
-            scrollToPatternId = newPatternId
+            viewModel.onEvent(
+                GalleryScreenEvent.NewPatternReceived(newPatternId)
+            )
+//            scrollToPatternId = newPatternId
 
             snackbarHostState.showSnackbar(
                 message = savedPopUpMessage,
@@ -110,8 +127,8 @@ fun GalleryScreen(
         }
     }
 
-    LaunchedEffect(scrollToPatternId, visiblePatterns) {
-        val patternId = scrollToPatternId ?: return@LaunchedEffect
+    LaunchedEffect(state.scrollToPatternId, visiblePatterns) {
+        val patternId = state.scrollToPatternId ?: return@LaunchedEffect
 
         val patternIndex = visiblePatterns.indexOfFirst {
             it.pattern.id == patternId
@@ -123,9 +140,12 @@ fun GalleryScreen(
             gridState.animateScrollToItem(
                 index = gridIndex
             )
-
-            scrollToPatternId = null
+//            scrollToPatternId = null
         }
+
+        viewModel.onEvent(
+            GalleryScreenEvent.ScrollToPattern
+        )
     }
 
     Scaffold(
@@ -173,9 +193,12 @@ fun GalleryScreen(
                 Spacer(modifier = Modifier.width(8.dp))
 
                 TemplateCheckbox(
-                    checked = hideExamplePatterns,
+                    checked = state.hideExamplePatterns,
                     onCheckedChange = {
-                        hideExamplePatterns = it
+                        //hideExamplePatterns = it
+                        viewModel.onEvent(
+                            GalleryScreenEvent.HideExamplePatternsChanged(it)
+                        )
                     },
                     modifier = Modifier.size(18.dp)
                 )
@@ -189,7 +212,10 @@ fun GalleryScreen(
                 scrollAreaState = scrollAreaState,
                 onCreateClick = onCreateClick,
                 onDeleteClick = {
-                    patternToDelete = it
+                    //patternToDelete = it
+                    viewModel.onEvent(
+                        GalleryScreenEvent.DeletePatternClicked(it)
+                    )
                 },
                 showAddPatternItem = true,
                 showBorder = false,
@@ -201,20 +227,26 @@ fun GalleryScreen(
         }
     }
 
-    if (patternToDelete != null) {
+    if (state.patternToDelete != null) {
         TemplateAlertDialog(
             title = stringResource(R.string.delete_dialog_title),
             message = stringResource(R.string.delete_pattern_dialog_message),
             confirmText = stringResource(R.string.delete_confirm_button_text),
             dismissText = stringResource(R.string.dismiss_button_text),
             onConfirm = {
-                patternToDelete?.let { pattern ->
-                    viewModel.deletePattern(pattern.pattern.id)
-                }
-                patternToDelete = null
+                viewModel.onEvent(
+                    GalleryScreenEvent.DeletePatternConfirmed
+                )
+//                patternToDelete?.let { pattern ->
+//                    viewModel.deletePattern(pattern.pattern.id)
+//                }
+//                patternToDelete = null
             },
             onDismiss = {
-                patternToDelete = null
+                viewModel.onEvent(
+                    GalleryScreenEvent.DeletePatternDismissed
+                )
+//                patternToDelete = null
             }
         )
     }

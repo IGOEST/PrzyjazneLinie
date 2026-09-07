@@ -59,7 +59,7 @@ fun <T> TemplateDropdown(
     label: String,
     width: Dp = 350.dp,
     height: Dp = 54.dp,
-    optionLabel: @Composable (T?) -> String = { it.toString() },
+    optionLabel: (T?) -> String = { it.toString() },
     enabled: Boolean = true,
     showHeader: Boolean = false,
     headerText: String? = null,
@@ -159,7 +159,7 @@ fun <T> TemplateDropdown(
                 }
 
                 Text(
-                    text = value?.let { optionLabel(it) } ?: label,
+                    text = value?.let(optionLabel) ?: label,
                     color = if (value != null || expanded) {
                         Primary1000
                     } else {
@@ -209,7 +209,7 @@ fun <T> TemplateDropdown(
 private fun <T> DropdownOptions(
     options: List<T>,
     selectedValue: T?,
-    optionLabel: @Composable (T?) -> String,
+    optionLabel: (T?) -> String,
     onOptionSelected: (T?) -> Unit,
     showEmptyOption: Boolean = false,
     emptyOptionLabel: String = "",
@@ -261,7 +261,7 @@ private fun <T> DropdownOptions(
                     }
                     items(
                         items = options,
-                        key = { it.hashCode() }
+                        key = {optionLabel(it)}
                     ) { option ->
                         val selected = option == selectedValue
                         DropdownItem(
@@ -297,7 +297,7 @@ private fun <T> DropdownOptions(
 private fun <T> DropdownItem(
     option: T?,
     selected: Boolean,
-    optionLabel: @Composable (T?) -> String,
+    optionLabel: (T?) -> String,
     onClick: () -> Unit,
     itemHeight: Dp,
     modifier: Modifier = Modifier

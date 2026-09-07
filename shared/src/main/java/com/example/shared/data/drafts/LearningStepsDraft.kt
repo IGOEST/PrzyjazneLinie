@@ -1,6 +1,4 @@
-package com.example.friendlylines.therapist_app.ui.configuration.list
-
-import com.example.friendlylines.therapist_app.ui.configuration.config.LearningStepsPatternConfigDraft
+package com.example.shared.data.drafts
 
 data class LearningStepsDraft(
     val id: Long,

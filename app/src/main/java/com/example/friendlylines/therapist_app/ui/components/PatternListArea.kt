@@ -10,7 +10,7 @@ import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.composables.core.ScrollAreaState
-import com.example.friendlylines.therapist_app.ui.materials.models.PatternItem
+//import com.example.friendlylines.therapist_app.ui.materials.models.PatternItem
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -33,6 +33,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import com.composables.core.Thumb
 import com.composables.core.VerticalScrollbar
+import com.example.shared.data.models.PatternItem
 
 @Composable
 fun PatternListArea(

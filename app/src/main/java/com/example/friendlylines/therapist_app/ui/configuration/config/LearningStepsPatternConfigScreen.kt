@@ -44,12 +44,17 @@ import com.example.friendlylines.therapist_app.ui.components.TemplateInfoDialog
 import com.example.friendlylines.therapist_app.ui.components.TemplateSlider
 import com.example.friendlylines.therapist_app.ui.components.TemplateToggleSwitch
 import com.example.friendlylines.therapist_app.ui.components.TemplateTopAppBar
-import com.example.friendlylines.therapist_app.ui.configuration.config.PatternConfigOptions.toDp
+//import com.example.friendlylines.therapist_app.ui.configuration.config.PatternConfigOptions.toDp
 import com.example.friendlylines.therapist_app.ui.configuration.patterns.LearningStepsPatternsScreenViewModel
 import com.example.friendlylines.therapist_app.ui.main.ExitDestination
 import com.example.friendlylines.therapist_app.ui.main.NavRoutes
 import com.example.friendlylines.therapist_app.ui.materials.models.PatternPreview
 import com.example.friendlylines.therapist_app.ui.theme.*
+import com.example.shared.data.drafts.ColorOption
+import com.example.shared.data.drafts.PatternWidth
+import com.example.shared.data.drafts.PatternConfigOptions.toDp
+import com.example.shared.data.drafts.PatternConfigOptions
+import com.example.shared.data.drafts.LearningStepsPatternConfigDraft
 
 @Composable
 fun LearningStepPatternConfigScreen(
@@ -239,7 +244,7 @@ fun LearningStepPatternConfigScreen(
                                         patternColor = it
                                     },
                                     label = stringResource(R.string.pattern_color_text),
-                                    optionLabel = { it?.let { option -> stringResource(option.nameRes) } ?: "" },
+                                    optionLabel = { it?.name ?: "" },
                                     showEmptyOption = true,
                                     showHeader = true,
                                     headerText = stringResource(R.string.pattern_color_text),
@@ -256,7 +261,7 @@ fun LearningStepPatternConfigScreen(
                                         writingColor = it
                                     },
                                     label = stringResource(R.string.drawing_color_text),
-                                    optionLabel = { it?.let { option -> stringResource(option.nameRes) } ?: "" },
+                                    optionLabel = { it?.name ?: "" },
                                     showEmptyOption = true,
                                     showHeader = true,
                                     headerText = stringResource(R.string.drawing_color_text),
@@ -273,7 +278,7 @@ fun LearningStepPatternConfigScreen(
                                         backgroundColor = it
                                     },
                                     label = stringResource(R.string.background_color_text),
-                                    optionLabel = { it?.let { option -> stringResource(option.nameRes) } ?: "" },
+                                    optionLabel = { it?.name ?: "" },
                                     showEmptyOption = true,
                                     showHeader = true,
                                     headerText = stringResource(R.string.background_color_text),
