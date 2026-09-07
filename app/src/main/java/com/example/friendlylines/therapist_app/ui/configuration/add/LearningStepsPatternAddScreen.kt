@@ -38,6 +38,7 @@ import com.example.friendlylines.therapist_app.ui.components.TemplateAlertDialog
 import com.example.friendlylines.therapist_app.ui.components.TemplateButton
 import com.example.friendlylines.therapist_app.ui.components.TemplateTopAppBar
 import com.example.friendlylines.therapist_app.ui.main.ExitDestination
+import com.example.friendlylines.therapist_app.ui.materials.gallery.GalleryScreenEvent
 import com.example.friendlylines.therapist_app.ui.materials.gallery.GalleryScreenViewModel
 import com.example.friendlylines.therapist_app.ui.materials.models.PatternItem
 import com.example.friendlylines.therapist_app.ui.theme.Primary1000
@@ -60,23 +61,32 @@ fun LearningStepsPatternAddScreen(
     val gridState = rememberLazyGridState()
     val scrollAreaState = rememberScrollAreaState(gridState)
 
-    LaunchedEffect(Unit) {
-        galleryViewModel.initializePatterns()
-    }
+//    LaunchedEffect(Unit) {
+//        galleryViewModel.initializePatterns()
+//    }
 
-    val patterns by galleryViewModel.patterns.collectAsStateWithLifecycle()
+    val galleryState by galleryViewModel.state.collectAsStateWithLifecycle()
+//    val patterns by galleryViewModel.patterns.collectAsStateWithLifecycle()
 
     var selectedPattern by remember {
         mutableStateOf<PatternItem?>(null)
     }
 
-    LaunchedEffect(patterns, selectedPatternId) {
+    LaunchedEffect(galleryState.patterns, selectedPatternId) {
         if (selectedPatternId != null) {
-            selectedPattern = patterns.find {
+            selectedPattern = galleryState.patterns.find {
                 it.pattern.id == selectedPatternId
             }
         }
     }
+
+//    LaunchedEffect(patterns, selectedPatternId) {
+//        if (selectedPatternId != null) {
+//            selectedPattern = patterns.find {
+//                it.pattern.id == selectedPatternId
+//            }
+//        }
+//    }
 
     var showExitDialog by remember {
         mutableStateOf(false)
@@ -126,7 +136,7 @@ fun LearningStepsPatternAddScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             PatternListArea(
-                patterns = patterns,
+                patterns = galleryState.patterns,
                 gridState = gridState,
                 scrollAreaState = scrollAreaState,
                 onCreateClick = {},
