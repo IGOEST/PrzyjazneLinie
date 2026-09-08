@@ -21,6 +21,7 @@ import com.example.friendlylines.therapist_app.ui.theme.Primary700
 @Composable
 fun TemplateToggleSwitch(
     checked: Boolean,
+    enabled: Boolean = true,
     onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     width: Dp = 60.dp,
@@ -31,7 +32,7 @@ fun TemplateToggleSwitch(
         modifier = modifier
             .width(width)
             .height(circleSize)
-            .clickable {
+            .clickable (enabled = enabled) {
                 onCheckedChange(!checked)
             },
         contentAlignment = Alignment.Center
@@ -48,10 +49,10 @@ fun TemplateToggleSwitch(
                     }
                 )
                 .background(
-                    color = if (checked) {
-                        Primary300
-                    } else {
-                        Neutral300
+                    color = when {
+                        !enabled -> Neutral300
+                        checked -> Primary300
+                        else -> Neutral300
                     },
                     shape = RoundedCornerShape(height / 2)
                 )
@@ -68,10 +69,10 @@ fun TemplateToggleSwitch(
                     }
                 )
                 .background(
-                    color = if (checked) {
-                        Primary700
-                    } else {
-                        Color.White
+                    color = when {
+                        !enabled -> Neutral300
+                        checked -> Primary700
+                        else -> Color.White
                     },
                     shape = CircleShape
                 )

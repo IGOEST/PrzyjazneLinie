@@ -33,6 +33,7 @@ import com.example.friendlylines.therapist_app.ui.components.TemplateTabBar
 import com.example.friendlylines.therapist_app.ui.components.TemplateTopAppBar
 import com.example.friendlylines.therapist_app.ui.configuration.patterns.LearningStepsPatternsScreen
 import com.example.friendlylines.therapist_app.ui.configuration.learning.LearningStepsLearningScreen
+import com.example.friendlylines.therapist_app.ui.configuration.test.LearningStepsTestScreen
 import com.example.friendlylines.therapist_app.ui.main.ExitDestination
 import com.example.friendlylines.therapist_app.ui.main.NavRoutes
 import com.example.friendlylines.therapist_app.ui.theme.Primary50
@@ -160,7 +161,11 @@ fun LearningStepsSettingsScreen(
                 }
 
                 LearningStepTab.TEST -> {
-                    // później
+                    LearningStepsTestScreen(
+                        onNextClick = {
+                            selectedTab = LearningStepTab.REINFORCEMENTS
+                        }
+                    )
                 }
 
                 LearningStepTab.REINFORCEMENTS -> {
