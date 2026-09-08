@@ -15,332 +15,162 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import androidx.lifecycle.viewModelScope
+import com.example.friendlylines.therapist_app.ui.configuration.learning.LearningStepsLearningEvent
+import com.example.friendlylines.therapist_app.ui.configuration.learning.LearningStepsLearningScreenViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import com.example.shared.data.drafts.LearningStepsPatternConfigDraft
 import com.example.shared.data.drafts.PatternWidth
 import com.example.shared.data.drafts.ColorOption
+import com.example.shared.data.drafts.LearningStepsLearningDraft
+import com.example.shared.data.drafts.LearningStepsPatternsDraft
 import com.example.shared.data.models.PatternItem
-
-//@HiltViewModel
-//class LearningStepsPatternsScreenViewModel @Inject constructor() : ViewModel() {
-//    private val _draft = MutableStateFlow(LearningStepsDraft())
-//    val draft: StateFlow<LearningStepsDraft> = _draft.asStateFlow()
-//
-//    fun addPattern(
-//        pattern: PatternItem,
-//        widthIndex: Int,
-//        patternColor: ColorOption?,
-//        writingColor: ColorOption?,
-//        backgroundColor: ColorOption?,
-//        patternVariety: Boolean
-//    ): Long {
-//        val newId = generateConfigId()
-//
-//        _draft.update { draft ->
-//            val newPattern = LearningStepsPatternConfigDraft(
-//                id = newId,
-//                pattern = pattern,
-//                widthIndex = widthIndex,
-//                patternColor = patternColor,
-//                writingColor = writingColor,
-//                backgroundColor = backgroundColor,
-//                patternVariety = patternVariety,
-//                order = draft.patterns.size
-//            )
-//
-//            draft.copy(
-//                patterns = draft.patterns + newPattern
-//            )
-//        }
-//
-//        return newId
-//    }
-//
-//    fun updatePattern(
-//        configId: Long,
-//        patternItem: PatternItem,
-//        widthIndex: Int,
-//        patternColor: ColorOption?,
-//        writingColor: ColorOption?,
-//        backgroundColor: ColorOption?,
-//        patternVariety: Boolean
-//    ) {
-//        _draft.update { draft ->
-//            val updatedPatterns = draft.patterns.map { config ->
-//                if (config.id == configId) {
-//                    config.copy(
-//                        pattern = patternItem,
-//                        widthIndex = widthIndex,
-//                        patternColor = patternColor,
-//                        writingColor = writingColor,
-//                        backgroundColor = backgroundColor,
-//                        patternVariety = patternVariety
-//                    )
-//                } else {
-//                    config
-//                }
-//            }
-//
-//            draft.copy(
-//                patterns = updatedPatterns
-//            )
-//        }
-//    }
-//
-//    fun deletePattern(configId: Long) {
-//        _draft.update { draft ->
-//            val updatedPatterns = draft.patterns
-//                .filterNot { it.id == configId }
-//                .mapIndexed { index, pattern ->
-//                    pattern.copy(order = index)
-//                }
-//
-//            draft.copy(
-//                patterns = updatedPatterns
-//            )
-//        }
-//    }
-//
-//    fun copyPattern(configId: Long): Long? {
-//        val newId = generateConfigId()
-//
-//        _draft.update { draft ->
-//            val source = draft.patterns.find { it.id == configId }
-//                ?: return@update draft
-//
-//            val copiedPattern = source.copy(
-//                id = newId,
-//                order = draft.patterns.size
-//            )
-//
-//            draft.copy(
-//                patterns = draft.patterns + copiedPattern
-//            )
-//        }
-//
-//        return newId
-//    }
-//
-//    private fun generateConfigId(): Long {
-//        return System.currentTimeMillis()
-//    }
-//
-//    fun movePattern(
-//        configId: Long,
-//        direction: MoveDirection
-//    ) {
-//        _draft.update { draft ->
-//            val currentIndex = draft.patterns.indexOfFirst {
-//                it.id == configId
-//            }
-//
-//            if (currentIndex == -1) {
-//                return@update draft
-//            }
-//
-//            val newIndex = when (direction) {
-//                MoveDirection.UP -> currentIndex - 1
-//                MoveDirection.DOWN -> currentIndex + 1
-//            }
-//
-//            // Już na początku / końcu listy
-//            if (newIndex !in draft.patterns.indices) {
-//                return@update draft
-//            }
-//
-//            val updatedPatterns = draft.patterns.toMutableList()
-//
-//            // Zamiana miejscami
-//            val temp = updatedPatterns[currentIndex]
-//            updatedPatterns[currentIndex] = updatedPatterns[newIndex]
-//            updatedPatterns[newIndex] = temp
-//
-//            // Aktualizacja kolejności
-//            val reorderedPatterns = updatedPatterns.mapIndexed { index, pattern ->
-//                pattern.copy(order = index)
-//            }
-//
-//            draft.copy(
-//                patterns = reorderedPatterns
-//            )
-//        }
-//    }
-//
-//    fun setPatternEnabled(
-//        configId: Long,
-//        enabled: Boolean
-//    ) {
-//        _draft.update { draft ->
-//            draft.copy(
-//                patterns = draft.patterns.map { pattern ->
-//                    if (pattern.id == configId) {
-//                        pattern.copy(
-//                            isEnabled = enabled
-//                        )
-//                    } else {
-//                        pattern
-//                    }
-//                }
-//            )
-//        }
-//    }
-//
-//    fun getPatternConfig(configId: Long): LearningStepsPatternConfigDraft? {
-//        return _draft.value.patterns.find { it.id == configId }
-//    }
-//}
 
 @HiltViewModel
 class LearningStepsPatternsScreenViewModel @Inject constructor() : ViewModel() {
 
-    private val _patternsDraft = MutableStateFlow<List<LearningStepsPatternConfigDraft>>(emptyList())
-    val patternsDraft: StateFlow<List<LearningStepsPatternConfigDraft>> = _patternsDraft.asStateFlow()
+    private val _draft = MutableStateFlow(LearningStepsPatternsDraft())
 
-    fun addPattern(
-        pattern: PatternItem,
-        width: PatternWidth,
-        patternColor: ColorOption?,
-        writingColor: ColorOption?,
-        backgroundColor: ColorOption?,
-        patternVariety: Boolean
-    ): Long {
-        val newId = generateConfigId()
+    val draft: StateFlow<LearningStepsPatternsDraft> = _draft.asStateFlow()
 
-        _patternsDraft.update { patterns ->
-            val newPattern = LearningStepsPatternConfigDraft(
-                id = newId,
-                pattern = pattern,
-                width = width,
-                patternColor = patternColor,
-                writingColor = writingColor,
-                backgroundColor = backgroundColor,
-                patternVariety = patternVariety,
-                order = patterns.size
-            )
-
-            patterns + newPattern
+    fun onEvent(event: LearningStepsPatternsEvent) {
+        _draft.update {
+            reduce(it, event)
         }
-
-        return newId
     }
 
-    fun updatePattern(
-        configId: Long,
-        patternItem: PatternItem,
-        width: PatternWidth,
-        patternColor: ColorOption?,
-        writingColor: ColorOption?,
-        backgroundColor: ColorOption?,
-        patternVariety: Boolean
-    ) {
-        _patternsDraft.update { patterns ->
-            patterns.map { config ->
-                if (config.id == configId) {
-                    config.copy(
-                        pattern = patternItem,
-                        width = width,
-                        patternColor = patternColor,
-                        writingColor = writingColor,
-                        backgroundColor = backgroundColor,
-                        patternVariety = patternVariety
+    companion object {
+
+        fun reduce(
+            state: LearningStepsPatternsDraft,
+            event: LearningStepsPatternsEvent
+        ): LearningStepsPatternsDraft {
+
+            return when (event) {
+
+                is LearningStepsPatternsEvent.AddPattern -> {
+                    val newId = System.currentTimeMillis()
+
+                    val newPattern = LearningStepsPatternConfigDraft(
+                        id = newId,
+                        pattern = event.pattern,
+                        width = event.width,
+                        patternColor = event.patternColor,
+                        writingColor = event.writingColor,
+                        backgroundColor = event.backgroundColor,
+                        patternVariety = event.patternVariety,
+                        order = state.patterns.size
                     )
-                } else {
-                    config
-                }
-            }
-        }
-    }
 
-    fun deletePattern(configId: Long) {
-        _patternsDraft.update { patterns ->
-            patterns
-                .filterNot { it.id == configId }
-                .mapIndexed { index, pattern ->
-                    pattern.copy(order = index)
-                }
-        }
-    }
-
-    fun copyPattern(configId: Long): Long? {
-        val source = _patternsDraft.value.find {
-            it.id == configId
-        } ?: return null
-
-        val newId = generateConfigId()
-
-        val copiedPattern = source.copy(
-            id = newId,
-            order = _patternsDraft.value.size
-        )
-
-        _patternsDraft.update {
-            it + copiedPattern
-        }
-
-        return newId
-    }
-
-    fun movePattern(
-        configId: Long,
-        direction: MoveDirection
-    ) {
-        _patternsDraft.update { patterns ->
-
-            val currentIndex = patterns.indexOfFirst {
-                it.id == configId
-            }
-
-            if (currentIndex == -1) {
-                return@update patterns
-            }
-
-            val newIndex = when (direction) {
-                MoveDirection.UP -> currentIndex - 1
-                MoveDirection.DOWN -> currentIndex + 1
-            }
-
-            if (newIndex !in patterns.indices) {
-                return@update patterns
-            }
-
-            val updatedPatterns = patterns.toMutableList()
-
-            val temp = updatedPatterns[currentIndex]
-            updatedPatterns[currentIndex] = updatedPatterns[newIndex]
-            updatedPatterns[newIndex] = temp
-
-            updatedPatterns.mapIndexed { index, pattern ->
-                pattern.copy(order = index)
-            }
-        }
-    }
-
-    fun setPatternEnabled(
-        configId: Long,
-        enabled: Boolean
-    ) {
-        _patternsDraft.update { patterns ->
-            patterns.map { pattern ->
-                if (pattern.id == configId) {
-                    pattern.copy(
-                        isEnabled = enabled
+                    state.copy(
+                        patterns = state.patterns + newPattern,
+                        scrollToConfigId = newId
                     )
-                } else {
-                    pattern
+                }
+
+                is LearningStepsPatternsEvent.SetPatternEnabled -> {
+                    state.copy(
+                        patterns = state.patterns.map { pattern ->
+                            if (pattern.id == event.configId) {
+                                pattern.copy(
+                                    isEnabled = event.enabled
+                                )
+                            } else {
+                                pattern
+                            }
+                        }
+                    )
+                }
+
+                is LearningStepsPatternsEvent.MovePattern -> {
+                    val currentIndex = state.patterns.indexOfFirst {
+                        it.id == event.configId
+                    }
+
+                    if (currentIndex == -1) {
+                        return state
+                    }
+
+                    val newIndex = when (event.direction) {
+                        MoveDirection.UP -> currentIndex - 1
+                        MoveDirection.DOWN -> currentIndex + 1
+                    }
+
+                    if (newIndex !in state.patterns.indices) {
+                        return state
+                    }
+
+                    val updatedPatterns = state.patterns.toMutableList()
+
+                    val temp = updatedPatterns[currentIndex]
+                    updatedPatterns[currentIndex] = updatedPatterns[newIndex]
+                    updatedPatterns[newIndex] = temp
+
+                    state.copy(
+                        patterns = updatedPatterns.mapIndexed { index, pattern ->
+                            pattern.copy(
+                                order = index
+                            )
+                        }
+                    )
+                }
+
+                is LearningStepsPatternsEvent.DeletePattern -> {
+                    state.copy(
+                        patterns = state.patterns
+                            .filterNot {
+                                it.id == event.configId
+                            }
+                            .mapIndexed { index, pattern ->
+                                pattern.copy(
+                                    order = index
+                                )
+                            }
+                    )
+                }
+
+                is LearningStepsPatternsEvent.CopyPattern -> {
+                    val source = state.patterns.find {
+                        it.id == event.configId
+                    } ?: return state
+
+                    val newId = System.currentTimeMillis()
+
+                    val copiedPattern = source.copy(
+                        id = newId,
+                        order = state.patterns.size
+                    )
+
+                    state.copy(
+                        patterns = state.patterns + copiedPattern,
+                        scrollToConfigId = newId
+                    )
+                }
+
+                is LearningStepsPatternsEvent.UpdatePattern -> {
+                    state.copy(
+                        patterns = state.patterns.map { config ->
+                            if (config.id == event.configId) {
+                                config.copy(
+                                    pattern = event.pattern,
+                                    width = event.width,
+                                    patternColor = event.patternColor,
+                                    writingColor = event.writingColor,
+                                    backgroundColor = event.backgroundColor,
+                                    patternVariety = event.patternVariety
+                                )
+                            } else {
+                                config
+                            }
+                        }
+                    )
+                }
+
+                is LearningStepsPatternsEvent.ScrollToConfigHandled -> {
+                    state.copy(
+                        scrollToConfigId = null
+                    )
                 }
             }
         }
-    }
-
-    fun getPatternConfig(
-        configId: Long
-    ): LearningStepsPatternConfigDraft? {
-        return _patternsDraft.value.find {
-            it.id == configId
-        }
-    }
-
-    private fun generateConfigId(): Long {
-        return System.currentTimeMillis()
     }
 }

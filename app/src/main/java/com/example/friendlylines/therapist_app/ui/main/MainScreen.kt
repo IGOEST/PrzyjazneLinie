@@ -257,12 +257,7 @@ fun MainScreen() {
                 order = order,
                 onBackClick = {navController.popBackStack()},
                 onHomeClick = {navController.navigate(NavRoutes.MAIN)},
-                onSaveClick = { newConfigId ->
-                    navController.getBackStackEntry(
-                        NavRoutes.LEARNING_STEPS_CREATE
-                    )
-                        .savedStateHandle
-                        .set("newConfigId", newConfigId)
+                onSaveClick = {
                     navController.popBackStack(
                         route = NavRoutes.LEARNING_STEPS_CREATE,
                         inclusive = false

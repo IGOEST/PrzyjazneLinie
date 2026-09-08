@@ -1,16 +1,16 @@
 package com.example.shared.data.drafts
 
-data class LearningStepsDraft(
-    val id: Long,
-    val name: String = "",
+enum class AccuracyLevel {
+    EASY,
+    MEDIUM,
+    HARD
+}
 
-    // learning settings
+data class LearningStepsLearningDraft(
     val repetitions: Int = 3,
     val attempts: Int = 3,
     val timeLimit: Int = 30,
     val accuracyLevel: AccuracyLevel = AccuracyLevel.MEDIUM,
     val startingPointEnabled: Boolean = false,
     val randomPatternOrder: Boolean = false,
-
-    val patterns: LearningStepsPatternsDraft,
 )

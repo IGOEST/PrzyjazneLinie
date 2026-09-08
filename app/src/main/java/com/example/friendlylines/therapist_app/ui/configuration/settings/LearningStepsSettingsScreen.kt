@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -23,6 +24,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.friendlylines.R
 import com.example.friendlylines.therapist_app.ui.components.TemplateAlertDialog
@@ -68,6 +71,9 @@ fun LearningStepsSettingsScreen(
     onBackClick: () -> Unit,
     onHomeClick: () -> Unit,
 ) {
+    val viewModel: LearningStepsSettingsViewModel = hiltViewModel()
+    val state by viewModel.state.collectAsState()
+
     var selectedTab by remember {
         mutableStateOf(LearningStepTab.PATTERNS)
     }
@@ -137,7 +143,9 @@ fun LearningStepsSettingsScreen(
                         },
                         onNextClick = {
                             selectedTab = LearningStepTab.LEARNING
-                        }
+                        },
+                        onEvent = { viewModel.onEvent(LearningStepsSettingsEvent.Patterns(it)) },
+                        draft = state.patternState
                     )
                 }
 
@@ -145,7 +153,9 @@ fun LearningStepsSettingsScreen(
                     LearningStepsLearningScreen(
                         onNextClick = {
                             selectedTab = LearningStepTab.TEST
-                        }
+                        },
+                        onEvent = { viewModel.onEvent(LearningStepsSettingsEvent.Learning(it)) },
+                        draft = state.learningState
                     )
                 }
 

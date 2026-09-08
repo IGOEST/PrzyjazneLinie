@@ -1,35 +1,65 @@
 package com.example.friendlylines.therapist_app.ui.configuration.learning
 
+import androidx.lifecycle.ViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
+import com.example.shared.data.drafts.AccuracyLevel
+import com.example.shared.data.drafts.LearningStepsDraft
+import com.example.shared.data.drafts.LearningStepsLearningDraft
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import javax.inject.Inject
+
 @HiltViewModel
 class LearningStepsLearningScreenViewModel @Inject constructor() : ViewModel() {
 
-    private val _draft = MutableStateFlow(
-        LearningStepsDraft(id = 0)
-    )
+    private val _draft = MutableStateFlow(LearningStepsLearningDraft())
+    val draft: StateFlow<LearningStepsLearningDraft> = _draft.asStateFlow()
 
-    val draft: StateFlow<LearningStepsDraft> = _draft.asStateFlow()
-
-    fun setRepetitions(value: Int) {
-        _draft.update { it.copy(repetitions = value) }
+    fun onEvent(event: LearningStepsLearningEvent) {
+        _draft.update {
+            reduce(it, event)
+        }
     }
 
-    fun setAttempts(value: Int) {
-        _draft.update { it.copy(attempts = value) }
-    }
+    companion object {
 
-    fun setTimeLimit(value: Int) {
-        _draft.update { it.copy(timeLimit = value) }
-    }
+        fun reduce(
+            state: LearningStepsLearningDraft,
+            event: LearningStepsLearningEvent
+        ): LearningStepsLearningDraft {
+            return when (event) {
+                is LearningStepsLearningEvent.SetRepetitions ->
+                    state.copy(
+                        repetitions = event.value
+                    )
 
-    fun setAccuracyLevel(value: AccuracyLevel) {
-        _draft.update { it.copy(accuracyLevel = value) }
-    }
+                is LearningStepsLearningEvent.SetAttempts ->
+                    state.copy(
+                        attempts = event.value
+                    )
 
-    fun setStartingPointEnabled(value: Boolean) {
-        _draft.update { it.copy(startingPointEnabled = value) }
-    }
+                is LearningStepsLearningEvent.SetTimeLimit ->
+                    state.copy(
+                        timeLimit = event.value
+                    )
 
-    fun setRandomPatternOrder(value: Boolean) {
-        _draft.update { it.copy(randomPatternOrder = value) }
+                is LearningStepsLearningEvent.SetAccuracyLevel ->
+                    state.copy(
+                        accuracyLevel = event.value
+                    )
+
+                is LearningStepsLearningEvent.SetStartingPointEnabled ->
+                    state.copy(
+                        startingPointEnabled = event.enabled
+                    )
+
+                is LearningStepsLearningEvent.SetRandomPatternOrder ->
+                    state.copy(
+                        randomPatternOrder = event.enabled
+                    )
+            }
+        }
     }
 }

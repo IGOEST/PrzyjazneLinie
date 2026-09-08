@@ -44,8 +44,11 @@ import com.example.friendlylines.therapist_app.ui.components.TemplateInfoDialog
 import com.example.friendlylines.therapist_app.ui.components.TemplateSlider
 import com.example.friendlylines.therapist_app.ui.components.TemplateToggleSwitch
 import com.example.friendlylines.therapist_app.ui.components.TemplateTopAppBar
+import com.example.friendlylines.therapist_app.ui.configuration.patterns.LearningStepsPatternsEvent
 //import com.example.friendlylines.therapist_app.ui.configuration.config.PatternConfigOptions.toDp
 import com.example.friendlylines.therapist_app.ui.configuration.patterns.LearningStepsPatternsScreenViewModel
+import com.example.friendlylines.therapist_app.ui.configuration.settings.LearningStepsSettingsEvent
+import com.example.friendlylines.therapist_app.ui.configuration.settings.LearningStepsSettingsViewModel
 import com.example.friendlylines.therapist_app.ui.main.ExitDestination
 import com.example.friendlylines.therapist_app.ui.main.NavRoutes
 import com.example.friendlylines.therapist_app.ui.materials.models.PatternPreview
@@ -81,11 +84,11 @@ fun LearningStepPatternConfigScreen(
             NavRoutes.LEARNING_STEPS_CREATE
         )
     }
-    val learningStepsPatternsViewModel: LearningStepsPatternsScreenViewModel = hiltViewModel(parentEntry)
-    val patterns by learningStepsPatternsViewModel.patternsDraft.collectAsStateWithLifecycle()
+    val settingsViewModel: LearningStepsSettingsViewModel = hiltViewModel(parentEntry)
+    val draft by settingsViewModel.state.collectAsStateWithLifecycle()
 
-    val existingConfig = remember(patterns, configId) {
-        patterns.firstOrNull {
+    val existingConfig = remember(draft, configId) {
+        draft.patternState.patterns.firstOrNull {
             it.id == configId
         }
     }
@@ -452,28 +455,54 @@ fun LearningStepPatternConfigScreen(
                     showSaveConfigDialog = false
 
                     if (configId == null) {
-                        val newConfigId = learningStepsPatternsViewModel.addPattern(
-                            pattern = pattern,
-                            width = selectedWidth,
-                            patternColor = patternColor,
-                            writingColor = writingColor,
-                            backgroundColor = backgroundColor,
-                            patternVariety = patternVariety
+                        settingsViewModel.onEvent(
+                            LearningStepsSettingsEvent.Patterns(
+                                LearningStepsPatternsEvent.AddPattern(
+                                    pattern = pattern,
+                                    width = selectedWidth,
+                                    patternColor = patternColor,
+                                    writingColor = writingColor,
+                                    backgroundColor = backgroundColor,
+                                    patternVariety = patternVariety
+                                )
+                            )
                         )
-                        onSaveClick(newConfigId)
+//                        val newConfigId = learningStepsPatternsViewModel.addPattern(
+//                            pattern = pattern,
+//                            width = selectedWidth,
+//                            patternColor = patternColor,
+//                            writingColor = writingColor,
+//                            backgroundColor = backgroundColor,
+//                            patternVariety = patternVariety
+//                        )
+//                        onSaveClick(newConfigId)
                     } else {
-                        learningStepsPatternsViewModel.updatePattern(
-                            configId = configId,
-                            patternItem = pattern,
-                            width = selectedWidth,
-                            patternColor = patternColor,
-                            writingColor = writingColor,
-                            backgroundColor = backgroundColor,
-                            patternVariety = patternVariety
+                        settingsViewModel.onEvent(
+                            LearningStepsSettingsEvent.Patterns(
+                                LearningStepsPatternsEvent.UpdatePattern(
+                                    configId = configId,
+                                    pattern = pattern,
+                                    width = selectedWidth,
+                                    patternColor = patternColor,
+                                    writingColor = writingColor,
+                                    backgroundColor = backgroundColor,
+                                    patternVariety = patternVariety
+                                )
+                            )
                         )
-                        onSaveClick(configId)
+//                        learningStepsPatternsViewModel.updatePattern(
+//                            configId = configId,
+//                            patternItem = pattern,
+//                            width = selectedWidth,
+//                            patternColor = patternColor,
+//                            writingColor = writingColor,
+//                            backgroundColor = backgroundColor,
+//                            patternVariety = patternVariety
+//                        )
+//                        onSaveClick(configId)
                     }
                 }
+                onSaveClick(configId)
             },
             onDismiss = {
                 showSaveConfigDialog = false
