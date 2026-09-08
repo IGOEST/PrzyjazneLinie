@@ -1,4 +1,4 @@
-package com.example.friendlylines.therapist_app.ui.configuration.learning
+package com.example.friendlylines.therapist_app.ui.configuration.test
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -41,11 +41,14 @@ import com.example.shared.data.drafts.AccuracyLevel
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.unit.sp
+import com.example.friendlylines.therapist_app.ui.configuration.learning.LearningStepsLearningScreenViewModel
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @Composable
-fun LearningStepsLearningScreen(
+fun LearningStepsTestScreen(
     onNextClick: () -> Unit,
-    viewModel: LearningStepsLearningScreenViewModel = hiltViewModel()
+    viewModel: LearningStepsTestScreenViewModel = hiltViewModel()
 ) {
 
     // STATES - sliders and switches
@@ -136,23 +139,12 @@ fun LearningStepsLearningScreen(
         ) {
             TemplateSlider(
                 values = attemptValues,
-                selectedIndex = attemptValues.indexOf(draft.attempts),
-                onValueSelected = { index ->
-                    viewModel.setAttempts(attemptValues[index])
-                },
+                selectedIndex = 0,
+                onValueSelected = {},
                 showMinusPlus = true,
-                onMinusClick = {
-                    viewModel.setAttempts(
-                        (draft.attempts - 1)
-                            .coerceAtLeast(attemptValues.first())
-                    )
-                },
-                onPlusClick = {
-                    viewModel.setAttempts(
-                        (draft.attempts + 1)
-                            .coerceAtMost(attemptValues.last())
-                    )
-                },
+                onMinusClick = {},
+                onPlusClick = {},
+                enabled = false,
                 sliderWidth = 320.dp
             )
         }
@@ -217,10 +209,9 @@ fun LearningStepsLearningScreen(
             }
         ) {
             TemplateToggleSwitch(
-                checked = draft.startingPointEnabled,
-                onCheckedChange = { enabled ->
-                    viewModel.setStartingPointEnabled(enabled)
-                },
+                checked = false,
+                enabled = false,
+                onCheckedChange = {},
                 modifier = Modifier.size(
                     width = 52.dp,
                     height = 32.dp
@@ -236,10 +227,9 @@ fun LearningStepsLearningScreen(
             }
         ) {
             TemplateToggleSwitch(
-                checked = draft.randomPatternOrder,
-                onCheckedChange = { enabled ->
-                    viewModel.setRandomPatternOrder(enabled)
-                },
+                checked = false,
+                enabled = false,
+                onCheckedChange = {},
                 modifier = Modifier.size(
                     width = 52.dp,
                     height = 32.dp

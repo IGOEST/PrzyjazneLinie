@@ -1,5 +1,15 @@
 package com.example.friendlylines.therapist_app.ui.configuration.learning
 
+import androidx.lifecycle.ViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
+import com.example.shared.data.drafts.AccuracyLevel
+import com.example.shared.data.drafts.LearningStepsDraft
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import javax.inject.Inject
+
 @HiltViewModel
 class LearningStepsLearningScreenViewModel @Inject constructor() : ViewModel() {
 

@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.friendlylines.therapist_app.ui.theme.InfoActive
 import com.example.friendlylines.therapist_app.ui.theme.InfoDefault
+import com.example.friendlylines.therapist_app.ui.theme.Neutral300
 import com.example.friendlylines.therapist_app.ui.theme.Primary1000
 import com.example.friendlylines.therapist_app.ui.theme.Primary300
 import com.example.friendlylines.therapist_app.ui.theme.Primary700
@@ -57,6 +58,8 @@ fun <T> TemplateSlider(
     sliderWidth: Dp = 350.dp,
     trackHeight: Dp = 6.dp,
     thumbRadius: Dp = 10.dp,
+
+    enabled: Boolean = true,
 
     showHeader: Boolean = false,
     headerText: String? = null,
@@ -135,6 +138,9 @@ fun <T> TemplateSlider(
             modifier = Modifier.wrapContentWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            val currentActiveColor = if (enabled) activeColor else Primary300
+            val currentInactiveColor = if (enabled) inactiveColor else Neutral300
+
             if (showMinusPlus) {
                 TemplateClickableIcon(
                     icon = Icons.Default.IndeterminateCheckBox,
@@ -143,7 +149,7 @@ fun <T> TemplateSlider(
                         onMinusClick?.invoke()
                         activateEffect()
                     },
-                    enabled = actualIndex > 0,
+                    enabled = enabled && actualIndex > 0,
                     modifier = Modifier.size(24.dp),
                     defaultTint = Primary700,
                     activeTint = Primary900,
@@ -157,7 +163,8 @@ fun <T> TemplateSlider(
                 modifier = Modifier
                     .width(sliderWidth)
                     .height(40.dp)
-                    .pointerInput(values) {
+                    .pointerInput(values, enabled) {
+                        if (!enabled) return@pointerInput
                         detectTapGestures { offset ->
                             val width = size.width.toFloat()
                             val position = (offset.x / width).coerceIn(0f, 1f)
@@ -171,7 +178,8 @@ fun <T> TemplateSlider(
                             activateEffect()
                         }
                     }
-                    .pointerInput(values) {
+                    .pointerInput(values, enabled) {
+                        if (!enabled) return@pointerInput
                         detectHorizontalDragGestures(
                             onDragStart = {
                                 isActive = true
@@ -218,7 +226,7 @@ fun <T> TemplateSlider(
 
                 // Background
                 drawLine(
-                    color = inactiveColor,
+                    color = currentInactiveColor,
                     start = Offset(startX, trackY),
                     end = Offset(endX, trackY),
                     strokeWidth = with(density) {
@@ -229,7 +237,7 @@ fun <T> TemplateSlider(
 
                 // Active bar
                 drawLine(
-                    color = activeColor,
+                    color = currentActiveColor,
                     start = Offset(startX, trackY),
                     end = Offset(thumbX, trackY),
                     strokeWidth = with(density) {
@@ -240,7 +248,7 @@ fun <T> TemplateSlider(
 
                 // Dot
                 drawCircle(
-                    color = activeColor,
+                    color = currentActiveColor,
                     radius = with(density) {
                         thumbRadius.toPx()
                     },
@@ -258,7 +266,7 @@ fun <T> TemplateSlider(
                         onPlusClick?.invoke()
                         activateEffect()
                     },
-                    enabled = actualIndex < values.lastIndex,
+                    enabled = enabled && actualIndex < values.lastIndex,
                     modifier = Modifier.size(24.dp),
                     defaultTint = Primary700,
                     activeTint = Primary900,
