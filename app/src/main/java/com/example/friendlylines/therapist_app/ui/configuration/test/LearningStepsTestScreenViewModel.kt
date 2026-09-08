@@ -10,24 +10,32 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
-@HiltViewModel
+// ViewModel responsible only for the test tab UI state
+// (the actual saving is handled by LearningStepsSettingsViewModel)
 class LearningStepsTestScreenViewModel @Inject constructor() : ViewModel() {
 
     private val _draft = MutableStateFlow(
         LearningStepsTestDraft(id = 0)
     )
 
-    val draft: StateFlow<LearningStepsTestDraft> = _draft.asStateFlow()
+    val draft: StateFlow<LearningStepsTestDraft> =
+        _draft.asStateFlow()
 
     fun setRepetitions(value: Int) {
-        _draft.update { it.copy(repetitions = value) }
+        _draft.update {
+            it.copy(repetitions = value)
+        }
     }
 
     fun setTimeLimit(value: Int) {
-        _draft.update { it.copy(timeLimit = value) }
+        _draft.update {
+            it.copy(timeLimit = value)
+        }
     }
 
     fun setAccuracyLevel(value: AccuracyLevel) {
-        _draft.update { it.copy(accuracyLevel = value) }
+        _draft.update {
+            it.copy(accuracyLevel = value)
+        }
     }
 }

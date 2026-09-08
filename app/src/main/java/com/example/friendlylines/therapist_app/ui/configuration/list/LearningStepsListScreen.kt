@@ -1,5 +1,8 @@
 package com.example.friendlylines.therapist_app.ui.configuration.list
 
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.friendlylines.R
+import com.example.friendlylines.therapist_app.ui.components.LearningStepListArea
 import com.example.friendlylines.therapist_app.ui.components.TemplateButton
 import com.example.friendlylines.therapist_app.ui.components.TemplateCheckbox
 import com.example.friendlylines.therapist_app.ui.components.TemplateClickableIcon
@@ -48,7 +52,8 @@ fun LearningStepsListScreen(
     navController: NavController,
     onBackClick: () -> Unit,
     onHomeClick: () -> Unit,
-    onCreateClick: () -> Unit
+    onCreateClick: () -> Unit,
+    viewModel: LearningStepsListScreenViewModel = hiltViewModel()
 ) {
     var searchQuery by remember {
         mutableStateOf("")
@@ -60,6 +65,12 @@ fun LearningStepsListScreen(
 
     var hideExampleSteps by remember {
         mutableStateOf(false)
+    }
+
+    val learningSteps by viewModel.learningSteps.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        viewModel.loadLearningSteps()
     }
 
     Scaffold(
@@ -97,6 +108,17 @@ fun LearningStepsListScreen(
                 hideExampleSteps = hideExampleSteps,
                 onHideExampleStepsChange = {
                     hideExampleSteps = it
+                }
+            )
+
+            LearningStepListArea(
+                learningSteps = learningSteps,
+                modifier = Modifier.weight(1f),
+                onLearningStepClick = { step ->
+                    // later
+                },
+                onDeleteClick = { step ->
+                    // later
                 }
             )
         }

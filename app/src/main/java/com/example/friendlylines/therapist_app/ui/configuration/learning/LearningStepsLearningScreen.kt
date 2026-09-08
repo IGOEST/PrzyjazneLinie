@@ -41,15 +41,19 @@ import com.example.shared.data.drafts.AccuracyLevel
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.unit.sp
+import com.example.friendlylines.therapist_app.ui.configuration.settings.LearningStepsSettingsViewModel
 
 @Composable
 fun LearningStepsLearningScreen(
     onNextClick: () -> Unit,
-    viewModel: LearningStepsLearningScreenViewModel = hiltViewModel()
+    settingsViewModel: LearningStepsSettingsViewModel
 ) {
-
-    // STATES - sliders and switches
-    val draft by viewModel.draft.collectAsStateWithLifecycle()
+    val learningRepetitions by settingsViewModel.learningRepetitions.collectAsStateWithLifecycle()
+    val learningAttempts by settingsViewModel.learningAttempts.collectAsStateWithLifecycle()
+    val learningTimeLimit by settingsViewModel.learningTimeLimit.collectAsStateWithLifecycle()
+    val learningAccuracy by settingsViewModel.learningAccuracy.collectAsStateWithLifecycle()
+    val startingPointEnabled by settingsViewModel.startingPointEnabled.collectAsStateWithLifecycle()
+    val randomPatternOrder by settingsViewModel.randomPatternOrder.collectAsStateWithLifecycle()
 
     // SLIDER VALUES
     val repetitionValues = listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
@@ -94,7 +98,8 @@ fun LearningStepsLearningScreen(
             .verticalScroll(rememberScrollState())
             .padding(
                 horizontal = 24.dp,
-                vertical = 8.dp)
+                vertical = 8.dp
+            )
     ) {
 
         // NUMBER OF REPETITIONS
@@ -106,20 +111,20 @@ fun LearningStepsLearningScreen(
         ) {
             TemplateSlider(
                 values = repetitionValues,
-                selectedIndex = repetitionValues.indexOf(draft.repetitions),
+                selectedIndex = repetitionValues.indexOf(learningRepetitions),
                 onValueSelected = { index ->
-                    viewModel.setRepetitions(repetitionValues[index])
+                    settingsViewModel.setLearningRepetitions(repetitionValues[index])
                 },
                 showMinusPlus = true,
                 onMinusClick = {
-                    viewModel.setRepetitions(
-                        (draft.repetitions - 1)
+                    settingsViewModel.setLearningRepetitions(
+                        (learningRepetitions - 1)
                             .coerceAtLeast(repetitionValues.first())
                     )
                 },
                 onPlusClick = {
-                    viewModel.setRepetitions(
-                        (draft.repetitions + 1)
+                    settingsViewModel.setLearningRepetitions(
+                        (learningRepetitions + 1)
                             .coerceAtMost(repetitionValues.last())
                     )
                 },
@@ -127,7 +132,7 @@ fun LearningStepsLearningScreen(
             )
         }
 
-         // NUMBER OF ATTEMPTS
+        // NUMBER OF ATTEMPTS
         LearningSettingRow(
             title = stringResource(R.string.num_of_attempts),
             onInfoClick = {
@@ -136,20 +141,20 @@ fun LearningStepsLearningScreen(
         ) {
             TemplateSlider(
                 values = attemptValues,
-                selectedIndex = attemptValues.indexOf(draft.attempts),
+                selectedIndex = attemptValues.indexOf(learningAttempts),
                 onValueSelected = { index ->
-                    viewModel.setAttempts(attemptValues[index])
+                    settingsViewModel.setLearningAttempts(attemptValues[index])
                 },
                 showMinusPlus = true,
                 onMinusClick = {
-                    viewModel.setAttempts(
-                        (draft.attempts - 1)
+                    settingsViewModel.setLearningAttempts(
+                        (learningAttempts - 1)
                             .coerceAtLeast(attemptValues.first())
                     )
                 },
                 onPlusClick = {
-                    viewModel.setAttempts(
-                        (draft.attempts + 1)
+                    settingsViewModel.setLearningAttempts(
+                        (learningAttempts + 1)
                             .coerceAtMost(attemptValues.last())
                     )
                 },
@@ -166,23 +171,23 @@ fun LearningStepsLearningScreen(
         ) {
             TemplateSlider(
                 values = timeLimitValues,
-                selectedIndex = timeLimitValues.indexOf(draft.timeLimit),
+                selectedIndex = timeLimitValues.indexOf(learningTimeLimit),
                 onValueSelected = { index ->
-                    viewModel.setTimeLimit(timeLimitValues[index])
+                    settingsViewModel.setLearningTimeLimit(timeLimitValues[index])
                 },
                 showMinusPlus = true,
                 onMinusClick = {
-                    val currentIndex = timeLimitValues.indexOf(draft.timeLimit)
+                    val currentIndex = timeLimitValues.indexOf(learningTimeLimit)
 
                     if (currentIndex > 0) {
-                        viewModel.setTimeLimit(timeLimitValues[currentIndex - 1])
+                        settingsViewModel.setLearningTimeLimit(timeLimitValues[currentIndex - 1])
                     }
                 },
                 onPlusClick = {
-                    val currentIndex = timeLimitValues.indexOf(draft.timeLimit)
+                    val currentIndex = timeLimitValues.indexOf(learningTimeLimit)
 
                     if (currentIndex < timeLimitValues.lastIndex) {
-                        viewModel.setTimeLimit(timeLimitValues[currentIndex + 1])
+                        settingsViewModel.setLearningTimeLimit(timeLimitValues[currentIndex + 1])
                     }
                 },
                 sliderWidth = 320.dp
@@ -198,9 +203,9 @@ fun LearningStepsLearningScreen(
         ) {
             TemplateSlider(
                 values = accuracyValues,
-                selectedIndex = draft.accuracyLevel.ordinal,
+                selectedIndex = learningAccuracy.ordinal,
                 onValueSelected = { index ->
-                    viewModel.setAccuracyLevel(
+                    settingsViewModel.setLearningAccuracy(
                         AccuracyLevel.entries[index]
                     )
                 },
@@ -217,9 +222,9 @@ fun LearningStepsLearningScreen(
             }
         ) {
             TemplateToggleSwitch(
-                checked = draft.startingPointEnabled,
+                checked = startingPointEnabled,
                 onCheckedChange = { enabled ->
-                    viewModel.setStartingPointEnabled(enabled)
+                    settingsViewModel.setStartingPointEnabled(enabled)
                 },
                 modifier = Modifier.size(
                     width = 52.dp,
@@ -236,9 +241,9 @@ fun LearningStepsLearningScreen(
             }
         ) {
             TemplateToggleSwitch(
-                checked = draft.randomPatternOrder,
+                checked = randomPatternOrder,
                 onCheckedChange = { enabled ->
-                    viewModel.setRandomPatternOrder(enabled)
+                    settingsViewModel.setRandomPatternOrder(enabled)
                 },
                 modifier = Modifier.size(
                     width = 52.dp,

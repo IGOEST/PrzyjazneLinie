@@ -1,5 +1,8 @@
 package com.example.friendlylines.therapist_app.ui.configuration.settings
 
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.friendlylines.therapist_app.ui.configuration.learning.LearningStepsLearningScreenViewModel
+import com.example.friendlylines.therapist_app.ui.configuration.test.LearningStepsTestScreenViewModel
 import androidx.activity.compose.BackHandler
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
@@ -30,6 +33,7 @@ import com.example.friendlylines.therapist_app.ui.components.TemplateTabBar
 import com.example.friendlylines.therapist_app.ui.components.TemplateTopAppBar
 import com.example.friendlylines.therapist_app.ui.configuration.patterns.LearningStepsPatternsScreen
 import com.example.friendlylines.therapist_app.ui.configuration.learning.LearningStepsLearningScreen
+import com.example.friendlylines.therapist_app.ui.configuration.summary.LearningStepsSummaryScreen
 import com.example.friendlylines.therapist_app.ui.configuration.test.LearningStepsTestScreen
 import com.example.friendlylines.therapist_app.ui.main.ExitDestination
 import com.example.friendlylines.therapist_app.ui.main.NavRoutes
@@ -68,6 +72,7 @@ fun LearningStepsSettingsScreen(
     stepId: Long?,
     onBackClick: () -> Unit,
     onHomeClick: () -> Unit,
+    settingsViewModel: LearningStepsSettingsViewModel = hiltViewModel()
 ) {
     var selectedTab by remember {
         mutableStateOf(LearningStepTab.PATTERNS)
@@ -126,7 +131,8 @@ fun LearningStepsSettingsScreen(
                 LearningStepTab.PATTERNS -> {
                     LearningStepsPatternsScreen(
                         navController = navController,
-                        stepId = null,
+                        stepId = stepId,
+                        settingsViewModel = settingsViewModel,
                         onBackClick = onBackClick,
                         onHomeClick = onHomeClick,
                         onAddPatternClick = { order ->
@@ -144,6 +150,7 @@ fun LearningStepsSettingsScreen(
 
                 LearningStepTab.LEARNING -> {
                     LearningStepsLearningScreen(
+                        settingsViewModel = settingsViewModel,
                         onNextClick = {
                             selectedTab = LearningStepTab.TEST
                         }
@@ -152,8 +159,9 @@ fun LearningStepsSettingsScreen(
 
                 LearningStepTab.TEST -> {
                     LearningStepsTestScreen(
+                        settingsViewModel = settingsViewModel,
                         onNextClick = {
-                            selectedTab = LearningStepTab.REINFORCEMENTS
+                            selectedTab = LearningStepTab.SUMMARY
                         }
                     )
                 }
@@ -163,7 +171,12 @@ fun LearningStepsSettingsScreen(
                 }
 
                 LearningStepTab.SUMMARY -> {
-                    // później
+                    LearningStepsSummaryScreen(
+                        settingsViewModel = settingsViewModel,
+                        onSaved = {
+                            onBackClick()
+                        }
+                    )
                 }
 
                 else -> {}

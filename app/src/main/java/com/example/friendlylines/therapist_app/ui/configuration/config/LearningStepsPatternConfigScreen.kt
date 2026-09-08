@@ -1,7 +1,5 @@
 package com.example.friendlylines.therapist_app.ui.configuration.config
 
-import android.annotation.SuppressLint
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -17,7 +15,6 @@ import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -45,16 +42,14 @@ import com.example.friendlylines.therapist_app.ui.components.TemplateSlider
 import com.example.friendlylines.therapist_app.ui.components.TemplateToggleSwitch
 import com.example.friendlylines.therapist_app.ui.components.TemplateTopAppBar
 //import com.example.friendlylines.therapist_app.ui.configuration.config.PatternConfigOptions.toDp
-import com.example.friendlylines.therapist_app.ui.configuration.patterns.LearningStepsPatternsScreenViewModel
 import com.example.friendlylines.therapist_app.ui.main.ExitDestination
-import com.example.friendlylines.therapist_app.ui.main.NavRoutes
 import com.example.friendlylines.therapist_app.ui.materials.models.PatternPreview
 import com.example.friendlylines.therapist_app.ui.theme.*
 import com.example.shared.data.drafts.ColorOption
 import com.example.shared.data.drafts.PatternWidth
 import com.example.shared.data.drafts.PatternConfigOptions.toDp
 import com.example.shared.data.drafts.PatternConfigOptions
-import com.example.shared.data.drafts.LearningStepsPatternConfigDraft
+import com.example.friendlylines.therapist_app.ui.configuration.settings.LearningStepsSettingsViewModel
 
 @Composable
 fun LearningStepPatternConfigScreen(
@@ -62,27 +57,23 @@ fun LearningStepPatternConfigScreen(
     patternId: Long,
     configId: Long? = null,
     order: Int,
+    settingsViewModel: LearningStepsSettingsViewModel,
     onBackClick: () -> Unit,
     onHomeClick: () -> Unit,
     onSaveClick: (Long?) -> Unit
 ) {
-    LaunchedEffect(order) {
-        Log.d("PatternConfig", "ORDER = $order")
-    }
+    val patternConfigViewModel: LearningStepsPatternConfigScreenViewModel =
+        hiltViewModel()
 
-    val viewModel: LearningStepsPatternConfigScreenViewModel = hiltViewModel()
-    val pattern by viewModel.pattern.collectAsStateWithLifecycle()
+    val pattern by patternConfigViewModel.pattern
+        .collectAsStateWithLifecycle()
+
     LaunchedEffect(patternId) {
-        viewModel.loadPattern(patternId)
+        patternConfigViewModel.loadPattern(patternId)
     }
 
-    val parentEntry = remember(navController.currentBackStackEntry) {
-        navController.getBackStackEntry(
-            NavRoutes.LEARNING_STEPS_CREATE
-        )
-    }
-    val learningStepsPatternsViewModel: LearningStepsPatternsScreenViewModel = hiltViewModel(parentEntry)
-    val patterns by learningStepsPatternsViewModel.patternsDraft.collectAsStateWithLifecycle()
+    val patterns by settingsViewModel.patterns
+        .collectAsStateWithLifecycle()
 
     val existingConfig = remember(patterns, configId) {
         patterns.firstOrNull {
@@ -452,7 +443,7 @@ fun LearningStepPatternConfigScreen(
                     showSaveConfigDialog = false
 
                     if (configId == null) {
-                        val newConfigId = learningStepsPatternsViewModel.addPattern(
+                        val newConfigId = settingsViewModel.addPattern(
                             pattern = pattern,
                             width = selectedWidth,
                             patternColor = patternColor,
@@ -460,9 +451,10 @@ fun LearningStepPatternConfigScreen(
                             backgroundColor = backgroundColor,
                             patternVariety = patternVariety
                         )
+
                         onSaveClick(newConfigId)
                     } else {
-                        learningStepsPatternsViewModel.updatePattern(
+                        settingsViewModel.updatePattern(
                             configId = configId,
                             patternItem = pattern,
                             width = selectedWidth,
@@ -471,6 +463,7 @@ fun LearningStepPatternConfigScreen(
                             backgroundColor = backgroundColor,
                             patternVariety = patternVariety
                         )
+
                         onSaveClick(configId)
                     }
                 }
