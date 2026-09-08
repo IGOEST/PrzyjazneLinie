@@ -30,6 +30,9 @@ class ChildViewModel @Inject constructor() : ViewModel() {
                     else -> "info"
                 }
             )
+            is ChildMainEvent.BackToMainMenu -> state.copy(
+                screenState = "main"
+            )
         }
     }
 }

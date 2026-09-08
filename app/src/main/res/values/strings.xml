@@ -113,6 +113,7 @@
     <string name="child_options">Options</string>
     <string name="child_start_again">Start again</string>
     <string name="chosen_mode">Mode</string>
+    <string name="child_level">LEVEL</string>
 
 </resources>
 

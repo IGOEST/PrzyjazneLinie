@@ -127,6 +127,6 @@
     <string name="child_options">Opcje</string>
     <string name="child_start_again">Zacznij od nowa</string>
     <string name="chosen_mode">Tryb</string>
-
+    <string name="child_level">POZIOM</string>
 
 </resources>

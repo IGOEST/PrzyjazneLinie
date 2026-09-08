@@ -1,4 +1,4 @@
-package com.example.friendlylines.child_app.main
+package com.example.friendlylines.child_app.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -40,12 +40,13 @@ fun MainMenuScreen(
     mode: String = "uczenie",
     onPlayClick: () -> Unit)
 {
-    // Bottom bar and mascot
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Primary50)
-    ) {
+    )
+    {
+        // Bottom bar and mascot
         Box(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
@@ -101,7 +102,7 @@ fun MainMenuScreen(
             // Play button
             ChildButton(
                 icon = IconType.Play,
-                onClick = { }, //TODO: play on click
+                onClick = onPlayClick,
                 size = 300.dp)
         }
     }

@@ -1,4 +1,4 @@
-package com.example.friendlylines.child_app.main
+package com.example.friendlylines.child_app.ui
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.friendlylines.R
 import com.example.friendlylines.child_app.theme.LoadingScreenBlue
+import kotlin.math.sqrt
 
 @SuppressLint("ConfigurationScreenWidthHeight")
 @Composable
@@ -42,7 +43,7 @@ fun calculateResponsiveFontSize(referenceFontSize: TextUnit): TextUnit {
     val screenHeight = configuration.screenHeightDp * configuration.densityDpi / 160f
     val widthRatio = screenWidth / referenceWidth
     val heightRatio = screenHeight / referenceHeight
-    val scalingFactor = kotlin.math.sqrt((widthRatio * heightRatio).toDouble()).toFloat()
+    val scalingFactor = sqrt((widthRatio * heightRatio).toDouble()).toFloat()
     return (referenceFontSize.value * scalingFactor).sp
 }
 
@@ -58,7 +59,7 @@ fun calculateResponsiveDp(
     val screenHeight = configuration.screenHeightDp * configuration.densityDpi / 160f
     val widthRatio = screenWidth / referenceWidth
     val heightRatio = screenHeight / referenceHeight
-    val scalingFactor = kotlin.math.sqrt((widthRatio * heightRatio).toDouble()).toFloat()
+    val scalingFactor = sqrt((widthRatio * heightRatio).toDouble()).toFloat()
     return (referenceDp.value * scalingFactor).dp
 }
 

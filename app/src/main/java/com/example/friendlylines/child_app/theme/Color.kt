@@ -20,4 +20,5 @@ val Warning = Color(0xFFD0C200)
 val Error = Color(0xFFD85676)
 
 val White = Color(0xFFFFFFFF)
+val Black = Color(0x00000000)
 val LoadingScreenBlue = Color(0xFF2EB2D6)
