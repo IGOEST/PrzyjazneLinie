@@ -32,12 +32,14 @@ import com.example.friendlylines.therapist_app.ui.theme.Primary50
 import com.example.friendlylines.therapist_app.ui.theme.Primary700
 import com.example.friendlylines.therapist_app.ui.theme.Primary900
 import com.example.shared.data.entities.LearningStepEntity
+import androidx.compose.material3.Checkbox
 
 @Composable
 fun LearningStepListArea(
     learningSteps: List<LearningStepEntity>,
     onLearningStepClick: (LearningStepEntity) -> Unit = {},
     onDeleteClick: (LearningStepEntity) -> Unit = {},
+    onActiveStepClick: (LearningStepEntity) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -71,6 +73,9 @@ fun LearningStepListArea(
                     },
                     onDeleteClick = {
                         onDeleteClick(learningStep)
+                    },
+                    onActiveStepClick = {
+                        onActiveStepClick(learningStep)
                     }
                 )
             }
@@ -83,7 +88,8 @@ fun LearningStepListArea(
 private fun LearningStepListItem(
     learningStep: LearningStepEntity,
     onClick: () -> Unit,
-    onDeleteClick: () -> Unit
+    onDeleteClick: () -> Unit,
+    onActiveStepClick: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -101,6 +107,13 @@ private fun LearningStepListItem(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            Checkbox(
+                checked = learningStep.activeStep,
+                onCheckedChange = {
+                    onActiveStepClick()
+                }
+            )
+
             Text(
                 text = learningStep.name,
                 modifier = Modifier.weight(1f),

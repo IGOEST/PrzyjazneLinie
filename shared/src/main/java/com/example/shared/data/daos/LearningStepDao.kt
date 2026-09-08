@@ -65,4 +65,24 @@ interface LearningStepDao {
         testTimeLimit: Int,
         testAccuracyLevel: String
     )
+
+    // updating which step is active
+    @Query(
+        """
+    UPDATE learning_steps
+    SET activeStep = 0
+    """
+    )
+    suspend fun deactivateAllSteps()
+
+    @Query(
+        """
+    UPDATE learning_steps
+    SET activeStep = 1
+    WHERE id = :learningStepId
+    """
+    )
+    suspend fun setActiveStep(
+        learningStepId: Long
+    )
 }

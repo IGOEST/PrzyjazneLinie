@@ -119,6 +119,9 @@ fun LearningStepsListScreen(
                 },
                 onDeleteClick = { step ->
                     // later
+                },
+                onActiveStepClick = { step ->
+                    viewModel.setActiveStep(step.id)
                 }
             )
         }

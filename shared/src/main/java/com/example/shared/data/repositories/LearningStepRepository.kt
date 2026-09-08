@@ -98,4 +98,12 @@ class LearningStepRepository @Inject constructor(
             testAccuracyLevel = testAccuracyLevel
         )
     }
+
+    // mark the step active, others - inactive
+    suspend fun setActiveStep(
+        learningStepId: Long
+    ) {
+        learningStepDao.deactivateAllSteps()
+        learningStepDao.setActiveStep(learningStepId)
+    }
 }

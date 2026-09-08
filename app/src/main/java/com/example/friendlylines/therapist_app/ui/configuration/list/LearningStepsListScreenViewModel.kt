@@ -29,4 +29,12 @@ class LearningStepsListScreenViewModel @Inject constructor(
             _learningSteps.value = learningStepRepository.getAllLearningSteps()
         }
     }
+
+    // mark step as active
+    fun setActiveStep(stepId: Long) {
+        viewModelScope.launch {
+            learningStepRepository.setActiveStep(stepId)
+            loadLearningSteps()
+        }
+    }
 }

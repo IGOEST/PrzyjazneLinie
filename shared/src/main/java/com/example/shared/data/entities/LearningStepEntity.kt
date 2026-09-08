@@ -11,6 +11,7 @@ data class LearningStepEntity(
     val id: Long = 0,
 
     val name: String,
+    val activeStep: Boolean = false,
 
     // learning settings
     val repetitions: Int,
