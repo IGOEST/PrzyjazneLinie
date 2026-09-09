@@ -70,6 +70,13 @@ class LearningStepRepository @Inject constructor(
         return learningStepDao.getAll()
     }
 
+    // returns one learning step by id
+    suspend fun getLearningStep(
+        learningStepId: Long
+    ): LearningStepEntity? {
+        return learningStepDao.getById(learningStepId)
+    }
+
     // deletes all pattern configurations belonging to a learning step
     suspend fun deletePatternConfigurations(
         learningStepId: Long
@@ -105,5 +112,16 @@ class LearningStepRepository @Inject constructor(
     ) {
         learningStepDao.deactivateAllSteps()
         learningStepDao.setActiveStep(learningStepId)
+    }
+
+    // change the mode (test, learning)
+    suspend fun updateLearningStepMode(
+        learningStepId: Long,
+        mode: String
+    ) {
+        learningStepDao.updateMode(
+            learningStepId = learningStepId,
+            mode = mode
+        )
     }
 }

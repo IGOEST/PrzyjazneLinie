@@ -130,15 +130,19 @@ fun LearningStepsListScreen(
             LearningStepListArea(
                 learningSteps = learningSteps,
                 modifier = Modifier.weight(1f),
-                onLearningStepClick = { step ->
-                    // later
-                },
                 onDeleteClick = { step ->
                     // later
                 },
                 onActiveStepClick = { step ->
                     viewModel.setActiveStep(step.id)
-                }
+                },
+                onModeChange = { step, isTest ->
+                    viewModel.setMode(
+                        stepId = step.id,
+                        isTest = isTest
+                    )
+                },
+                onCreateClick = onCreateClick
             )
         }
 

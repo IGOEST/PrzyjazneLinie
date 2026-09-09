@@ -3,6 +3,7 @@ package com.example.friendlylines.therapist_app.ui.configuration.list
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shared.data.entities.LearningStepEntity
+import com.example.shared.data.entities.LearningStepMode
 import com.example.shared.data.repositories.LearningStepRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,6 +35,26 @@ class LearningStepsListScreenViewModel @Inject constructor(
     fun setActiveStep(stepId: Long) {
         viewModelScope.launch {
             learningStepRepository.setActiveStep(stepId)
+            loadLearningSteps()
+        }
+    }
+
+    fun setMode(
+        stepId: Long,
+        isTest: Boolean
+    ) {
+        viewModelScope.launch {
+            val mode = if (isTest) {
+                LearningStepMode.TEST.name
+            } else {
+                LearningStepMode.LEARNING.name
+            }
+
+            learningStepRepository.updateLearningStepMode(
+                learningStepId = stepId,
+                mode = mode
+            )
+
             loadLearningSteps()
         }
     }
