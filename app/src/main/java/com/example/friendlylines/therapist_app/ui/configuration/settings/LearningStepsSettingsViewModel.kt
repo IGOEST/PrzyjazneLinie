@@ -253,13 +253,14 @@ class LearningStepsSettingsViewModel @Inject constructor(
 
     // saves the complete learning step configuration
     fun saveLearningStep(
+        name: String,
         onSaved: (Long) -> Unit
     ) {
         viewModelScope.launch {
 
             // save the learning step itself
             val learningStepId = learningStepRepository.saveLearningStep(
-                name = _name.value,
+                name = name,
                 repetitions = _learningRepetitions.value,
                 attempts = _learningAttempts.value,
                 timeLimit = _learningTimeLimit.value,

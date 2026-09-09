@@ -156,4 +156,6 @@
     <string name="easy_label_text">Łatwy</string>
     <string name="hard_label_text">Trudny</string>
 
+    <string name="save_learning_step_dialog_title">Zapisz krok uczenia</string>
+
 </resources>

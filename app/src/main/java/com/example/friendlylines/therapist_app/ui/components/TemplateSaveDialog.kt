@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.friendlylines.R
-import com.example.friendlylines.therapist_app.ui.materials.create_new.PatternNameError
+import com.example.friendlylines.therapist_app.ui.components.NameError
 import com.example.friendlylines.therapist_app.ui.theme.Error
 import com.example.friendlylines.therapist_app.ui.theme.Neutral300
 import com.example.friendlylines.therapist_app.ui.theme.Primary1000
@@ -46,11 +46,11 @@ fun TemplateSaveDialog(
     confirmText: String,
     dismissText: String,
     textFieldLabel: String,
-    patternName: String,
-    onPatternNameChange: (String) -> Unit,
+    name: String,
+    onNameChange: (String) -> Unit,
     onDismiss: () -> Unit,
     onSave: () -> Unit,
-    patternNameError: PatternNameError?
+    nameError: NameError?
 ) {
     Dialog(
         onDismissRequest = onDismiss
@@ -106,8 +106,8 @@ fun TemplateSaveDialog(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 OutlinedTextField(
-                    value = patternName,
-                    onValueChange = onPatternNameChange,
+                    value = name,
+                    onValueChange = onNameChange,
                     modifier = Modifier.fillMaxWidth(),
                     label = {
                         Text(
@@ -126,13 +126,13 @@ fun TemplateSaveDialog(
                         cursorColor = Primary1000
                     ),
                     singleLine = true,
-                    isError = patternNameError != null,
+                    isError = nameError != null,
                     supportingText = {
-                        patternNameError?.let { error ->
+                        nameError?.let { error ->
                             Text(
                                 text = when (error) {
-                                    PatternNameError.BLANK -> stringResource(R.string.name_blank_error)
-                                    PatternNameError.EXISTS -> stringResource(R.string.name_exists_error)
+                                    NameError.BLANK -> stringResource(R.string.name_blank_error)
+                                    NameError.EXISTS -> stringResource(R.string.name_exists_error)
                                 },
                                 color = Error,
                                 fontSize = 16.7.sp,
@@ -176,7 +176,7 @@ fun TemplateSaveDialog(
                         modifier = Modifier
                             .wrapContentWidth()
                             .height(54.dp),
-                        enabled = patternName.isNotBlank(),
+                        enabled = name.isNotBlank(),
                         isDialogButton = true,
                         onClick = onSave,
                         text = confirmText,
