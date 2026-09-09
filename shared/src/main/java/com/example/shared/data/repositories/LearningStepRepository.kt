@@ -106,4 +106,9 @@ class LearningStepRepository @Inject constructor(
         learningStepDao.deactivateAllSteps()
         learningStepDao.setActiveStep(learningStepId)
     }
+
+    // returns active learning step
+    suspend fun getActiveStep(): LearningStepEntity {
+        return learningStepDao.getActiveStep()
+    }
 }

@@ -85,4 +85,15 @@ interface LearningStepDao {
     suspend fun setActiveStep(
         learningStepId: Long
     )
+
+    // returns active step
+    @Query(
+        """
+         SELECT *
+         FROM learning_steps
+         WHERE activeStep = 1
+         LIMIT 1
+         """
+    )
+    suspend fun getActiveStep(): LearningStepEntity
 }

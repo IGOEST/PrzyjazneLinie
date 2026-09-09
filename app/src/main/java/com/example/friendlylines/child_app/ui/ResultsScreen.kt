@@ -129,7 +129,7 @@ fun ResultsScreen(
                         )
                         Spacer(modifier = Modifier.width(15.dp))
                         Text(
-                            text = config.patternColor,
+                            text = config.patternColor.name,
                             color = Primary1000,
                             fontSize = 20.sp
                         )
@@ -143,7 +143,7 @@ fun ResultsScreen(
                         )
                         Spacer(modifier = Modifier.width(15.dp))
                         Text(
-                            text = config.traceColor,
+                            text = config.traceColor.name,
                             color = Primary1000,
                             fontSize = 20.sp
                         )
@@ -157,7 +157,7 @@ fun ResultsScreen(
                         )
                         Spacer(modifier = Modifier.width(15.dp))
                         Text(
-                            text = config.backgroundColor,
+                            text = config.backgroundColor.name,
                             color = Primary1000,
                             fontSize = 20.sp
                         )
