@@ -467,15 +467,6 @@ fun LearningStepPatternConfigScreen(
                                 )
                             )
                         )
-//                        val newConfigId = learningStepsPatternsViewModel.addPattern(
-//                            pattern = pattern,
-//                            width = selectedWidth,
-//                            patternColor = patternColor,
-//                            writingColor = writingColor,
-//                            backgroundColor = backgroundColor,
-//                            patternVariety = patternVariety
-//                        )
-//                        onSaveClick(newConfigId)
                     } else {
                         settingsViewModel.onEvent(
                             LearningStepsSettingsEvent.Patterns(
@@ -490,16 +481,6 @@ fun LearningStepPatternConfigScreen(
                                 )
                             )
                         )
-//                        learningStepsPatternsViewModel.updatePattern(
-//                            configId = configId,
-//                            patternItem = pattern,
-//                            width = selectedWidth,
-//                            patternColor = patternColor,
-//                            writingColor = writingColor,
-//                            backgroundColor = backgroundColor,
-//                            patternVariety = patternVariety
-//                        )
-//                        onSaveClick(configId)
                     }
                 }
                 onSaveClick(configId)

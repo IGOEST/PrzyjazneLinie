@@ -62,12 +62,7 @@ fun LearningStepsPatternAddScreen(
     val gridState = rememberLazyGridState()
     val scrollAreaState = rememberScrollAreaState(gridState)
 
-//    LaunchedEffect(Unit) {
-//        galleryViewModel.initializePatterns()
-//    }
-
     val galleryState by galleryViewModel.state.collectAsStateWithLifecycle()
-//    val patterns by galleryViewModel.patterns.collectAsStateWithLifecycle()
 
     var selectedPattern by remember {
         mutableStateOf<PatternItem?>(null)
@@ -80,14 +75,6 @@ fun LearningStepsPatternAddScreen(
             }
         }
     }
-
-//    LaunchedEffect(patterns, selectedPatternId) {
-//        if (selectedPatternId != null) {
-//            selectedPattern = patterns.find {
-//                it.pattern.id == selectedPatternId
-//            }
-//        }
-//    }
 
     var showExitDialog by remember {
         mutableStateOf(false)

@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import com.example.friendlylines.therapist_app.ui.configuration.learning.LearningStepsLearningScreenViewModel
 import com.example.friendlylines.therapist_app.ui.configuration.patterns.LearningStepsPatternsEvent
 import com.example.friendlylines.therapist_app.ui.configuration.patterns.LearningStepsPatternsScreenViewModel
+import com.example.friendlylines.therapist_app.ui.configuration.test.LearningStepsTestScreenViewModel
+import com.example.shared.data.drafts.LearningStepsTestDraft
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -37,6 +39,17 @@ class LearningStepsSettingsViewModel @Inject constructor(
                     it.copy(
                         learningState = LearningStepsLearningScreenViewModel.reduce(
                             it.learningState,
+                            event.event
+                        )
+                    )
+                }
+            }
+
+            is LearningStepsSettingsEvent.Test -> {
+                _state.update {
+                    it.copy(
+                        testState = LearningStepsTestScreenViewModel.reduce(
+                            it.testState,
                             event.event
                         )
                     )

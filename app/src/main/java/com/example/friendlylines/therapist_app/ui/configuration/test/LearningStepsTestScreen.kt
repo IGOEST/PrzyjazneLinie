@@ -44,15 +44,20 @@ import androidx.compose.ui.unit.sp
 import com.example.friendlylines.therapist_app.ui.configuration.learning.LearningStepsLearningScreenViewModel
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.friendlylines.therapist_app.ui.configuration.learning.LearningStepsLearningEvent
+import com.example.shared.data.drafts.LearningStepsLearningDraft
+import com.example.shared.data.drafts.LearningStepsTestDraft
 
 @Composable
 fun LearningStepsTestScreen(
     onNextClick: () -> Unit,
-    viewModel: LearningStepsTestScreenViewModel = hiltViewModel()
+    //viewModel: LearningStepsTestScreenViewModel = hiltViewModel()
+    onEvent: (LearningStepsTestEvent) -> Unit,
+    draft: LearningStepsTestDraft
 ) {
 
     // STATES - sliders and switches
-    val draft by viewModel.draft.collectAsStateWithLifecycle()
+    //val draft by viewModel.draft.collectAsStateWithLifecycle()
 
     // SLIDER VALUES
     val repetitionValues = listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
@@ -111,19 +116,27 @@ fun LearningStepsTestScreen(
                 values = repetitionValues,
                 selectedIndex = repetitionValues.indexOf(draft.repetitions),
                 onValueSelected = { index ->
-                    viewModel.setRepetitions(repetitionValues[index])
+                    onEvent(
+                        LearningStepsTestEvent.SetRepetitions(
+                            repetitionValues[index]
+                        )
+                    )
                 },
                 showMinusPlus = true,
                 onMinusClick = {
-                    viewModel.setRepetitions(
-                        (draft.repetitions - 1)
-                            .coerceAtLeast(repetitionValues.first())
+                    onEvent(
+                        LearningStepsTestEvent.SetRepetitions(
+                            (draft.repetitions - 1)
+                                .coerceAtLeast(repetitionValues.first())
+                        )
                     )
                 },
                 onPlusClick = {
-                    viewModel.setRepetitions(
-                        (draft.repetitions + 1)
-                            .coerceAtMost(repetitionValues.last())
+                    onEvent(
+                        LearningStepsTestEvent.SetRepetitions(
+                            (draft.repetitions + 1)
+                                .coerceAtMost(repetitionValues.last())
+                        )
                     )
                 },
                 sliderWidth = 320.dp
@@ -160,21 +173,33 @@ fun LearningStepsTestScreen(
                 values = timeLimitValues,
                 selectedIndex = timeLimitValues.indexOf(draft.timeLimit),
                 onValueSelected = { index ->
-                    viewModel.setTimeLimit(timeLimitValues[index])
+                    onEvent(
+                        LearningStepsTestEvent.SetTimeLimit(
+                            timeLimitValues[index]
+                        )
+                    )
                 },
                 showMinusPlus = true,
                 onMinusClick = {
                     val currentIndex = timeLimitValues.indexOf(draft.timeLimit)
 
                     if (currentIndex > 0) {
-                        viewModel.setTimeLimit(timeLimitValues[currentIndex - 1])
+                        onEvent(
+                            LearningStepsTestEvent.SetTimeLimit(
+                                timeLimitValues[currentIndex - 1]
+                            )
+                        )
                     }
                 },
                 onPlusClick = {
                     val currentIndex = timeLimitValues.indexOf(draft.timeLimit)
 
                     if (currentIndex < timeLimitValues.lastIndex) {
-                        viewModel.setTimeLimit(timeLimitValues[currentIndex + 1])
+                        onEvent(
+                            LearningStepsTestEvent.SetTimeLimit(
+                                timeLimitValues[currentIndex + 1]
+                            )
+                        )
                     }
                 },
                 sliderWidth = 320.dp
@@ -192,8 +217,10 @@ fun LearningStepsTestScreen(
                 values = accuracyValues,
                 selectedIndex = draft.accuracyLevel.ordinal,
                 onValueSelected = { index ->
-                    viewModel.setAccuracyLevel(
-                        AccuracyLevel.entries[index]
+                    onEvent(
+                        LearningStepsTestEvent.SetAccuracyLevel(
+                            AccuracyLevel.entries[index]
+                        )
                     )
                 },
                 showMinusPlus = false,

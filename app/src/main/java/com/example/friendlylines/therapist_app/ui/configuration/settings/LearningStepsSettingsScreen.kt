@@ -164,7 +164,9 @@ fun LearningStepsSettingsScreen(
                     LearningStepsTestScreen(
                         onNextClick = {
                             selectedTab = LearningStepTab.REINFORCEMENTS
-                        }
+                        },
+                        onEvent ={ viewModel.onEvent(LearningStepsSettingsEvent.Test(it)) },
+                        draft = state.testState
                     )
                 }
 

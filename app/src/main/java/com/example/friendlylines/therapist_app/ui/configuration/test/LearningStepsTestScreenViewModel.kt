@@ -1,7 +1,9 @@
 package com.example.friendlylines.therapist_app.ui.configuration.test
 
 import androidx.lifecycle.ViewModel
+import com.example.friendlylines.therapist_app.ui.configuration.learning.LearningStepsLearningEvent
 import com.example.shared.data.drafts.AccuracyLevel
+import com.example.shared.data.drafts.LearningStepsLearningDraft
 import com.example.shared.data.drafts.LearningStepsTestDraft
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,22 +14,37 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LearningStepsTestScreenViewModel @Inject constructor() : ViewModel() {
-
-    private val _draft = MutableStateFlow(
-        LearningStepsTestDraft(id = 0)
-    )
-
+    private val _draft = MutableStateFlow(LearningStepsTestDraft())
     val draft: StateFlow<LearningStepsTestDraft> = _draft.asStateFlow()
 
-    fun setRepetitions(value: Int) {
-        _draft.update { it.copy(repetitions = value) }
+    fun onEvent(event: LearningStepsTestEvent) {
+        _draft.update {
+            reduce(it, event)
+        }
     }
 
-    fun setTimeLimit(value: Int) {
-        _draft.update { it.copy(timeLimit = value) }
-    }
+    companion object {
 
-    fun setAccuracyLevel(value: AccuracyLevel) {
-        _draft.update { it.copy(accuracyLevel = value) }
+        fun reduce(
+            state: LearningStepsTestDraft,
+            event: LearningStepsTestEvent
+        ): LearningStepsTestDraft {
+            return when (event) {
+                is LearningStepsTestEvent.SetRepetitions ->
+                    state.copy(
+                        repetitions = event.value
+                    )
+
+                is LearningStepsTestEvent.SetTimeLimit ->
+                    state.copy(
+                        timeLimit = event.value
+                    )
+
+                is LearningStepsTestEvent.SetAccuracyLevel ->
+                    state.copy(
+                        accuracyLevel = event.value
+                    )
+            }
+        }
     }
 }
