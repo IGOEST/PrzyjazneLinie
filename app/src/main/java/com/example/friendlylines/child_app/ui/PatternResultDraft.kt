@@ -10,10 +10,6 @@ data class PatternConfig(
     val patternThickness: String,
     val patternThicknessDp: Dp,
     val smoothingEnabled: Boolean,
-    val showStartingPoint: Boolean,
-    val testMode: Boolean,
-    val timeLimit: Int,
-    val attempts: Int
 )
 
 data class LearningStepResult(
@@ -21,11 +17,16 @@ data class LearningStepResult(
     val correctCoverage: Int = 0,
     val lineOutOfBounds: Int = 0,
     val shapeMatch: Int = 0,
+    val showStartingPoint: Boolean,
+    val testMode: Boolean,
+    val timeLimit: Int,
+    val attempts: Int
 )
 
 data class PatternResult(
     val patternId: Long,
-    val patternName: String,
+    var patternName: String,
+    var originalName: String,
     val config: PatternConfig,
     val correctCoverage: Int = 0,
     val lineOutOfBounds: Int = 0,

@@ -192,7 +192,7 @@ fun ResultsScreen(
                             )
                         }
                         Spacer(modifier = Modifier.width(25.dp))
-                        if (config.showStartingPoint) {
+                        if (learningStepResult.showStartingPoint) {
                             Icon(
                                 imageVector = Icons.Filled.CheckBox,
                                 contentDescription = stringResource(id=R.string.results_yes),
@@ -218,7 +218,7 @@ fun ResultsScreen(
                             fontSize = 20.sp
                         )
                         Spacer(modifier = Modifier.width(25.dp))
-                        if (config.testMode) {
+                        if (learningStepResult.testMode) {
                             Icon(
                                 imageVector = Icons.Filled.CheckBox,
                                 contentDescription = stringResource(id=R.string.results_yes),
@@ -244,7 +244,7 @@ fun ResultsScreen(
                         )
                         Spacer(modifier = Modifier.width(15.dp))
                         Text(
-                            text = "${config.timeLimit} s",
+                            text = "${learningStepResult.timeLimit} s",
                             color = Primary1000,
                             fontSize = 20.sp
                         )

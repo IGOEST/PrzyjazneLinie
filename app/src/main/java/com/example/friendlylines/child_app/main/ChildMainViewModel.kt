@@ -1,7 +1,5 @@
 package com.example.friendlylines.child_app.main
 
-import androidx.appcompat.R
-import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.friendlylines.child_app.ui.LearningStepResult
@@ -23,7 +21,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.res.stringResource
+import com.example.shared.data.entities.LearningStepMode
 
 @HiltViewModel
 class ChildViewModel  @Inject constructor(
@@ -187,10 +185,16 @@ class ChildViewModel  @Inject constructor(
                 
                 if (nextScreen == "game") {
                     // Reset to first pattern and load it
+                    val prepared = preparePatterns(
+                        state.patternResults.toMutableList(),
+                        state.learningStepResult?.testMode == false,
+                        state.learningStepResult?.testMode ?: false
+                    )
                     val resetState = state.copy(
                         screenState = nextScreen,
                         currentPattern = 0,
-                        userStrokes = emptyList()
+                        userStrokes = emptyList(),
+                        patternResults = prepared
                     )
                     loadPatternDrawing(0, resetState)
                     return resetState
@@ -206,7 +210,7 @@ class ChildViewModel  @Inject constructor(
         val patternResult = state.patternResults.getOrNull(index) ?: return
         
         // Start time limit for the new pattern
-        startTimeLimitTimer(patternResult.config.timeLimit)
+        startTimeLimitTimer(state.learningStepResult?.timeLimit ?: 0)
 
         viewModelScope.launch {
             try {
@@ -228,10 +232,16 @@ class ChildViewModel  @Inject constructor(
 
                 if (activePatterns.isEmpty()) return@launch
 
-                val patternResults = mutableListOf<PatternResult>()
-                val repetitions = step.repetitions
-                val learningStepResult = LearningStepResult(name = step.name)
-                var patternCount = 1
+                var patternResults = mutableListOf<PatternResult>()
+                val testMode = (step.mode == LearningStepMode.TEST.name)
+                val repetitions = if (testMode) step.testRepetitions else step.repetitions
+                val learningStepResult = LearningStepResult(
+                    name = step.name,
+                    testMode = testMode,
+                    showStartingPoint = if (testMode) false else step.startingPointEnabled,
+                    timeLimit = if (testMode) step.testTimeLimit else step.timeLimit,
+                    attempts = if (testMode) 1 else step.attempts
+                )
                 for (p in activePatterns) {
                     for (i in 0 until repetitions) {
                         val patternEntity = patternRepository.getPattern(p.patternId)?.pattern
@@ -251,29 +261,49 @@ class ChildViewModel  @Inject constructor(
                                 patternThickness = p.width,
                                 patternThicknessDp = widthEnum.toDp(),
                                 smoothingEnabled = patternEntity.smoothingEnabled,
-                                showStartingPoint = step.startingPointEnabled,
-                                testMode = false,
-                                timeLimit = step.timeLimit,
-                                attempts = step.attempts
                             )
 
                             patternResults.add(
                                 PatternResult(
                                     patternId = p.patternId,
-                                    patternName = patternEntity.name + " " + patternCount,
+                                    patternName = patternEntity.name,
+                                    originalName = patternEntity.name,
                                     config = config
                                 )
                             )
-                            patternCount++
                         }
                     }
                 }
 
+                val preparedResults = preparePatterns(patternResults, step.randomPatternOrder, testMode)
+
                 _state.update { it.copy(
-                    patternResults = patternResults,
+                    patternResults = preparedResults,
                     learningStepResult = learningStepResult
                 ) }
             } catch (_: Exception) {}
         }
     }
+
+    private fun preparePatterns(
+        patterns: MutableList<PatternResult>,
+        shouldShuffle: Boolean,
+        isTestMode: Boolean
+    ): List<PatternResult> {
+        val prepared = if (shouldShuffle && !isTestMode) {
+            patterns.shuffled()
+        } else {
+            patterns
+        }
+
+        // assigning numbers
+        var count = 1
+        for (p in prepared) {
+            p.patternName = p.originalName + " " + count
+            count++
+        }
+
+        return prepared
+    }
 }
+
