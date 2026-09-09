@@ -1,6 +1,5 @@
 package com.example.friendlylines.therapist_app.ui.configuration.add
 
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -39,9 +38,10 @@ import com.example.friendlylines.therapist_app.ui.components.TemplateButton
 import com.example.friendlylines.therapist_app.ui.components.TemplateTopAppBar
 import com.example.friendlylines.therapist_app.ui.main.ExitDestination
 import com.example.friendlylines.therapist_app.ui.materials.gallery.GalleryScreenViewModel
-import com.example.friendlylines.therapist_app.ui.materials.models.PatternItem
+//import com.example.friendlylines.therapist_app.ui.materials.models.PatternItem
 import com.example.friendlylines.therapist_app.ui.theme.Primary1000
 import com.example.friendlylines.therapist_app.ui.theme.Primary50
+import  com.example.shared.data.models.PatternItem
 
 @Composable
 fun LearningStepsPatternAddScreen(
@@ -60,19 +60,15 @@ fun LearningStepsPatternAddScreen(
     val gridState = rememberLazyGridState()
     val scrollAreaState = rememberScrollAreaState(gridState)
 
-    LaunchedEffect(Unit) {
-        galleryViewModel.initializePatterns()
-    }
-
-    val patterns by galleryViewModel.patterns.collectAsStateWithLifecycle()
+    val galleryState by galleryViewModel.state.collectAsStateWithLifecycle()
 
     var selectedPattern by remember {
         mutableStateOf<PatternItem?>(null)
     }
 
-    LaunchedEffect(patterns, selectedPatternId) {
+    LaunchedEffect(galleryState.patterns, selectedPatternId) {
         if (selectedPatternId != null) {
-            selectedPattern = patterns.find {
+            selectedPattern = galleryState.patterns.find {
                 it.pattern.id == selectedPatternId
             }
         }
@@ -126,7 +122,7 @@ fun LearningStepsPatternAddScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             PatternListArea(
-                patterns = patterns,
+                patterns = galleryState.patterns,
                 gridState = gridState,
                 scrollAreaState = scrollAreaState,
                 onCreateClick = {},

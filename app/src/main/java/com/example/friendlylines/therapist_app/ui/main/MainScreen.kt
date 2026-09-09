@@ -49,6 +49,8 @@ import com.example.friendlylines.therapist_app.ui.theme.Primary1000
 import com.example.friendlylines.therapist_app.ui.theme.Primary300
 import com.example.friendlylines.therapist_app.ui.theme.Primary50
 import com.example.friendlylines.therapist_app.ui.theme.Primary900
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.friendlylines.therapist_app.ui.configuration.settings.LearningStepsSettingsViewModel
 
 object NavRoutes {
     const val MAIN = "main"
@@ -121,6 +123,8 @@ enum class ExitDestination {
 fun MainScreen() {
     val navController = rememberNavController()
 
+    val settingsViewModel: LearningStepsSettingsViewModel = hiltViewModel()
+
     NavHost(
         navController = navController,
         startDestination = NavRoutes.MAIN
@@ -160,7 +164,10 @@ fun MainScreen() {
                 navController = navController,
                 onBackClick = {navController.popBackStack()},
                 onHomeClick = {navController.navigate(NavRoutes.MAIN)},
-                onCreateClick = {navController.navigate(NavRoutes.LEARNING_STEPS_CREATE)}
+                onCreateClick = {
+                    settingsViewModel.resetForNewLearningStep()
+                    navController.navigate(NavRoutes.LEARNING_STEPS_CREATE)
+                }
             )
         }
 
@@ -168,6 +175,7 @@ fun MainScreen() {
             LearningStepsSettingsScreen(
                 navController = navController,
                 stepId = null,
+                settingsViewModel = settingsViewModel,
                 onBackClick = {navController.popBackStack()},
                 onHomeClick = {navController.navigate(NavRoutes.MAIN)},
             )
@@ -255,6 +263,7 @@ fun MainScreen() {
                 patternId = patternId,
                 configId = configId,
                 order = order,
+                settingsViewModel = settingsViewModel,
                 onBackClick = {navController.popBackStack()},
                 onHomeClick = {navController.navigate(NavRoutes.MAIN)},
                 onSaveClick = { newConfigId ->

@@ -48,12 +48,14 @@ import com.example.friendlylines.therapist_app.ui.components.LearningStepsPatter
 import com.example.friendlylines.therapist_app.ui.components.TemplateAlertDialog
 import com.example.friendlylines.therapist_app.ui.components.TemplateButton
 import com.example.friendlylines.therapist_app.ui.components.TemplateSearchBox
-import com.example.friendlylines.therapist_app.ui.configuration.config.LearningStepsPatternConfigDraft
+//import com.example.friendlylines.therapist_app.ui.configuration.config.LearningStepsPatternConfigDraft
 import com.example.friendlylines.therapist_app.ui.configuration.settings.LearningStepTab
+import com.example.friendlylines.therapist_app.ui.configuration.settings.LearningStepsSettingsViewModel
 import com.example.friendlylines.therapist_app.ui.main.NavRoutes
 import com.example.friendlylines.therapist_app.ui.theme.Primary50
 import com.example.friendlylines.therapist_app.ui.theme.Primary700
 import com.example.friendlylines.therapist_app.ui.theme.Primary900
+import com.example.shared.data.drafts.LearningStepsPatternConfigDraft
 
 enum class MoveDirection {
     UP,
@@ -68,6 +70,7 @@ fun LearningStepsPatternsScreen(
     onHomeClick: () -> Unit,
     onAddPatternClick: (Int) -> Unit,
     onNextClick: () -> Unit,
+    settingsViewModel: LearningStepsSettingsViewModel
 ) {
     val listState = rememberLazyListState()
     val scrollAreaState = rememberScrollAreaState(listState)
@@ -87,8 +90,7 @@ fun LearningStepsPatternsScreen(
         .getStateFlow<Long?>("newConfigId", null)
         .collectAsStateWithLifecycle()
 
-    val viewModel: LearningStepsPatternsScreenViewModel = hiltViewModel()
-    val patterns by viewModel.patternsDraft.collectAsStateWithLifecycle()
+    val patterns by settingsViewModel.patterns.collectAsStateWithLifecycle()
 
     var searchQuery by remember {
         mutableStateOf("")
@@ -206,19 +208,19 @@ fun LearningStepsPatternsScreen(
                                 canMoveUp = index > 0,
                                 canMoveDown = index < patterns.lastIndex,
                                 onEnabledChange = { enabled ->
-                                    viewModel.setPatternEnabled(
+                                    settingsViewModel.setPatternEnabled(
                                         configId = pattern.id,
                                         enabled = enabled
                                     )
                                 },
                                 onMoveUpClick = {
-                                    viewModel.movePattern(
+                                    settingsViewModel.movePattern(
                                         configId = pattern.id,
                                         direction = MoveDirection.UP
                                     )
                                 },
                                 onMoveDownClick = {
-                                    viewModel.movePattern(
+                                    settingsViewModel.movePattern(
                                         configId = pattern.id,
                                         direction = MoveDirection.DOWN
                                     )
@@ -287,7 +289,7 @@ fun LearningStepsPatternsScreen(
             dismissText = stringResource(R.string.dismiss_button_text),
             onConfirm = {
                 patternConfigToCopy?.let { pattern ->
-                    val newConfigId = viewModel.copyPattern(pattern.id)
+                    val newConfigId = settingsViewModel.copyPattern(pattern.id)
                     if (newConfigId != null) {
                         scrollToConfigId = newConfigId
                     }
@@ -308,7 +310,7 @@ fun LearningStepsPatternsScreen(
             dismissText = stringResource(R.string.dismiss_button_text),
             onConfirm = {
                 patternConfigToDelete?.let { pattern ->
-                    viewModel.deletePattern(pattern.id)
+                    settingsViewModel.deletePattern(pattern.id)
                 }
                 patternConfigToDelete = null
             },

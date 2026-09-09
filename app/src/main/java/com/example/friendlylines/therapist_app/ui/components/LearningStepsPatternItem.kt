@@ -27,8 +27,9 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.FileCopy
 import androidx.compose.ui.res.stringResource
-import com.example.friendlylines.therapist_app.ui.configuration.config.LearningStepsPatternConfigDraft
+//import com.example.friendlylines.therapist_app.ui.configuration.config.LearningStepsPatternConfigDraft
 import com.example.friendlylines.therapist_app.ui.theme.Primary300
+import com.example.shared.data.drafts.LearningStepsPatternConfigDraft
 
 @Composable
 fun LearningStepsPatternItem(

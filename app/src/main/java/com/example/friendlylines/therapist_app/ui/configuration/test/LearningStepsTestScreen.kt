@@ -1,4 +1,4 @@
-package com.example.friendlylines.therapist_app.ui.configuration.learning
+package com.example.friendlylines.therapist_app.ui.configuration.test
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -35,25 +35,25 @@ import com.example.friendlylines.therapist_app.ui.theme.InfoActive
 import com.example.friendlylines.therapist_app.ui.theme.InfoDefault
 import com.example.friendlylines.therapist_app.ui.theme.Neutral300
 import com.example.friendlylines.therapist_app.ui.theme.Primary50
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shared.data.drafts.AccuracyLevel
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.unit.sp
+import com.example.friendlylines.therapist_app.ui.configuration.learning.LearningStepsLearningScreenViewModel
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.friendlylines.therapist_app.ui.configuration.settings.LearningStepsSettingsViewModel
 
 @Composable
-fun LearningStepsLearningScreen(
+fun LearningStepsTestScreen(
     onNextClick: () -> Unit,
     settingsViewModel: LearningStepsSettingsViewModel
 ) {
-    val learningRepetitions by settingsViewModel.learningRepetitions.collectAsStateWithLifecycle()
-    val learningAttempts by settingsViewModel.learningAttempts.collectAsStateWithLifecycle()
-    val learningTimeLimit by settingsViewModel.learningTimeLimit.collectAsStateWithLifecycle()
-    val learningAccuracy by settingsViewModel.learningAccuracy.collectAsStateWithLifecycle()
-    val startingPointEnabled by settingsViewModel.startingPointEnabled.collectAsStateWithLifecycle()
-    val randomPatternOrder by settingsViewModel.randomPatternOrder.collectAsStateWithLifecycle()
+
+    val testRepetitions by settingsViewModel.testRepetitions.collectAsStateWithLifecycle()
+    val testTimeLimit by settingsViewModel.testTimeLimit.collectAsStateWithLifecycle()
+    val testAccuracy by settingsViewModel.testAccuracy.collectAsStateWithLifecycle()
 
     // SLIDER VALUES
     val repetitionValues = listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
@@ -98,8 +98,7 @@ fun LearningStepsLearningScreen(
             .verticalScroll(rememberScrollState())
             .padding(
                 horizontal = 24.dp,
-                vertical = 8.dp
-            )
+                vertical = 8.dp)
     ) {
 
         // NUMBER OF REPETITIONS
@@ -111,20 +110,22 @@ fun LearningStepsLearningScreen(
         ) {
             TemplateSlider(
                 values = repetitionValues,
-                selectedIndex = repetitionValues.indexOf(learningRepetitions),
+                selectedIndex = repetitionValues.indexOf(testRepetitions),
                 onValueSelected = { index ->
-                    settingsViewModel.setLearningRepetitions(repetitionValues[index])
+                    settingsViewModel.setTestRepetitions(
+                        repetitionValues[index]
+                    )
                 },
                 showMinusPlus = true,
                 onMinusClick = {
-                    settingsViewModel.setLearningRepetitions(
-                        (learningRepetitions - 1)
+                    settingsViewModel.setTestRepetitions(
+                        (testRepetitions - 1)
                             .coerceAtLeast(repetitionValues.first())
                     )
                 },
                 onPlusClick = {
-                    settingsViewModel.setLearningRepetitions(
-                        (learningRepetitions + 1)
+                    settingsViewModel.setTestRepetitions(
+                        (testRepetitions + 1)
                             .coerceAtMost(repetitionValues.last())
                     )
                 },
@@ -132,7 +133,7 @@ fun LearningStepsLearningScreen(
             )
         }
 
-        // NUMBER OF ATTEMPTS
+         // NUMBER OF ATTEMPTS
         LearningSettingRow(
             title = stringResource(R.string.num_of_attempts),
             onInfoClick = {
@@ -141,23 +142,12 @@ fun LearningStepsLearningScreen(
         ) {
             TemplateSlider(
                 values = attemptValues,
-                selectedIndex = attemptValues.indexOf(learningAttempts),
-                onValueSelected = { index ->
-                    settingsViewModel.setLearningAttempts(attemptValues[index])
-                },
+                selectedIndex = 0,
+                onValueSelected = {},
                 showMinusPlus = true,
-                onMinusClick = {
-                    settingsViewModel.setLearningAttempts(
-                        (learningAttempts - 1)
-                            .coerceAtLeast(attemptValues.first())
-                    )
-                },
-                onPlusClick = {
-                    settingsViewModel.setLearningAttempts(
-                        (learningAttempts + 1)
-                            .coerceAtMost(attemptValues.last())
-                    )
-                },
+                onMinusClick = {},
+                onPlusClick = {},
+                enabled = false,
                 sliderWidth = 320.dp
             )
         }
@@ -171,23 +161,29 @@ fun LearningStepsLearningScreen(
         ) {
             TemplateSlider(
                 values = timeLimitValues,
-                selectedIndex = timeLimitValues.indexOf(learningTimeLimit),
+                selectedIndex = timeLimitValues.indexOf(testTimeLimit),
                 onValueSelected = { index ->
-                    settingsViewModel.setLearningTimeLimit(timeLimitValues[index])
+                    settingsViewModel.setTestTimeLimit(
+                        timeLimitValues[index]
+                    )
                 },
                 showMinusPlus = true,
                 onMinusClick = {
-                    val currentIndex = timeLimitValues.indexOf(learningTimeLimit)
+                    val currentIndex = timeLimitValues.indexOf(testTimeLimit)
 
                     if (currentIndex > 0) {
-                        settingsViewModel.setLearningTimeLimit(timeLimitValues[currentIndex - 1])
+                        settingsViewModel.setTestTimeLimit(
+                            timeLimitValues[currentIndex - 1]
+                        )
                     }
                 },
                 onPlusClick = {
-                    val currentIndex = timeLimitValues.indexOf(learningTimeLimit)
+                    val currentIndex = timeLimitValues.indexOf(testTimeLimit)
 
                     if (currentIndex < timeLimitValues.lastIndex) {
-                        settingsViewModel.setLearningTimeLimit(timeLimitValues[currentIndex + 1])
+                        settingsViewModel.setTestTimeLimit(
+                            timeLimitValues[currentIndex + 1]
+                        )
                     }
                 },
                 sliderWidth = 320.dp
@@ -203,9 +199,9 @@ fun LearningStepsLearningScreen(
         ) {
             TemplateSlider(
                 values = accuracyValues,
-                selectedIndex = learningAccuracy.ordinal,
+                selectedIndex = testAccuracy.ordinal,
                 onValueSelected = { index ->
-                    settingsViewModel.setLearningAccuracy(
+                    settingsViewModel.setTestAccuracy(
                         AccuracyLevel.entries[index]
                     )
                 },
@@ -222,10 +218,9 @@ fun LearningStepsLearningScreen(
             }
         ) {
             TemplateToggleSwitch(
-                checked = startingPointEnabled,
-                onCheckedChange = { enabled ->
-                    settingsViewModel.setStartingPointEnabled(enabled)
-                },
+                checked = false,
+                enabled = false,
+                onCheckedChange = {},
                 modifier = Modifier.size(
                     width = 52.dp,
                     height = 32.dp
@@ -241,10 +236,9 @@ fun LearningStepsLearningScreen(
             }
         ) {
             TemplateToggleSwitch(
-                checked = randomPatternOrder,
-                onCheckedChange = { enabled ->
-                    settingsViewModel.setRandomPatternOrder(enabled)
-                },
+                checked = false,
+                enabled = false,
+                onCheckedChange = {},
                 modifier = Modifier.size(
                     width = 52.dp,
                     height = 32.dp

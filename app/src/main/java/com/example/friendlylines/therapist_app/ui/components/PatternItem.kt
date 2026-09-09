@@ -33,13 +33,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.friendlylines.R
-import com.example.friendlylines.therapist_app.ui.materials.models.PatternItem
+//import com.example.friendlylines.therapist_app.ui.materials.models.PatternItem
 import com.example.friendlylines.therapist_app.ui.materials.models.PatternPreview
 import com.example.friendlylines.therapist_app.ui.theme.Neutral300
 import com.example.friendlylines.therapist_app.ui.theme.Neutral400
 import com.example.friendlylines.therapist_app.ui.theme.Primary500
 import com.example.friendlylines.therapist_app.ui.theme.Primary700
 import com.example.friendlylines.therapist_app.ui.theme.Primary900
+import com.example.shared.data.models.PatternItem
 
 @Composable
 fun PatternItem(

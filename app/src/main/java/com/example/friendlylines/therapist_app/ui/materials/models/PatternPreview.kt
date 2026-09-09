@@ -11,6 +11,7 @@ import androidx.compose.ui.unit.dp
 import com.example.friendlylines.therapist_app.ui.materials.geometry.NormalizedBounds
 import com.example.friendlylines.therapist_app.ui.materials.geometry.calculateNormalizedBounds
 import com.example.shared.data.models.Point
+import com.example.shared.data.models.PatternDrawing
 
 @Composable
 fun PatternPreview(
