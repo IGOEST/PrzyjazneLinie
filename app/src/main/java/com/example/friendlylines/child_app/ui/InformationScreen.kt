@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.friendlylines.R
-import com.example.friendlylines.child_app.theme.LoadingScreenBlue
+import com.example.friendlylines.child_app.ui.theme.LoadingScreenBlue
 import kotlin.math.sqrt
 
 @SuppressLint("ConfigurationScreenWidthHeight")

@@ -115,6 +115,23 @@
     <string name="chosen_mode">Mode</string>
     <string name="child_level">LEVEL</string>
 
+    <string name="results">RESULTS</string>
+    <string name="results_download_button_1">DOWNLOAD</string>
+    <string name="results_download_button_2">DETAILED REPORT</string>
+    <string name="results_choose_pattern">Choose pattern</string>
+    <string name="results_starting_point_1">Showing starting</string>
+    <string name="results_starting_point_2">point</string>
+    <string name="results_test_mode">Test mode</string>
+    <string name="results_correct_covering">Correct covering</string>
+    <string name="results_line_out_of_bounds">Line out of bounds</string>
+    <string name="results_correct_shape">Correct shape</string>
+    <string name="results_correct_starting_point_1">Correct starting</string>
+    <string name="results_correct_starting_point_2">point</string>
+    <string name="results_yes">YES</string>
+    <string name="results_no">NO</string>
+    <string name="results_of_learning_step">Learning step results</string>
+    <string name="results_of_pattern">Pattern results</string>
+
 </resources>
 
 

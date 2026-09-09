@@ -1,4 +1,4 @@
-package com.example.friendlylines.child_app.components
+package com.example.friendlylines.child_app.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -12,19 +12,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.example.friendlylines.child_app.theme.Success
-import com.example.friendlylines.child_app.theme.White
-import androidx.compose.ui.graphics.Color
+import com.example.friendlylines.child_app.ui.theme.Success
+import com.example.friendlylines.child_app.ui.theme.White
 import androidx.compose.ui.res.stringResource
 import com.example.friendlylines.R
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.automirrored.filled.MenuOpen
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.ui.draw.shadow
 
 enum class IconType(val contentDescription: Int) {
     Play(R.string.child_play),
@@ -44,7 +41,7 @@ private fun IconType.toImageVector() = when (this) {
 
 
 @Composable
-fun ChildButton(
+fun TemplateChildButton(
     icon: IconType,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,

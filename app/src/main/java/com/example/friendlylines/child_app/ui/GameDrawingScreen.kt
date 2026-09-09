@@ -24,12 +24,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.friendlylines.R
-import com.example.friendlylines.child_app.components.ChildButton
-import com.example.friendlylines.child_app.components.IconType
-import com.example.friendlylines.child_app.theme.Primary1000
-import com.example.friendlylines.child_app.theme.Primary50
-import com.example.friendlylines.child_app.theme.Black
-import com.example.friendlylines.child_app.theme.Neutral400
+import com.example.friendlylines.child_app.ui.components.TemplateChildButton
+import com.example.friendlylines.child_app.ui.components.IconType
+import com.example.friendlylines.child_app.ui.theme.Primary1000
+import com.example.friendlylines.child_app.ui.theme.Primary50
+import com.example.friendlylines.child_app.ui.theme.Black
+import com.example.friendlylines.child_app.ui.theme.Neutral400
 
 @Composable
 fun GameDrawingScreen(
@@ -70,13 +70,13 @@ fun GameDrawingScreen(
                         .padding(8.dp)
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        ChildButton(
+                        TemplateChildButton(
                             icon = IconType.StartAgain,
                             onClick = { }, //TODO: restart
                             size = 56.dp
                         )
                         Spacer(modifier = Modifier.width(10.dp))
-                        ChildButton(
+                        TemplateChildButton(
                             icon = IconType.Back,
                             onClick = onBackClick,
                             size = 56.dp
@@ -100,7 +100,7 @@ fun GameDrawingScreen(
                 fontSize = 34.6.sp
             )
             Spacer(modifier = Modifier.weight(1f))
-            ChildButton(
+            TemplateChildButton(
                 icon = if (isMenuOpen) IconType.CloseMenu else IconType.Menu,
                 onClick = { isMenuOpen = !isMenuOpen }, //TODO: kontynuuj / zatrzymaj stoper
                 size = 56.dp

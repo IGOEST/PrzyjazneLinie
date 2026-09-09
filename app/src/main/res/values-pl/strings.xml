@@ -129,4 +129,21 @@
     <string name="chosen_mode">Tryb</string>
     <string name="child_level">POZIOM</string>
 
+    <string name="results">WYNIKI</string>
+    <string name="results_download_button_1">POBIERZ RAPORT</string>
+    <string name="results_download_button_2">SZCZEGÓŁOWY</string>
+    <string name="results_choose_pattern">Wybierz wzór</string>
+    <string name="results_starting_point_1">Wyświetlanie punktu</string>
+    <string name="results_starting_point_2">startowego</string>
+    <string name="results_test_mode">Tryb testu</string>
+    <string name="results_correct_covering">Poprawne pokrycie</string>
+    <string name="results_line_out_of_bounds">Ślad poza linią</string>
+    <string name="results_correct_shape">Zgodność kształtu</string>
+    <string name="results_correct_starting_point_1">Prawidłowy punkt</string>
+    <string name="results_correct_starting_point_2">startowy</string>
+    <string name="results_yes">TAK</string>
+    <string name="results_no">NIE</string>
+    <string name="results_of_learning_step">Wyniki kroku uczenia</string>
+    <string name="results_of_pattern">Wyniki wzoru</string>
+
 </resources>

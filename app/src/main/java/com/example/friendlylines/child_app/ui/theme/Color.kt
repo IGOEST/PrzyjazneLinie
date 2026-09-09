@@ -1,4 +1,4 @@
-package com.example.friendlylines.child_app.theme
+package com.example.friendlylines.child_app.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

@@ -9,8 +9,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.friendlylines.child_app.theme.Primary50
-import com.example.friendlylines.child_app.theme.Primary500
+import com.example.friendlylines.child_app.ui.theme.Primary50
+import com.example.friendlylines.child_app.ui.theme.Primary500
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -29,9 +29,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.example.friendlylines.R
-import com.example.friendlylines.child_app.components.ChildButton
-import com.example.friendlylines.child_app.components.IconType
-import com.example.friendlylines.child_app.theme.Primary1000
+import com.example.friendlylines.child_app.ui.components.TemplateChildButton
+import com.example.friendlylines.child_app.ui.components.IconType
+import com.example.friendlylines.child_app.ui.theme.Primary1000
 
 
 @Composable
@@ -100,7 +100,7 @@ fun MainMenuScreen(
             )
             Spacer(modifier = Modifier.height(30.dp))
             // Play button
-            ChildButton(
+            TemplateChildButton(
                 icon = IconType.Play,
                 onClick = onPlayClick,
                 size = 300.dp)
