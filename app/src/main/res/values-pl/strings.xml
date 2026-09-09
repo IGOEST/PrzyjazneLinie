@@ -158,4 +158,11 @@
 
     <string name="save_learning_step_dialog_title">Zapisz krok uczenia</string>
 
+    <string name="learning_mode">Uczenie</string>
+    <string name="test_mode">Test</string>
+    <string name="copy_learning_step">Kopiuj krok</string>
+    <string name="edit_learning_step">Edytuj krok</string>
+    <string name="delete_learning_step">Usuń krok</string>
+    <string name="create_learning_step">Utwórz nowy krok uczenia</string>
+
 </resources>

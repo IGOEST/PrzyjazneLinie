@@ -96,4 +96,17 @@ interface LearningStepDao {
          """
     )
     suspend fun getActiveStep(): LearningStepEntity
+    
+    // updating mode (test or learning)
+    @Query(
+        """
+    UPDATE learning_steps
+    SET mode = :mode
+    WHERE id = :learningStepId
+    """
+    )
+    suspend fun updateMode(
+        learningStepId: Long,
+        mode: String
+    )
 }
