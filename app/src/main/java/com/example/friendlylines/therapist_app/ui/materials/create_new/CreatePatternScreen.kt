@@ -6,9 +6,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.BoxWithConstraintsScope
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -68,12 +65,7 @@ import com.example.friendlylines.therapist_app.ui.materials.models.toNormalizedS
 import com.example.friendlylines.therapist_app.ui.theme.Primary1000
 import com.example.friendlylines.therapist_app.ui.theme.Primary50
 import java.lang.System.currentTimeMillis
-import com.composables.core.ScrollArea
-
-enum class PatternNameError {
-    BLANK,
-    EXISTS
-}
+import com.example.friendlylines.therapist_app.ui.components.NameError
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -526,15 +518,15 @@ fun CreatePatternScreen(
             confirmText = stringResource(R.string.save_button_text),
             dismissText = stringResource(R.string.dismiss_button_text),
             textFieldLabel = stringResource(R.string.save_name_field_title),
-            patternName = state.patternName,
-            onPatternNameChange = {
+            name = state.patternName,
+            onNameChange = {
                 viewModel.onEvent(
                     CreatePatternScreenEvent.PatternNameChanged(it)
                 )
 //                patternName = it
 //                patternNameError = null
             },
-            patternNameError = state.patternNameError,
+            nameError = state.patternNameError,
             onDismiss = {
                 viewModel.onEvent(
                     CreatePatternScreenEvent.SaveDismissed

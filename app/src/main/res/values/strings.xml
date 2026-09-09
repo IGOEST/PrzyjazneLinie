@@ -110,6 +110,8 @@
     <string name="easy_label_text">Easy</string>
     <string name="hard_label_text">Hard</string>
 
+    <string name="save_learning_step_dialog_title">Save learning step</string>
+
 </resources>
 
 
