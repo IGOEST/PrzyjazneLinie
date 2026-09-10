@@ -46,6 +46,7 @@ fun LearningStepListArea(
     onActiveStepClick: (LearningStepEntity) -> Unit = {},
     onModeChange: (LearningStepEntity, Boolean) -> Unit = { _, _ -> },
     onCreateClick: () -> Unit = {},
+    onEditClick: (LearningStepEntity) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -79,7 +80,7 @@ fun LearningStepListArea(
                         onModeChange(learningStep, isTest)
                     },
                     onEditClick = {
-                        // later
+                        onEditClick(learningStep)
                     },
                     onCopyClick = {
                         // later
@@ -172,6 +173,7 @@ private fun LearningStepListItem(
             icon = Icons.Default.Edit,
             contentDescription = stringResource(R.string.edit_learning_step),
             onClick = onEditClick,
+            enabled = !learningStep.isExample,
             modifier = Modifier.size(24.dp)
         )
 
@@ -190,6 +192,7 @@ private fun LearningStepListItem(
             icon = Icons.Default.Delete,
             contentDescription = stringResource(R.string.delete_learning_step),
             onClick = onDeleteClick,
+            enabled = !learningStep.isExample,
             modifier = Modifier.size(24.dp)
         )
     }

@@ -24,6 +24,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.friendlylines.therapist_app.ui.components.TemplateSaveDialog
 
 // Final screen of learning step configuration
@@ -32,14 +33,18 @@ fun LearningStepsSummaryScreen(
     settingsViewModel: LearningStepsSettingsViewModel,
     onSaved: () -> Unit
 ) {
+
+
+    val currentName by settingsViewModel.name.collectAsStateWithLifecycle()
+    val learningStepId by settingsViewModel.learningStepId.collectAsStateWithLifecycle()
+
     var showSaveDialog by remember {
         mutableStateOf(false)
     }
 
-    var stepName by remember {
-        mutableStateOf("")
+    var stepName by remember(currentName) {
+        mutableStateOf(currentName)
     }
-
     var stepNameError by remember {
         mutableStateOf<NameError?>(null)
     }
@@ -63,7 +68,7 @@ fun LearningStepsSummaryScreen(
                 modifier = Modifier.wrapContentWidth(),
                 enabled = true,
                 onClick = {
-                    stepName = ""
+                    stepName = currentName
                     stepNameError = null
                     showSaveDialog = true
                 },
@@ -98,15 +103,23 @@ fun LearningStepsSummaryScreen(
                     return@TemplateSaveDialog
                 }
 
-                settingsViewModel.saveLearningStep(
-                    name = name,
-                    onSaved = {
-                        showSaveDialog = false
-                        stepName = ""
-                        stepNameError = null
-                        onSaved()
+                settingsViewModel.isLearningStepNameTaken(name) { isTaken ->
+
+                    if (isTaken) {
+                        stepNameError = NameError.EXISTS
+                        return@isLearningStepNameTaken
                     }
-                )
+
+                    settingsViewModel.saveLearningStep(
+                        name = name,
+                        onSaved = {
+                            showSaveDialog = false
+                            stepName = ""
+                            stepNameError = null
+                            onSaved()
+                        }
+                    )
+                }
             }
         )
     }

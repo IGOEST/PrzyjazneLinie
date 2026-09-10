@@ -50,6 +50,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import com.example.friendlylines.therapist_app.ui.components.TemplateAlertDialog
+import com.example.friendlylines.therapist_app.ui.main.NavRoutes
 
 @Composable
 fun LearningStepsListScreen(
@@ -67,6 +69,14 @@ fun LearningStepsListScreen(
         mutableStateOf(false)
     }
 
+    var showEditDialog by remember {
+        mutableStateOf(false)
+    }
+
+    var selectedStepId by remember {
+        mutableStateOf<Long?>(null)
+    }
+
     var hideExampleSteps by remember {
         mutableStateOf(false)
     }
@@ -74,6 +84,19 @@ fun LearningStepsListScreen(
     val learningSteps by viewModel.learningSteps.collectAsStateWithLifecycle()
 
     val lifecycleOwner = LocalLifecycleOwner.current
+
+    val visibleLearningSteps = if (hideExampleSteps) {
+        learningSteps.filter { !it.isExample }
+    } else {
+        learningSteps
+    }
+
+    val filteredLearningSteps = visibleLearningSteps.filter { step ->
+        step.name.contains(
+            searchQuery.trim(),
+            ignoreCase = true
+        )
+    }
 
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
@@ -128,8 +151,12 @@ fun LearningStepsListScreen(
             )
 
             LearningStepListArea(
-                learningSteps = learningSteps,
+                learningSteps = filteredLearningSteps,
                 modifier = Modifier.weight(1f),
+                onEditClick = { step ->
+                    selectedStepId = step.id
+                    showEditDialog = true
+                },
                 onDeleteClick = { step ->
                     // later
                 },
@@ -152,6 +179,33 @@ fun LearningStepsListScreen(
                 info = stringResource(R.string.learning_steps_info),
                 onDismiss = {
                     showInfoDialog = false
+                }
+            )
+        }
+
+        if (showEditDialog) {
+            TemplateAlertDialog(
+                title = stringResource(R.string.edit_dialog_title),
+                message = stringResource(R.string.edit_learning_step_dialog_message),
+                confirmText = stringResource(R.string.edit_button_text),
+                dismissText = stringResource(R.string.dismiss_button_text),
+                onConfirm = {
+                    val stepId = selectedStepId
+
+                    showEditDialog = false
+                    selectedStepId = null
+
+                    if (stepId != null) {
+                        navController.navigate(
+                            NavRoutes.learningStepsCreate(
+                                stepId = stepId
+                            )
+                        )
+                    }
+                },
+                onDismiss = {
+                    showEditDialog = false
+                    selectedStepId = null
                 }
             )
         }

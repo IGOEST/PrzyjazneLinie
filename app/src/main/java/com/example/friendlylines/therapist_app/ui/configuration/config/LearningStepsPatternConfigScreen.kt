@@ -41,15 +41,13 @@ import com.example.friendlylines.therapist_app.ui.components.TemplateInfoDialog
 import com.example.friendlylines.therapist_app.ui.components.TemplateSlider
 import com.example.friendlylines.therapist_app.ui.components.TemplateToggleSwitch
 import com.example.friendlylines.therapist_app.ui.components.TemplateTopAppBar
-//import com.example.friendlylines.therapist_app.ui.configuration.config.PatternConfigOptions.toDp
 import com.example.friendlylines.therapist_app.ui.main.ExitDestination
 import com.example.friendlylines.therapist_app.ui.materials.models.PatternPreview
 import com.example.friendlylines.therapist_app.ui.theme.*
-import com.example.shared.data.drafts.ColorOption
 import com.example.shared.data.drafts.PatternWidth
-import com.example.shared.data.drafts.PatternConfigOptions.toDp
-import com.example.shared.data.drafts.PatternConfigOptions
 import com.example.friendlylines.therapist_app.ui.configuration.settings.LearningStepsSettingsViewModel
+import com.example.shared.data.drafts.ColorOption
+import com.example.shared.data.drafts.toDp
 
 @Composable
 fun LearningStepPatternConfigScreen(
@@ -68,6 +66,11 @@ fun LearningStepPatternConfigScreen(
     val pattern by patternConfigViewModel.pattern
         .collectAsStateWithLifecycle()
 
+    val learningStepId by settingsViewModel
+        .learningStepId
+        .collectAsStateWithLifecycle()
+
+
     LaunchedEffect(patternId) {
         patternConfigViewModel.loadPattern(patternId)
     }
@@ -78,6 +81,7 @@ fun LearningStepPatternConfigScreen(
     val existingConfig = remember(patterns, configId) {
         patterns.firstOrNull {
             it.id == configId
+
         }
     }
 
@@ -109,15 +113,24 @@ fun LearningStepPatternConfigScreen(
 
     val strokeWidth = selectedWidth.toDp()
 
-    val availablePatternColors = PatternConfigOptions.patternAndWriting.filter { option ->
+    val patternAndWritingColors = PatternConfigColors.patternAndWriting()
+    val backgroundColors = PatternConfigColors.background()
+
+    val colorNames = patternAndWritingColors
+        .plus(backgroundColors)
+        .associate { option ->
+            option.key to PatternConfigColors.nameFor(option.key)
+        }
+
+    val availablePatternColors = patternAndWritingColors.filter { option ->
         option != writingColor
     }
 
-    val availableWritingColors = PatternConfigOptions.patternAndWriting.filter { option ->
+    val availableWritingColors = patternAndWritingColors.filter { option ->
         option != patternColor
     }
 
-    val availableBackgroundColors = PatternConfigOptions.background
+    val availableBackgroundColors = backgroundColors
 
     var showThicknessInfoDialog by remember {
         mutableStateOf(false)
@@ -235,7 +248,9 @@ fun LearningStepPatternConfigScreen(
                                         patternColor = it
                                     },
                                     label = stringResource(R.string.pattern_color_text),
-                                    optionLabel = { it?.name ?: "" },
+                                    optionLabel = { option ->
+                                        option?.let { colorNames[it.key] } ?: ""
+                                    },
                                     showEmptyOption = true,
                                     showHeader = true,
                                     headerText = stringResource(R.string.pattern_color_text),
@@ -252,7 +267,9 @@ fun LearningStepPatternConfigScreen(
                                         writingColor = it
                                     },
                                     label = stringResource(R.string.drawing_color_text),
-                                    optionLabel = { it?.name ?: "" },
+                                    optionLabel = { option ->
+                                        option?.let { colorNames[it.key] } ?: ""
+                                    },
                                     showEmptyOption = true,
                                     showHeader = true,
                                     headerText = stringResource(R.string.drawing_color_text),
@@ -269,7 +286,9 @@ fun LearningStepPatternConfigScreen(
                                         backgroundColor = it
                                     },
                                     label = stringResource(R.string.background_color_text),
-                                    optionLabel = { it?.name ?: "" },
+                                    optionLabel = { option ->
+                                        option?.let { colorNames[it.key] } ?: ""
+                                    },
                                     showEmptyOption = true,
                                     showHeader = true,
                                     headerText = stringResource(R.string.background_color_text),
@@ -452,8 +471,20 @@ fun LearningStepPatternConfigScreen(
                             patternVariety = patternVariety
                         )
 
-                        onSaveClick(newConfigId)
+                        // if learning step exists and we are in editing mode
+                        if (learningStepId != null) {
+                            settingsViewModel.saveCurrentLearningStep {
+                                onSaveClick(newConfigId)
+                            }
+                        } else {
+                            // if the learning step is new and we are just in creation mode
+                            onSaveClick(newConfigId)
+                        }
                     } else {
+                        println("SAVE CONFIG")
+                        println("configId = $configId")
+                        println("pattern.id = ${pattern.pattern.id}")
+                        println("pattern.name = ${pattern.pattern.name}")
                         settingsViewModel.updatePattern(
                             configId = configId,
                             patternItem = pattern,
@@ -464,7 +495,9 @@ fun LearningStepPatternConfigScreen(
                             patternVariety = patternVariety
                         )
 
-                        onSaveClick(configId)
+                        settingsViewModel.saveCurrentLearningStep {
+                            onSaveClick(configId)
+                        }
                     }
                 }
             },

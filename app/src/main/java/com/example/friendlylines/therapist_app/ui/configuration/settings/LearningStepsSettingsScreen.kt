@@ -1,8 +1,6 @@
 package com.example.friendlylines.therapist_app.ui.configuration.settings
 
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.friendlylines.therapist_app.ui.configuration.learning.LearningStepsLearningScreenViewModel
-import com.example.friendlylines.therapist_app.ui.configuration.test.LearningStepsTestScreenViewModel
 import androidx.activity.compose.BackHandler
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
@@ -19,6 +17,7 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -74,6 +73,12 @@ fun LearningStepsSettingsScreen(
     onHomeClick: () -> Unit,
     settingsViewModel: LearningStepsSettingsViewModel = hiltViewModel()
 ) {
+    LaunchedEffect(stepId) {
+        if (stepId != null) {
+            settingsViewModel.loadLearningStep(stepId)
+        }
+    }
+
     var selectedTab by remember {
         mutableStateOf(LearningStepTab.PATTERNS)
     }

@@ -38,12 +38,6 @@ interface PatternDao {
         patternId: Long
     ): PatternWithStrokes?
 
-    @Transaction
-    @Query("SELECT * FROM patterns WHERE id = :patternId")
-    suspend fun getPattern(
-        patternId: Long
-    ): PatternWithStrokes?
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPattern(
         pattern: PatternEntity

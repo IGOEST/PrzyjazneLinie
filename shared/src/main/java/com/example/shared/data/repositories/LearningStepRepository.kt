@@ -2,16 +2,23 @@ package com.example.shared.data.repositories
 
 import com.example.shared.data.daos.LearningStepPatternDao
 import com.example.shared.data.daos.LearningStepDao
+import com.example.shared.data.daos.PatternDao
+import com.example.shared.data.drafts.LearningStepsPatternConfigDraft
+import com.example.shared.data.drafts.PatternWidth
+import com.example.shared.data.drafts.colorOptionFromKey
 import com.example.shared.data.entities.LearningStepEntity
 import com.example.shared.data.entities.LearningStepPatternEntity
 import javax.inject.Inject
+import com.example.shared.data.models.PatternItem
+import com.example.shared.data.models.toPatternDrawing
 
 
 // Repository responsible for storing and reading learning step configuration (bridge between app and the database)
 
 class LearningStepRepository @Inject constructor(
     private val learningStepDao: LearningStepDao,
-    private val learningStepPatternDao: LearningStepPatternDao
+    private val learningStepPatternDao: LearningStepPatternDao,
+    private val patternDao: PatternDao
 ) {
 
     // saves a learning step in the database
@@ -44,6 +51,35 @@ class LearningStepRepository @Inject constructor(
         return learningStepDao.insert(learningStep)
     }
 
+    // updates a learning step
+    suspend fun updateLearningStep(
+        learningStepId: Long,
+        name: String,
+        repetitions: Int,
+        attempts: Int,
+        timeLimit: Int,
+        accuracyLevel: String,
+        startingPointEnabled: Boolean,
+        randomPatternOrder: Boolean,
+        testRepetitions: Int,
+        testTimeLimit: Int,
+        testAccuracyLevel: String
+    ) {
+        learningStepDao.update(
+            learningStepId = learningStepId,
+            name = name,
+            repetitions = repetitions,
+            attempts = attempts,
+            timeLimit = timeLimit,
+            accuracyLevel = accuracyLevel,
+            startingPointEnabled = startingPointEnabled,
+            randomPatternOrder = randomPatternOrder,
+            testRepetitions = testRepetitions,
+            testTimeLimit = testTimeLimit,
+            testAccuracyLevel = testAccuracyLevel
+        )
+    }
+
     // saves a pattern configuration assigned to a learning step
     suspend fun savePatternConfiguration(
         pattern: LearningStepPatternEntity
@@ -63,6 +99,36 @@ class LearningStepRepository @Inject constructor(
         learningStepId: Long
     ): List<LearningStepPatternEntity> {
         return learningStepPatternDao.getForLearningStep(learningStepId)
+    }
+
+    suspend fun getPatternItemsForLearningStep(
+        learningStepId: Long
+    ): List<LearningStepsPatternConfigDraft> {
+
+        val configurations =
+            learningStepPatternDao.getForLearningStep(learningStepId)
+
+        return configurations.mapNotNull { config ->
+
+            val patternWithStrokes =
+                patternDao.getPatternWithStrokes(config.patternId)
+                    ?: return@mapNotNull null
+
+            LearningStepsPatternConfigDraft(
+                id = config.id,
+                pattern = PatternItem(
+                    pattern = patternWithStrokes.pattern,
+                    drawing = patternWithStrokes.toPatternDrawing()
+                ),
+                width = PatternWidth.valueOf(config.width),
+                patternColor = colorOptionFromKey(config.patternColor),
+                writingColor = colorOptionFromKey(config.writingColor),
+                backgroundColor = colorOptionFromKey(config.backgroundColor),
+                patternVariety = config.patternVariety,
+                order = config.order,
+                isEnabled = config.isEnabled
+            )
+        }
     }
 
     // returns all saved learning steps
@@ -91,21 +157,6 @@ class LearningStepRepository @Inject constructor(
         learningStepDao.deleteById(learningStepId)
     }
 
-    // updates only the test settings of an existing learning step
-    suspend fun updateTestSettings(
-        learningStepId: Long,
-        testRepetitions: Int,
-        testTimeLimit: Int,
-        testAccuracyLevel: String
-    ) {
-        learningStepDao.updateTestSettings(
-            learningStepId = learningStepId,
-            testRepetitions = testRepetitions,
-            testTimeLimit = testTimeLimit,
-            testAccuracyLevel = testAccuracyLevel
-        )
-    }
-
     // mark the step active, others - inactive
     suspend fun setActiveStep(
         learningStepId: Long
@@ -122,6 +173,17 @@ class LearningStepRepository @Inject constructor(
         learningStepDao.updateMode(
             learningStepId = learningStepId,
             mode = mode
+        )
+    }
+
+    // check if given name already exists
+    suspend fun learningStepExistsByName(
+        name: String,
+        excludeId: Long? = null
+    ): Boolean {
+        return learningStepDao.existsByName(
+            name = name,
+            excludeId = excludeId
         )
     }
 }

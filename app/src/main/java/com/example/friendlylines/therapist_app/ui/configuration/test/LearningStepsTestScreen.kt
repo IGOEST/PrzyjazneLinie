@@ -40,9 +40,6 @@ import com.example.shared.data.drafts.AccuracyLevel
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.unit.sp
-import com.example.friendlylines.therapist_app.ui.configuration.learning.LearningStepsLearningScreenViewModel
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.friendlylines.therapist_app.ui.configuration.settings.LearningStepsSettingsViewModel
 
 @Composable

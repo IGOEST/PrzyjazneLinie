@@ -49,23 +49,6 @@ interface LearningStepDao {
         id: Long
     )
 
-    // updates only the test settings of an existing learning step
-    @Query(
-        """
-    UPDATE learning_steps
-    SET testRepetitions = :testRepetitions,
-        testTimeLimit = :testTimeLimit,
-        testAccuracyLevel = :testAccuracyLevel
-    WHERE id = :learningStepId
-    """
-    )
-    suspend fun updateTestSettings(
-        learningStepId: Long,
-        testRepetitions: Int,
-        testTimeLimit: Int,
-        testAccuracyLevel: String
-    )
-
     // updating which step is active
     @Query(
         """
@@ -98,4 +81,51 @@ interface LearningStepDao {
         learningStepId: Long,
         mode: String
     )
+
+    // for editing learning step
+    @Query(
+        """
+    UPDATE learning_steps
+    SET name = :name,
+        repetitions = :repetitions,
+        attempts = :attempts,
+        timeLimit = :timeLimit,
+        accuracyLevel = :accuracyLevel,
+        startingPointEnabled = :startingPointEnabled,
+        randomPatternOrder = :randomPatternOrder,
+        testRepetitions = :testRepetitions,
+        testTimeLimit = :testTimeLimit,
+        testAccuracyLevel = :testAccuracyLevel
+    WHERE id = :learningStepId
+    """
+    )
+    suspend fun update(
+        learningStepId: Long,
+        name: String,
+        repetitions: Int,
+        attempts: Int,
+        timeLimit: Int,
+        accuracyLevel: String,
+        startingPointEnabled: Boolean,
+        randomPatternOrder: Boolean,
+        testRepetitions: Int,
+        testTimeLimit: Int,
+        testAccuracyLevel: String
+    )
+
+    // to ensure uniqueness of each steps name
+    @Query(
+        """
+    SELECT EXISTS(
+        SELECT 1
+        FROM learning_steps
+        WHERE name = :name
+        AND (:excludeId IS NULL OR id != :excludeId)
+    )
+    """
+    )
+    suspend fun existsByName(
+        name: String,
+        excludeId: Long?
+    ): Boolean
 }

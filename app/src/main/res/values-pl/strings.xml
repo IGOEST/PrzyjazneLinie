@@ -82,13 +82,14 @@
 <string name="copy_dialog_message">Czy na pewno chcesz utworzyć kopię tej konfiguracji wzoru?</string>
 <string name="copy_button_text">KOPIUJ</string>
 
-<string name="edit_dialog_title">Edytować?</string>
-<string name="edit_dialog_message">Czy na pewno chcesz edytować tę konfigurację wzoru?</string>
-<string name="edit_button_text">EDYTUJ</string>
+    <string name="edit_dialog_title">Edytować?</string>
+    <string name="edit_dialog_message">Czy na pewno chcesz edytować tę konfigurację wzoru?</string>
+    <string name="edit_learning_step_dialog_message">Czy na pewno chcesz edytować tę konfigurację kroku uczenia?</string>
+    <string name="edit_button_text">EDYTUJ</string>
 
-<string name="new_learning_step_header">Nowy krok uczenia</string>
+    <string name="new_learning_step_header">Nowy krok uczenia</string>
 
-<string name="pattern_preview_info">Wizualizacja różni się wielkością od realnego wzoru – odwzorowana jest szerokość wzoru.</string>
+    <string name="pattern_preview_info">Wizualizacja różni się wielkością od realnego wzoru – odwzorowana jest szerokość wzoru.</string>
 
 <string name="color_red">Czerwony</string>
 <string name="color_orange">Pomarańczowy</string>

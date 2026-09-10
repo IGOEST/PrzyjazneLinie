@@ -71,6 +71,7 @@
     <string name="copy_button_text">COPY</string>
     <string name="edit_dialog_title">Edit?</string>
     <string name="edit_dialog_message">Are you sure you want to edit this pattern configuration?</string>
+    <string name="edit_learning_step_dialog_message">Are you sure you want to edit this learning step configuration?</string>
     <string name="edit_button_text">EDIT</string>
     <string name="new_learning_step_header">New learning step</string>
     <string name="pattern_preview_info">The visualization differs in size from the actual pattern – the width of the pattern is shown.</string>

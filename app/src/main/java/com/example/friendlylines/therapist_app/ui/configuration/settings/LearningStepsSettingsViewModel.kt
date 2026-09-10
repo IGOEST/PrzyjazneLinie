@@ -2,13 +2,15 @@ package com.example.friendlylines.therapist_app.ui.configuration.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.friendlylines.therapist_app.ui.configuration.config.PatternConfigColors
 import com.example.friendlylines.therapist_app.ui.configuration.patterns.MoveDirection
 import com.example.shared.data.drafts.AccuracyLevel
 import com.example.shared.data.drafts.ColorOption
-import com.example.shared.data.drafts.LearningStepsPatternConfigDraft
 import com.example.shared.data.drafts.PatternWidth
+import com.example.shared.data.drafts.LearningStepsPatternConfigDraft
 import com.example.shared.data.entities.LearningStepPatternEntity
 import com.example.shared.data.models.PatternItem
+import com.example.shared.data.models.toPatternDrawing
 import com.example.shared.data.repositories.LearningStepRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -251,54 +253,141 @@ class LearningStepsSettingsViewModel @Inject constructor(
         _testAccuracy.value = value
     }
 
-    // saves the complete learning step configuration
+    // saves pattern configuration
+    private suspend fun savePatternConfigurations(
+        learningStepId: Long
+    ) {
+        // replace pattern configurations with current state - delete old
+        learningStepRepository.deletePatternConfigurations(
+            learningStepId
+        )
+
+        // // convert pattern drafts to database entities
+        val patternEntities = _patterns.value.map { patternConfig ->
+            LearningStepPatternEntity(
+                learningStepId = learningStepId,
+                patternId = patternConfig.pattern.pattern.id,
+                width = patternConfig.width.name,
+                patternColor = patternConfig.patternColor?.key,
+                writingColor = patternConfig.writingColor?.key,
+                backgroundColor = patternConfig.backgroundColor?.key,
+                patternVariety = patternConfig.patternVariety,
+                order = patternConfig.order,
+                isEnabled = patternConfig.isEnabled
+            )
+        }
+
+        // save all pattern configurations
+        if (patternEntities.isNotEmpty()) {
+            learningStepRepository.savePatternConfigurations(
+                patternEntities
+            )
+        }
+    }
+
+    // saves/updates the complete learning step configuration
     fun saveLearningStep(
         name: String,
         onSaved: (Long) -> Unit
     ) {
         viewModelScope.launch {
 
-            // save the learning step itself
-            val learningStepId = learningStepRepository.saveLearningStep(
-                name = name,
-                repetitions = _learningRepetitions.value,
-                attempts = _learningAttempts.value,
-                timeLimit = _learningTimeLimit.value,
-                accuracyLevel = _learningAccuracy.value.name,
-                startingPointEnabled = _startingPointEnabled.value,
-                randomPatternOrder = _randomPatternOrder.value,
-                testRepetitions = _testRepetitions.value,
-                testTimeLimit = _testTimeLimit.value,
-                testAccuracyLevel = _testAccuracy.value.name
-            )
+            val existingLearningStepId = _learningStepId.value
 
-            // convert pattern drafts to database entities
-            val patternEntities = _patterns.value.map { patternConfig ->
-                LearningStepPatternEntity(
-                    learningStepId = learningStepId,
-                    patternId = patternConfig.pattern.pattern.id,
-                    width = patternConfig.width.name,
-                    patternColor = patternConfig.patternColor?.name,
-                    writingColor = patternConfig.writingColor?.name,
-                    backgroundColor = patternConfig.backgroundColor?.name,
-                    patternVariety = patternConfig.patternVariety,
-                    order = patternConfig.order,
-                    isEnabled = patternConfig.isEnabled
+            val learningStepId = if (existingLearningStepId == null) {
+
+                // save new learning step
+                learningStepRepository.saveLearningStep(
+                    name = name,
+                    repetitions = _learningRepetitions.value,
+                    attempts = _learningAttempts.value,
+                    timeLimit = _learningTimeLimit.value,
+                    accuracyLevel = _learningAccuracy.value.name,
+                    startingPointEnabled = _startingPointEnabled.value,
+                    randomPatternOrder = _randomPatternOrder.value,
+                    testRepetitions = _testRepetitions.value,
+                    testTimeLimit = _testTimeLimit.value,
+                    testAccuracyLevel = _testAccuracy.value.name
                 )
+
+            } else {
+
+                // edit existing learning step
+                learningStepRepository.updateLearningStep(
+                    learningStepId = existingLearningStepId,
+                    name = name,
+                    repetitions = _learningRepetitions.value,
+                    attempts = _learningAttempts.value,
+                    timeLimit = _learningTimeLimit.value,
+                    accuracyLevel = _learningAccuracy.value.name,
+                    startingPointEnabled = _startingPointEnabled.value,
+                    randomPatternOrder = _randomPatternOrder.value,
+                    testRepetitions = _testRepetitions.value,
+                    testTimeLimit = _testTimeLimit.value,
+                    testAccuracyLevel = _testAccuracy.value.name
+                )
+
+                existingLearningStepId
             }
 
-            // save all pattern configurations
-            if (patternEntities.isNotEmpty()) {
-                learningStepRepository.savePatternConfigurations(
-                    patternEntities
-                )
-            }
+            // save pattern configuration
+            savePatternConfigurations(learningStepId)
 
             // remember the database id
             _learningStepId.value = learningStepId
 
             // tell the UI that saving is complete
             onSaved(learningStepId)
+        }
+    }
+
+    // save current state of learning step (used for saving patterns while editing step)
+    fun saveCurrentLearningStep(
+        onSaved: () -> Unit = {}
+    ) {
+        saveLearningStep(
+            name = _name.value
+        ) {
+            onSaved()
+        }
+    }
+
+    // loads the saved learning step
+    fun loadLearningStep(stepId: Long) {
+        viewModelScope.launch {
+            val step = learningStepRepository.getLearningStep(stepId)
+                ?: return@launch
+
+            _learningStepId.value = step.id
+            _name.value = step.name
+
+            _learningRepetitions.value = step.repetitions
+            _learningAttempts.value = step.attempts
+            _learningTimeLimit.value = step.timeLimit
+            _learningAccuracy.value =
+                AccuracyLevel.valueOf(step.accuracyLevel)
+
+            _startingPointEnabled.value =
+                step.startingPointEnabled
+
+            _randomPatternOrder.value =
+                step.randomPatternOrder
+
+            _testRepetitions.value =
+                step.testRepetitions
+
+            _testTimeLimit.value =
+                step.testTimeLimit
+
+            _testAccuracy.value =
+                AccuracyLevel.valueOf(step.testAccuracyLevel)
+
+            val patternDrafts =
+                learningStepRepository.getPatternItemsForLearningStep(
+                    step.id
+                )
+
+            _patterns.value = patternDrafts
         }
     }
 
@@ -320,5 +409,20 @@ class LearningStepsSettingsViewModel @Inject constructor(
         _testAccuracy.value = AccuracyLevel.MEDIUM
 
         _learningStepId.value = null
+    }
+
+    // checking if the name of learning step is already taken
+    fun isLearningStepNameTaken(
+        name: String,
+        onResult: (Boolean) -> Unit
+    ) {
+        viewModelScope.launch {
+            val exists = learningStepRepository.learningStepExistsByName(
+                name = name,
+                excludeId = _learningStepId.value
+            )
+
+            onResult(exists)
+        }
     }
 }
