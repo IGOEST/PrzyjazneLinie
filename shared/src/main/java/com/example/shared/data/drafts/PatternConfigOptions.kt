@@ -46,4 +46,12 @@ fun PatternWidth.toDp(): Dp {
         PatternWidth.MEDIUM -> 24.dp
         PatternWidth.THICK -> 48.dp
     }
+
+    fun getPatternAndWritingColor(name: String?): ColorOption {
+        return patternAndWriting.find { it.name == name } ?: patternAndWriting.first()
+    }
+
+    fun getBackgroundColor(name: String?): ColorOption {
+        return background.find { it.name == name } ?: background.first()
+    }
 }

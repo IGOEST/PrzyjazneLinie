@@ -102,6 +102,36 @@
     <string name="starting_point">Starting point</string>
     <string name="random_pattern_order">Random pattern order</string>
 
+    <string name="loading_screen_1">Fine motor skills training through tracing a pattern on the screen</string>
+    <string name="loading_screen_2">The applications are developed as part of a joint non-profit and open-source project</string>
+    <string name="loading_screen_3">of Gdańsk University of Technology and the Institute for Child Development foundation in Gdańsk (http://iwrd.pl/).</string>
+    <string name="loading_screen_4">Neither the Institute for Child Development, Gdańsk University of Technology, nor any participant in the project receives any financial benefit from developing the applications.</string>
+    <string name="loading_screen_5">For more information, visit: https://tiapps.org/</string>
+
+    <string name="child_play">Play</string>
+    <string name="child_back">Back</string>
+    <string name="child_close_options">Close options</string>
+    <string name="child_options">Options</string>
+    <string name="child_start_again">Start again</string>
+    <string name="chosen_mode">Mode</string>
+    <string name="child_level">LEVEL</string>
+
+    <string name="results">RESULTS</string>
+    <string name="results_download_button_1">DOWNLOAD</string>
+    <string name="results_download_button_2">DETAILED REPORT</string>
+    <string name="results_choose_pattern">Choose pattern</string>
+    <string name="results_starting_point_1">Showing starting</string>
+    <string name="results_starting_point_2">point</string>
+    <string name="results_test_mode">Test mode</string>
+    <string name="results_correct_covering">Correct covering</string>
+    <string name="results_line_out_of_bounds">Line out of bounds</string>
+    <string name="results_correct_shape">Correct shape</string>
+    <string name="results_correct_starting_point_1">Correct starting</string>
+    <string name="results_correct_starting_point_2">point</string>
+    <string name="results_yes">YES</string>
+    <string name="results_no">NO</string>
+    <string name="results_of_learning_step">Learning step results</string>
+    <string name="results_of_pattern">Pattern results</string>
     <string name="num_of_repetitions_info">The number of times the pattern will appear while going through the given learning level.</string>
     <string name="num_of_attempts_info">The number of times the pattern can be redrawn after an incorrect attempt. The first correct attempt completes the pattern.</string>
     <string name="time_limit_info">The number of seconds given to draw the pattern. For complex shapes, the timer resets after each component is drawn. When the time runs out, the attempt ends.</string>

@@ -165,15 +165,9 @@ class LearningStepRepository @Inject constructor(
         learningStepDao.setActiveStep(learningStepId)
     }
 
-    // change the mode (test, learning)
-    suspend fun updateLearningStepMode(
-        learningStepId: Long,
-        mode: String
-    ) {
-        learningStepDao.updateMode(
-            learningStepId = learningStepId,
-            mode = mode
-        )
+    // returns active learning step
+    suspend fun getActiveStep(): LearningStepEntity {
+        return learningStepDao.getActiveStep()
     }
 
     // check if given name already exists
@@ -186,4 +180,15 @@ class LearningStepRepository @Inject constructor(
             excludeId = excludeId
         )
     }
+
+        // change the mode (test, learning)
+        suspend fun updateLearningStepMode(
+            learningStepId: Long,
+            mode: String
+        ) {
+            learningStepDao.updateMode(
+                learningStepId = learningStepId,
+                mode = mode
+            )
+        }
 }
