@@ -166,4 +166,8 @@
     <string name="delete_learning_step">Usuń krok</string>
     <string name="create_learning_step">Utwórz nowy krok uczenia</string>
 
+    <string name="example_pattern_square">Kwadrat</string>
+    <string name="example_pattern_triangle">Trójkąt</string>
+    <string name="example_pattern_circle">Koło</string>
+
 </resources>

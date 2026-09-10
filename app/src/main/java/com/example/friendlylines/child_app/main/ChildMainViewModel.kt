@@ -5,10 +5,10 @@ import androidx.lifecycle.viewModelScope
 import com.example.friendlylines.child_app.ui.LearningStepResult
 import com.example.friendlylines.child_app.ui.PatternConfig
 import com.example.friendlylines.child_app.ui.PatternResult
-import com.example.shared.data.drafts.PatternConfigOptions
-import com.example.shared.data.drafts.PatternConfigOptions.toDp
 import com.example.shared.data.drafts.PatternWidth
+import com.example.shared.data.drafts.toDp
 import com.example.shared.data.models.toPatternDrawing
+import com.example.shared.data.drafts.PatternConfigOptions
 import com.example.shared.data.repositories.LearningStepRepository
 import com.example.shared.data.repositories.PatternRepository
 import dagger.hilt.android.lifecycle.HiltViewModel

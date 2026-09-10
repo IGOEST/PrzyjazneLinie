@@ -150,6 +150,11 @@
     <string name="delete_learning_step">Delete learning step</string>
     <string name="create_learning_step">Create new learning step</string>
 
+    <string name="example_pattern_square">Square</string>
+    <string name="example_pattern_triangle">Triangle</string>
+    <string name="example_pattern_circle">Circle</string>
+
+
 </resources>
 
 

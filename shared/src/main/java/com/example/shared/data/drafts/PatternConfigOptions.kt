@@ -14,7 +14,7 @@ fun colorOptionFromKey(key: String?): ColorOption? {
         "red" -> ColorOption("red", Color(0xFFFF1744))
         "orange" -> ColorOption("orange", Color(0xFFFF9100))
         "yellow" -> ColorOption("yellow", Color(0xFFFFFF00))
-        "green" -> ColorOption("green",  Color(0xFF00E676))
+        "green" -> ColorOption("green", Color(0xFF00E676))
         "blue" -> ColorOption("blue", Color(0xFF00B0FF))
         "purple" -> ColorOption("purple", Color(0xFFD500F9))
         "pink" -> ColorOption("pink", Color(0xFFFF4081))
@@ -46,12 +46,39 @@ fun PatternWidth.toDp(): Dp {
         PatternWidth.MEDIUM -> 24.dp
         PatternWidth.THICK -> 48.dp
     }
+}
+
+object PatternConfigOptions {
+
+    val patternAndWriting = listOf(
+        colorOptionFromKey("red")!!,
+        colorOptionFromKey("orange")!!,
+        colorOptionFromKey("yellow")!!,
+        colorOptionFromKey("green")!!,
+        colorOptionFromKey("blue")!!,
+        colorOptionFromKey("purple")!!,
+        colorOptionFromKey("pink")!!
+    )
+
+    val background = listOf(
+        colorOptionFromKey("white")!!,
+        colorOptionFromKey("black")!!,
+        colorOptionFromKey("pastel_red")!!,
+        colorOptionFromKey("pastel_orange")!!,
+        colorOptionFromKey("pastel_yellow")!!,
+        colorOptionFromKey("pastel_green")!!,
+        colorOptionFromKey("pastel_blue")!!,
+        colorOptionFromKey("pastel_purple")!!,
+        colorOptionFromKey("pastel_pink")!!
+    )
 
     fun getPatternAndWritingColor(name: String?): ColorOption {
-        return patternAndWriting.find { it.name == name } ?: patternAndWriting.first()
+        return patternAndWriting.find { it.key == name }
+            ?: patternAndWriting.first()
     }
 
     fun getBackgroundColor(name: String?): ColorOption {
-        return background.find { it.name == name } ?: background.first()
+        return background.find { it.key == name }
+            ?: background.first()
     }
 }

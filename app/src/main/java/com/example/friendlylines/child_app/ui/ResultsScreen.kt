@@ -40,6 +40,9 @@ import com.example.friendlylines.child_app.ui.theme.Primary50
 import com.example.friendlylines.child_app.ui.theme.Primary700
 import com.example.friendlylines.child_app.ui.theme.Primary800
 import com.example.friendlylines.child_app.ui.theme.White
+import com.example.friendlylines.name_mapping.ExamplePatternNames
+import com.example.friendlylines.therapist_app.ui.configuration.config.PatternConfigColors
+import com.example.shared.data.drafts.PatternWidth
 
 @Composable
 fun ResultsScreen(
@@ -129,7 +132,7 @@ fun ResultsScreen(
                         )
                         Spacer(modifier = Modifier.width(15.dp))
                         Text(
-                            text = config.patternColor.name,
+                            text = PatternConfigColors.nameFor(config.patternColor.key),
                             color = Primary1000,
                             fontSize = 20.sp
                         )
@@ -143,7 +146,7 @@ fun ResultsScreen(
                         )
                         Spacer(modifier = Modifier.width(15.dp))
                         Text(
-                            text = config.traceColor.name,
+                            text = PatternConfigColors.nameFor(config.traceColor.key),
                             color = Primary1000,
                             fontSize = 20.sp
                         )
@@ -157,7 +160,7 @@ fun ResultsScreen(
                         )
                         Spacer(modifier = Modifier.width(15.dp))
                         Text(
-                            text = config.backgroundColor.name,
+                            text = PatternConfigColors.nameFor(config.backgroundColor.key),
                             color = Primary1000,
                             fontSize = 20.sp
                         )
@@ -171,7 +174,12 @@ fun ResultsScreen(
                         )
                         Spacer(modifier = Modifier.width(15.dp))
                         Text(
-                            text = config.patternThickness,
+                            text = when (config.patternThickness) {
+                                "THIN" -> stringResource(R.string.thin_label_text)
+                                "MEDIUM" -> stringResource(R.string.medium_label_text)
+                                "THICK" -> stringResource(R.string.thick_label_text)
+                                else -> config.patternThickness
+                            },
                             color = Primary1000,
                             fontSize = 20.sp
                         )
