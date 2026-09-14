@@ -12,9 +12,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.ArrowForwardIos
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -25,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.friendlylines.R
 import com.example.friendlylines.therapist_app.ui.components.TemplateButton
 import com.example.friendlylines.therapist_app.ui.components.TemplateClickableIcon
@@ -35,18 +38,12 @@ import com.example.friendlylines.therapist_app.ui.theme.InfoActive
 import com.example.friendlylines.therapist_app.ui.theme.InfoDefault
 import com.example.friendlylines.therapist_app.ui.theme.Neutral300
 import com.example.friendlylines.therapist_app.ui.theme.Primary50
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shared.data.drafts.AccuracyLevel
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.ui.unit.sp
 import com.example.shared.data.drafts.LearningStepsLearningDraft
 
 @Composable
 fun LearningStepsLearningScreen(
     onNextClick: () -> Unit,
-    //viewModel: LearningStepsLearningScreenViewModel = hiltViewModel(),
     onEvent: (LearningStepsLearningEvent) -> Unit,
     draft: LearningStepsLearningDraft
 ) {
@@ -211,15 +208,6 @@ fun LearningStepsLearningScreen(
                                 .coerceAtLeast(timeLimitValues.first())
                         )
                     )
-//                    val currentIndex = timeLimitValues.indexOf(draft.timeLimit)
-//
-//                    if (currentIndex > 0) {
-//                        onEvent(
-//                            LearningStepsLearningEvent.SetTimeLimit(
-//                                timeLimitValues[currentIndex - 1]
-//                            )
-//                        )
-//                    }
                 },
                 onPlusClick = {
                     onEvent(
@@ -228,15 +216,6 @@ fun LearningStepsLearningScreen(
                                 .coerceAtMost(timeLimitValues.last())
                         )
                     )
-//                    val currentIndex = timeLimitValues.indexOf(draft.timeLimit)
-//
-//                    if (currentIndex < timeLimitValues.lastIndex) {
-//                        onEvent(
-//                            LearningStepsLearningEvent.SetTimeLimit(
-//                                timeLimitValues[currentIndex + 1]
-//                            )
-//                        )
-//                    }
                 },
                 sliderWidth = 320.dp
             )
@@ -420,9 +399,7 @@ fun LearningSettingRow(
         )
 
         // SPACE (between the information icon and the title)
-        Spacer(
-            modifier = Modifier.width(12.dp)
-        )
+        Spacer(modifier = Modifier.width(12.dp))
 
         // SETTING TITLE
         Text(
@@ -431,9 +408,7 @@ fun LearningSettingRow(
         )
 
         // SPACE (between title and setting component)
-        Spacer(
-            modifier = Modifier.weight(1f)
-        )
+        Spacer(modifier = Modifier.weight(1f))
 
         // SETTING COMPONENT
         settingContent()

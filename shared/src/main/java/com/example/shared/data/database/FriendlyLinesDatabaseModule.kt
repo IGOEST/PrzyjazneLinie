@@ -20,9 +20,7 @@ object DatabaseModule {
 
     @Provides
     @Singleton
-    fun provideFriendlyLinesDatabase(
-        @ApplicationContext context: Context
-    ): FriendlyLinesDatabase {
+    fun provideFriendlyLinesDatabase(@ApplicationContext context: Context): FriendlyLinesDatabase {
         return Room.databaseBuilder(
             context.applicationContext,
             FriendlyLinesDatabase::class.java,
@@ -40,17 +38,13 @@ object DatabaseModule {
 
     @Provides
     @Singleton
-    fun providePatternDao(
-        database: FriendlyLinesDatabase
-    ): PatternDao {
+    fun providePatternDao(database: FriendlyLinesDatabase): PatternDao {
         return database.patternDao()
     }
 
     @Provides
     @Singleton
-    fun provideLearningStepsDao(
-        database: FriendlyLinesDatabase
-    ): LearningStepsDao {
+    fun provideLearningStepsDao(database: FriendlyLinesDatabase): LearningStepsDao {
         return database.learningStepsDao()
     }
 }

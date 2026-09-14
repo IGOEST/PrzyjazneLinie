@@ -1,6 +1,6 @@
 package com.example.friendlylines.therapist_app.ui.configuration.config
 
-import android.annotation.SuppressLint
+//import com.example.friendlylines.therapist_app.ui.configuration.config.PatternConfigOptions.toDp
 import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
@@ -17,7 +17,6 @@ import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -45,8 +44,6 @@ import com.example.friendlylines.therapist_app.ui.components.TemplateSlider
 import com.example.friendlylines.therapist_app.ui.components.TemplateToggleSwitch
 import com.example.friendlylines.therapist_app.ui.components.TemplateTopAppBar
 import com.example.friendlylines.therapist_app.ui.configuration.patterns.LearningStepsPatternsEvent
-//import com.example.friendlylines.therapist_app.ui.configuration.config.PatternConfigOptions.toDp
-import com.example.friendlylines.therapist_app.ui.configuration.patterns.LearningStepsPatternsScreenViewModel
 import com.example.friendlylines.therapist_app.ui.configuration.settings.LearningStepsSettingsEvent
 import com.example.friendlylines.therapist_app.ui.configuration.settings.LearningStepsSettingsViewModel
 import com.example.friendlylines.therapist_app.ui.main.ExitDestination
@@ -54,10 +51,8 @@ import com.example.friendlylines.therapist_app.ui.main.NavRoutes
 import com.example.friendlylines.therapist_app.ui.materials.models.PatternPreview
 import com.example.friendlylines.therapist_app.ui.theme.*
 import com.example.shared.data.drafts.ColorOption
+import com.example.shared.data.drafts.toDp
 import com.example.shared.data.drafts.PatternWidth
-import com.example.shared.data.drafts.PatternConfigOptions.toDp
-import com.example.shared.data.drafts.PatternConfigOptions
-import com.example.shared.data.drafts.LearningStepsPatternConfigDraft
 
 @Composable
 fun LearningStepPatternConfigScreen(
@@ -121,15 +116,24 @@ fun LearningStepPatternConfigScreen(
 
     val strokeWidth = selectedWidth.toDp()
 
-    val availablePatternColors = PatternConfigOptions.patternAndWriting.filter { option ->
+    val patternAndWritingColors = PatternConfigColors.patternAndWriting()
+    val backgroundColors = PatternConfigColors.background()
+
+    val colorNames = patternAndWritingColors
+        .plus(backgroundColors)
+        .associate { option ->
+            option.key to PatternConfigColors.nameFor(option.key)
+        }
+
+    val availablePatternColors = patternAndWritingColors.filter { option ->
         option != writingColor
     }
 
-    val availableWritingColors = PatternConfigOptions.patternAndWriting.filter { option ->
+    val availableWritingColors = patternAndWritingColors.filter { option ->
         option != patternColor
     }
 
-    val availableBackgroundColors = PatternConfigOptions.background
+    val availableBackgroundColors = backgroundColors
 
     var showThicknessInfoDialog by remember {
         mutableStateOf(false)
@@ -247,7 +251,9 @@ fun LearningStepPatternConfigScreen(
                                         patternColor = it
                                     },
                                     label = stringResource(R.string.pattern_color_text),
-                                    optionLabel = { it?.name ?: "" },
+                                    optionLabel = { option ->
+                                        option?.let { colorNames[it.key] } ?: ""
+                                    },
                                     showEmptyOption = true,
                                     showHeader = true,
                                     headerText = stringResource(R.string.pattern_color_text),
@@ -264,7 +270,9 @@ fun LearningStepPatternConfigScreen(
                                         writingColor = it
                                     },
                                     label = stringResource(R.string.drawing_color_text),
-                                    optionLabel = { it?.name ?: "" },
+                                    optionLabel = { option ->
+                                        option?.let { colorNames[it.key] } ?: ""
+                                    },
                                     showEmptyOption = true,
                                     showHeader = true,
                                     headerText = stringResource(R.string.drawing_color_text),
@@ -281,7 +289,9 @@ fun LearningStepPatternConfigScreen(
                                         backgroundColor = it
                                     },
                                     label = stringResource(R.string.background_color_text),
-                                    optionLabel = { it?.name ?: "" },
+                                    optionLabel = { option ->
+                                        option?.let { colorNames[it.key] } ?: ""
+                                    },
                                     showEmptyOption = true,
                                     showHeader = true,
                                     headerText = stringResource(R.string.background_color_text),

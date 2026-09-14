@@ -1,9 +1,6 @@
 package com.example.friendlylines.therapist_app.ui.configuration.test
 
 import androidx.lifecycle.ViewModel
-import com.example.friendlylines.therapist_app.ui.configuration.learning.LearningStepsLearningEvent
-import com.example.shared.data.drafts.AccuracyLevel
-import com.example.shared.data.drafts.LearningStepsLearningDraft
 import com.example.shared.data.drafts.LearningStepsTestDraft
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

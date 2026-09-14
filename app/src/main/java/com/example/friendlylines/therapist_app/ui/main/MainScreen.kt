@@ -41,7 +41,6 @@ import com.example.friendlylines.therapist_app.ui.components.TemplateTopAppBar
 import com.example.friendlylines.therapist_app.ui.configuration.add.LearningStepsPatternAddScreen
 import com.example.friendlylines.therapist_app.ui.configuration.config.LearningStepPatternConfigScreen
 import com.example.friendlylines.therapist_app.ui.configuration.list.LearningStepsListScreen
-import com.example.friendlylines.therapist_app.ui.configuration.patterns.LearningStepsPatternsScreen
 import com.example.friendlylines.therapist_app.ui.configuration.settings.LearningStepsSettingsScreen
 import com.example.friendlylines.therapist_app.ui.materials.create_new.CreatePatternScreen
 import com.example.friendlylines.therapist_app.ui.materials.gallery.GalleryScreen
@@ -62,8 +61,6 @@ object NavRoutes {
 //    const val LEARNING_STEPS_CREATE = "learning_steps/create"
 
     const val LEARNING_STEPS_CREATE = "learning_steps/create?stepId={stepId}"
-
-    const val LEARNING_STEPS_PATTERNS = "learning_steps/patterns"
 
 //    const val LEARNING_STEPS_PATTERN_ADD = "learning_steps/patterns/add"
 
@@ -192,22 +189,6 @@ fun MainScreen() {
                 onHomeClick = {navController.navigate(NavRoutes.MAIN)},
             )
         }
-
-//        composable(route = NavRoutes.LEARNING_STEPS_PATTERNS) {
-//            LearningStepsPatternsScreen(
-//                navController = navController,
-//                stepId = null,
-//                onBackClick = {navController.popBackStack()},
-//                onHomeClick = {navController.navigate(NavRoutes.MAIN)},
-//                onAddPatternClick = { order ->
-//                    navController.navigate(
-//                        NavRoutes.learningStepsPatternAdd(
-//                            order = order
-//                        )
-//                    )
-//                }
-//            )
-//        }
 
         composable(
             route = NavRoutes.LEARNING_STEPS_PATTERN_ADD,

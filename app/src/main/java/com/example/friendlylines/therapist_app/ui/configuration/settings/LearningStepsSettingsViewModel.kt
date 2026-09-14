@@ -1,19 +1,14 @@
 package com.example.friendlylines.therapist_app.ui.configuration.settings
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.friendlylines.therapist_app.ui.configuration.learning.LearningStepsLearningScreenViewModel
-import com.example.friendlylines.therapist_app.ui.configuration.patterns.LearningStepsPatternsEvent
 import com.example.friendlylines.therapist_app.ui.configuration.patterns.LearningStepsPatternsScreenViewModel
-import com.example.friendlylines.therapist_app.ui.configuration.summary.LearningStepNameError
 import com.example.friendlylines.therapist_app.ui.configuration.summary.LearningStepsSummaryEvent
 import com.example.friendlylines.therapist_app.ui.configuration.test.LearningStepsTestScreenViewModel
-import com.example.friendlylines.therapist_app.ui.materials.create_new.CreatePatternScreenEvent
-import com.example.friendlylines.therapist_app.ui.materials.create_new.PatternNameError
+import com.example.friendlylines.therapist_app.ui.materials.models.NameError
 import com.example.shared.data.drafts.LearningStepsDraft
-import com.example.shared.data.drafts.LearningStepsTestDraft
 import com.example.shared.data.repositories.LearningStepsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -84,7 +79,7 @@ class LearningStepsSettingsViewModel @Inject constructor(
                         if (name.isBlank()) {
                             _state.update {
                                 it.copy(
-                                    stepNameError = LearningStepNameError.BLANK
+                                    stepNameError = NameError.BLANK
                                 )
                             }
                             return
@@ -100,7 +95,7 @@ class LearningStepsSettingsViewModel @Inject constructor(
                                 if (nameExists) {
                                     _state.update {
                                         it.copy(
-                                            stepNameError = LearningStepNameError.EXISTS
+                                            stepNameError = NameError.EXISTS
                                         )
                                     }
                                     return@launch

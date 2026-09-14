@@ -2,7 +2,6 @@ package com.example.shared.data.entities
 
 import androidx.room3.Entity
 import androidx.room3.PrimaryKey
-import com.example.shared.data.drafts.AccuracyLevel
 
 @Entity(
     tableName = "learning_steps"
@@ -16,6 +15,7 @@ data class LearningStepEntity(
     val isActive: Boolean = false,
     val isLearning: Boolean = true,
     val isTest: Boolean = false,
+    val isExample: Boolean = false,
 
     // Learning settings
     val learningRepetitions: Int,

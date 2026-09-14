@@ -1,5 +1,6 @@
 package com.example.friendlylines.therapist_app.ui.configuration.patterns
 
+//import com.example.friendlylines.therapist_app.ui.configuration.config.LearningStepsPatternConfigDraft
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,7 +36,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.composables.core.ScrollArea
 import com.composables.core.Thumb
@@ -46,7 +46,6 @@ import com.example.friendlylines.therapist_app.ui.components.LearningStepsPatter
 import com.example.friendlylines.therapist_app.ui.components.TemplateAlertDialog
 import com.example.friendlylines.therapist_app.ui.components.TemplateButton
 import com.example.friendlylines.therapist_app.ui.components.TemplateSearchBox
-//import com.example.friendlylines.therapist_app.ui.configuration.config.LearningStepsPatternConfigDraft
 import com.example.friendlylines.therapist_app.ui.main.NavRoutes
 import com.example.friendlylines.therapist_app.ui.theme.Primary50
 import com.example.friendlylines.therapist_app.ui.theme.Primary700

@@ -1,5 +1,6 @@
 package com.example.friendlylines.therapist_app.ui.materials.gallery
 
+//import com.example.friendlylines.therapist_app.ui.materials.models.PatternItem
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,9 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -40,10 +39,8 @@ import com.example.friendlylines.therapist_app.ui.components.TemplateAlertDialog
 import com.example.friendlylines.therapist_app.ui.components.TemplateCheckbox
 import com.example.friendlylines.therapist_app.ui.components.TemplateNotification
 import com.example.friendlylines.therapist_app.ui.components.TemplateTopAppBar
-//import com.example.friendlylines.therapist_app.ui.materials.models.PatternItem
 import com.example.friendlylines.therapist_app.ui.theme.Primary50
 import com.example.friendlylines.therapist_app.ui.theme.Primary900
-import com.example.shared.data.models.PatternItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

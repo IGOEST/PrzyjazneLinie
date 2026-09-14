@@ -15,7 +15,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
@@ -24,6 +25,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,32 +42,24 @@ import androidx.navigation.NavController
 import com.composables.core.ScrollArea
 import com.composables.core.Thumb
 import com.composables.core.VerticalScrollbar
+import com.composables.core.rememberScrollAreaState
 import com.example.friendlylines.R
-import com.example.friendlylines.therapist_app.ui.components.LearningStepsPatternItem
+import com.example.friendlylines.therapist_app.ui.components.LearningStepsListItem
+import com.example.friendlylines.therapist_app.ui.components.LearningStepsListItemAdd
+import com.example.friendlylines.therapist_app.ui.components.TemplateAlertDialog
 import com.example.friendlylines.therapist_app.ui.components.TemplateButton
 import com.example.friendlylines.therapist_app.ui.components.TemplateCheckbox
 import com.example.friendlylines.therapist_app.ui.components.TemplateClickableIcon
 import com.example.friendlylines.therapist_app.ui.components.TemplateInfoDialog
 import com.example.friendlylines.therapist_app.ui.components.TemplateSearchBox
 import com.example.friendlylines.therapist_app.ui.components.TemplateTopAppBar
-import com.example.friendlylines.therapist_app.ui.configuration.patterns.LearningStepsPatternsEvent
-import com.example.friendlylines.therapist_app.ui.configuration.patterns.MoveDirection
+import com.example.friendlylines.therapist_app.ui.main.NavRoutes
 import com.example.friendlylines.therapist_app.ui.theme.InfoActive
 import com.example.friendlylines.therapist_app.ui.theme.InfoDefault
 import com.example.friendlylines.therapist_app.ui.theme.Neutral300
 import com.example.friendlylines.therapist_app.ui.theme.Primary50
 import com.example.friendlylines.therapist_app.ui.theme.Primary700
 import com.example.friendlylines.therapist_app.ui.theme.Primary900
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.setValue
-import com.composables.core.rememberScrollAreaState
-import com.example.friendlylines.therapist_app.ui.components.LearningStepsListItem
-import com.example.friendlylines.therapist_app.ui.components.LearningStepsListItemAdd
-import com.example.friendlylines.therapist_app.ui.components.TemplateAlertDialog
-import com.example.friendlylines.therapist_app.ui.main.NavRoutes
-import com.example.shared.data.drafts.LearningStepsPatternConfigDraft
 import com.example.shared.data.entities.LearningStepEntity
 
 @Composable
@@ -153,6 +147,12 @@ fun LearningStepsListScreen(
 
     var learningStepToDelete by remember {
         mutableStateOf<LearningStepEntity?>(null)
+    }
+
+    val visibleLearningSteps = if (hideExampleSteps) {
+        state.learningSteps.filter { !it.isExample }
+    } else {
+        state.learningSteps
     }
 
     Scaffold(

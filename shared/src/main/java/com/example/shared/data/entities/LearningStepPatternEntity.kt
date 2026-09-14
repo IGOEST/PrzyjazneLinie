@@ -5,8 +5,6 @@ import androidx.room3.ForeignKey
 import androidx.room3.ForeignKey.Companion.CASCADE
 import androidx.room3.Index
 import androidx.room3.PrimaryKey
-import com.example.shared.data.drafts.ColorOption
-import com.example.shared.data.drafts.PatternWidth
 
 @Entity(
     tableName = "learning_step_patterns",
@@ -33,14 +31,16 @@ data class LearningStepPatternEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
 
-    val learningStepId: Long,
-    val patternId: Long,
+    val learningStepId: Long,   // identifies the learning step this pattern belongs to
+    val patternId: Long,    // references the actual pattern stored in PatternEntity
 
+    // configuration of this pattern within the learning step
     val width: String,
     val patternColor: String?,
     val writingColor: String?,
     val backgroundColor: String?,
     val patternVariety: Boolean,
+
     val order: Int,
     val isEnabled: Boolean
 )

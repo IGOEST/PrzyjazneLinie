@@ -1,9 +1,7 @@
 package com.example.shared.data.repositories
 
 import com.example.shared.data.daos.LearningStepsDao
-import com.example.shared.data.daos.PatternDao
 import com.example.shared.data.drafts.AccuracyLevel
-import com.example.shared.data.drafts.ColorOption
 import com.example.shared.data.drafts.LearningStepsDraft
 import com.example.shared.data.drafts.LearningStepsLearningDraft
 import com.example.shared.data.drafts.LearningStepsPatternConfigDraft
@@ -24,7 +22,13 @@ class LearningStepsRepository @Inject constructor(
     suspend fun saveLearningStep(draft: LearningStepsDraft): Long {
 
         val learningStepEntity = LearningStepEntity(
+            id = 0L,
             name = draft.name,
+
+            isActive = false,
+            isLearning = true,
+            isTest = false,
+            isExample = false,
 
             // Learning
             learningRepetitions = draft.learning.repetitions,
@@ -48,9 +52,9 @@ class LearningStepsRepository @Inject constructor(
                 learningStepId = 0, // zostanie ustawione przez DAO
                 patternId = patternDraft.pattern.pattern.id,
                 width = patternDraft.width.name,
-                patternColor = patternDraft.patternColor?.name,
-                writingColor = patternDraft.writingColor?.name,
-                backgroundColor = patternDraft.backgroundColor?.name,
+                patternColor = patternDraft.patternColor?.key,
+                writingColor = patternDraft.writingColor?.key,
+                backgroundColor = patternDraft.backgroundColor?.key,
                 patternVariety = patternDraft.patternVariety,
                 order = patternDraft.order,
                 isEnabled = patternDraft.isEnabled
@@ -63,7 +67,7 @@ class LearningStepsRepository @Inject constructor(
         )
     }
 
-        suspend fun getLearningStep(stepId: Long): LearningStepsDraft? {
+    suspend fun getLearningStep(stepId: Long): LearningStepsDraft? {
         val data = learningStepsDao.getLearningStepWithPatterns(stepId) ?: return null
         val learningStep = data.learningStep
 
@@ -82,13 +86,13 @@ class LearningStepsRepository @Inject constructor(
                     ),
                     width = PatternWidth.valueOf(patternConfig.width),
                     patternColor = patternConfig.patternColor?.let { name ->
-                        PatternConfigOptions.patternAndWriting.firstOrNull{ it.name == name }
+                        PatternConfigOptions.patternAndWriting.firstOrNull{ it.key == name }
                     },
                     writingColor = patternConfig.writingColor?.let { name ->
-                        PatternConfigOptions.patternAndWriting.firstOrNull { it.name == name }
+                        PatternConfigOptions.patternAndWriting.firstOrNull { it.key == name }
                     },
                     backgroundColor = patternConfig.backgroundColor?.let { name ->
-                        PatternConfigOptions.background.firstOrNull { it.name == name }
+                        PatternConfigOptions.background.firstOrNull { it.key == name }
                     },
                     patternVariety = patternConfig.patternVariety,
                     order = patternConfig.order,
@@ -129,6 +133,16 @@ class LearningStepsRepository @Inject constructor(
         return learningStepsDao.getAll()
     }
 
+    // returns active learning step
+    suspend fun getActiveStep(): LearningStepEntity {
+        return learningStepsDao.getActiveStep()
+    }
+
+    // returns all pattern configurations belonging to a learning step
+    suspend fun getPatternConfigurations(learningStepId: Long): List<LearningStepPatternEntity> {
+        return learningStepsDao.getForLearningStep(learningStepId)
+    }
+
     suspend fun updateLearningStepActive(id: Long, isActive: Boolean) {
         learningStepsDao.updateActiveStep(
             id = id,
@@ -155,6 +169,7 @@ class LearningStepsRepository @Inject constructor(
             isActive = current.isActive,
             isLearning = current.isLearning,
             isTest = current.isTest,
+            isExample = current.isExample,
 
             learningRepetitions = draft.learning.repetitions,
             learningAttempts = draft.learning.attempts,
@@ -177,9 +192,9 @@ class LearningStepsRepository @Inject constructor(
                 learningStepId = draft.id,
                 patternId = patternDraft.pattern.pattern.id,
                 width = patternDraft.width.name,
-                patternColor = patternDraft.patternColor?.name,
-                writingColor = patternDraft.writingColor?.name,
-                backgroundColor = patternDraft.backgroundColor?.name,
+                patternColor = patternDraft.patternColor?.key,
+                writingColor = patternDraft.writingColor?.key,
+                backgroundColor = patternDraft.backgroundColor?.key,
                 patternVariety = patternDraft.patternVariety,
                 order = patternDraft.order,
                 isEnabled = patternDraft.isEnabled
@@ -209,7 +224,8 @@ class LearningStepsRepository @Inject constructor(
         val newLearningStep = source.learningStep.copy(
             id = 0L,
             name = "${source.learningStep.name} - kopia",
-            isActive = false
+            isActive = false,
+            isExample = false
         )
 
         val newLearningStepId = learningStepsDao.insertLearningStep(newLearningStep)

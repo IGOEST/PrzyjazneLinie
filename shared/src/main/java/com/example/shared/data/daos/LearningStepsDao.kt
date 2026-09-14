@@ -59,6 +59,13 @@ interface LearningStepsDao {
     @Query("UPDATE learning_steps SET isActive = :isActive WHERE id = :id")
     suspend fun setActive(id: Long, isActive: Boolean)
 
+    @Query("SELECT * FROM learning_steps WHERE isActive = 1 LIMIT 1")
+    suspend fun getActiveStep(): LearningStepEntity
+
+    // returns all patterns assigned to a learning step ordered
+    @Query("SELECT * FROM learning_step_patterns WHERE learningStepId = :learningStepId ORDER BY `order` ASC")
+    suspend fun getForLearningStep(learningStepId: Long): List<LearningStepPatternEntity>
+
     @Transaction
     suspend fun updateActiveStep(id: Long, isActive: Boolean) {
         if (isActive) {

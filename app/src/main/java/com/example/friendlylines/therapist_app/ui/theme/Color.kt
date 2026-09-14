@@ -27,3 +27,5 @@ val InfoActive = Color(0xFF70C2E5)
 
 val SliderBG = Color(0xFFD4E6D7)
 val SliderGlow = Color(0xFFE0EDE2)
+
+val LoadingScreenBlue = Color(0xFF2EB2D6)

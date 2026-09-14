@@ -2,21 +2,18 @@ package com.example.friendlylines.therapist_app.ui.materials.create_new
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.friendlylines.therapist_app.ui.materials.models.toNormalizedStroke
+import com.example.friendlylines.therapist_app.ui.main.ExitDestination
 import com.example.shared.data.entities.PatternWithStrokes
 import com.example.shared.data.models.Point
 import com.example.shared.data.repositories.PatternRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.lang.System.currentTimeMillis
 import javax.inject.Inject
-import com.example.friendlylines.therapist_app.ui.main.ExitDestination
+import com.example.friendlylines.therapist_app.ui.materials.models.NameError
 
 @HiltViewModel
 class CreatePatternScreenViewModel @Inject constructor(
@@ -70,7 +67,7 @@ class CreatePatternScreenViewModel @Inject constructor(
             CreatePatternScreenEvent.PatternBlankName -> {
                 _state.update {
                     it.copy(
-                        patternNameError = PatternNameError.BLANK
+                        patternNameError = NameError.BLANK
                     )
                 }
             }
@@ -78,7 +75,7 @@ class CreatePatternScreenViewModel @Inject constructor(
             CreatePatternScreenEvent.PatternNameExists -> {
                 _state.update {
                     it.copy(
-                        patternNameError = PatternNameError.EXISTS
+                        patternNameError = NameError.EXISTS
                     )
                 }
             }
@@ -164,7 +161,7 @@ class CreatePatternScreenViewModel @Inject constructor(
         if (name.isBlank()) {
             _state.update {
                 it.copy(
-                    patternNameError = PatternNameError.BLANK
+                    patternNameError = NameError.BLANK
                 )
             }
             return
@@ -177,7 +174,7 @@ class CreatePatternScreenViewModel @Inject constructor(
                 if (exists) {
                     _state.update {
                         it.copy(
-                            patternNameError = PatternNameError.EXISTS
+                            patternNameError = NameError.EXISTS
                         )
                     }
                     return@launch

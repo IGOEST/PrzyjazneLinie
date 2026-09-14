@@ -34,54 +34,35 @@ interface PatternDao {
 
     @Transaction
     @Query("SELECT * FROM patterns WHERE id = :patternId")
-    suspend fun getPatternWithStrokes(
-        patternId: Long
-    ): PatternWithStrokes?
+    suspend fun getPatternWithStrokes(patternId: Long): PatternWithStrokes?
 
     @Transaction
     @Query("SELECT * FROM patterns WHERE id = :patternId")
-    suspend fun getPattern(
-        patternId: Long
-    ): PatternWithStrokes?
+    suspend fun getPattern(patternId: Long): PatternWithStrokes?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertPattern(
-        pattern: PatternEntity
-    ): Long
+    suspend fun insertPattern(pattern: PatternEntity): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertStroke(
-        stroke: StrokeEntity
-    ): Long
+    suspend fun insertStroke(stroke: StrokeEntity): Long
 
     @Insert
-    suspend fun insertStrokes(
-        strokes: List<StrokeEntity>
-    ): List<Long>
+    suspend fun insertStrokes(strokes: List<StrokeEntity>): List<Long>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertPoint(
-        point: PointEntity
-    )
+    suspend fun insertPoint(point: PointEntity)
 
     @Insert
-    suspend fun insertPoints(
-        points: List<PointEntity>
-    ): List<Long>
+    suspend fun insertPoints(points: List<PointEntity>): List<Long>
 
     @Delete
-    suspend fun deletePattern(
-        pattern: PatternEntity
-    )
+    suspend fun deletePattern(pattern: PatternEntity)
 
     @Query("DELETE FROM patterns WHERE id = :patternId")
     suspend fun deletePatternById(patternId: Long)
 
     @Transaction
-    suspend fun insertPatternWithStrokes(
-        pattern: PatternEntity,
-        strokes: List<StrokeEntity>,
-        pointsByStroke: List<List<PointEntity>>
+    suspend fun insertPatternWithStrokes(pattern: PatternEntity, strokes: List<StrokeEntity>, pointsByStroke: List<List<PointEntity>>
     ): Long {
         val patternId = insertPattern(pattern)
 
