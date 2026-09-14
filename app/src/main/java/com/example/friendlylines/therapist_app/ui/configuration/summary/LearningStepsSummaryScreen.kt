@@ -84,7 +84,7 @@ fun LearningStepsSummaryScreen(
                     modifier = Modifier.fillMaxWidth(),
                     label = {
                         Text(
-                            text = "Wpisz nazwę kroku:",
+                            text = stringResource(R.string.enter_step_name) + ":",
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Normal,
                         )

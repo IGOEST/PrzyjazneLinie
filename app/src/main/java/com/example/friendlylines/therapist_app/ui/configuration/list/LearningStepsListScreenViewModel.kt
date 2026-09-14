@@ -42,8 +42,7 @@ class LearningStepsListScreenViewModel @Inject constructor(
                 viewModelScope.launch {
                     learningStepsRepository.updateLearningStepMode(
                         id = event.id,
-                        isLearning = event.isLearning,
-                        isTest = !event.isLearning
+                        isTest = event.isTest
                     )
 
                     loadLearningSteps()

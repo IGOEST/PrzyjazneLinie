@@ -33,6 +33,7 @@ import com.example.friendlylines.therapist_app.ui.components.TemplateTabBar
 import com.example.friendlylines.therapist_app.ui.components.TemplateTopAppBar
 import com.example.friendlylines.therapist_app.ui.configuration.learning.LearningStepsLearningScreen
 import com.example.friendlylines.therapist_app.ui.configuration.patterns.LearningStepsPatternsScreen
+import com.example.friendlylines.therapist_app.ui.configuration.reinforcement.LearningStepsReinforcementScreen
 import com.example.friendlylines.therapist_app.ui.configuration.summary.LearningStepsSummaryEvent
 import com.example.friendlylines.therapist_app.ui.configuration.summary.LearningStepsSummaryScreen
 import com.example.friendlylines.therapist_app.ui.configuration.test.LearningStepsTestScreen
@@ -191,7 +192,11 @@ fun LearningStepsSettingsScreen(
                 }
 
                 LearningStepTab.REINFORCEMENTS -> {
-                    // później
+                    LearningStepsReinforcementScreen(
+                        onNextClick = {
+                            selectedTab = LearningStepTab.SUMMARY
+                        }
+                    )
                 }
 
                 LearningStepTab.SUMMARY -> {
@@ -215,6 +220,29 @@ fun LearningStepsSettingsScreen(
                 else -> {}
             }
         }
+    }
+
+    if (state.showSaveDialog) {
+        TemplateAlertDialog(
+            title = stringResource(R.string.save_config_dialog_title),
+            confirmText = stringResource(R.string.save_button_text),
+            message = null,
+            dismissText = stringResource(R.string.dismiss_button_text),
+            onConfirm = {
+                viewModel.onEvent(
+                    LearningStepsSettingsEvent.Summary(
+                        LearningStepsSummaryEvent.SaveConfirmed
+                    )
+                )
+            },
+            onDismiss = {
+                viewModel.onEvent(
+                    LearningStepsSettingsEvent.Summary(
+                        LearningStepsSummaryEvent.SaveDialogDismissed
+                    )
+                )
+            }
+        )
     }
 
     if (showExitDialog) {

@@ -14,5 +14,6 @@ data class LearningStepsSettingsState (
     val showExitDialog: Boolean = false,
     val exitDestination: ExitDestination? = null,
     val savedLearningStepId: Long? = null,
-    val stepNameError: NameError? = null
+    val stepNameError: NameError? = null,
+    val showSaveDialog: Boolean = false
 )

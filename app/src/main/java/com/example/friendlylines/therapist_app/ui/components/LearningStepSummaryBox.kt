@@ -20,11 +20,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.friendlylines.R
 import com.composables.core.ScrollArea
 import com.composables.core.Thumb
 import com.composables.core.VerticalScrollbar
@@ -75,7 +77,7 @@ fun LearningStepSummaryBox(
 
                         item {
                             SummaryRow(
-                                label = "Liczba uczonych wzorów",
+                                label = stringResource(R.string.learned_patterns_number),
                                 learningValue = enabledPatterns.size.toString(),
                                 testValue = enabledPatterns.size.toString()
                             )
@@ -83,15 +85,15 @@ fun LearningStepSummaryBox(
 
                         item {
                             SummaryRow(
-                                label = "Uczone wzory",
-                                learningValue = patternNames.ifBlank { "Brak" },
-                                testValue = patternNames.ifBlank { "Brak" }
+                                label = stringResource(R.string.learned_patterns),
+                                learningValue = patternNames.ifBlank { stringResource(R.string.none) },
+                                testValue = patternNames.ifBlank { stringResource(R.string.none)  }
                             )
                         }
 
                         item {
                             SummaryRow(
-                                label = "Liczba powtórzeń",
+                                label = stringResource(R.string.num_of_repetitions),
                                 learningValue = state.learningState.repetitions.toString(),
                                 testValue = state.testState.repetitions.toString()
                             )
@@ -99,7 +101,7 @@ fun LearningStepSummaryBox(
 
                         item {
                             SummaryRow(
-                                label = "Liczba prób",
+                                label = stringResource(R.string.num_of_attempts),
                                 learningValue = state.learningState.attempts.toString(),
                                 testValue = state.testState.attempts.toString()
                             )
@@ -107,7 +109,7 @@ fun LearningStepSummaryBox(
 
                         item {
                             SummaryRow(
-                                label = "Limit czasu",
+                                label = stringResource(R.string.time_limit),
                                 learningValue = "${state.learningState.timeLimit} s",
                                 testValue = "${state.testState.timeLimit} s"
                             )
@@ -115,7 +117,7 @@ fun LearningStepSummaryBox(
 
                         item {
                             SummaryRow(
-                                label = "Poziom dokładności",
+                                label = stringResource(R.string.level_of_accuracy),
                                 learningValue = state.learningState.accuracyLevel.toString(),
                                 testValue = state.testState.accuracyLevel.toString()
                             )
@@ -123,7 +125,7 @@ fun LearningStepSummaryBox(
 
                         item {
                             SummaryRow(
-                                label = "Punkt startowy",
+                                label = stringResource(R.string.starting_point),
                                 learningValue = state.learningState.startingPointEnabled.toYesNo(),
                                 testValue = state.testState.startingPointEnabled.toYesNo()
                             )
@@ -131,7 +133,7 @@ fun LearningStepSummaryBox(
 
                         item {
                             SummaryRow(
-                                label = "Losowa kolejność wzorów",
+                                label = stringResource(R.string.random_pattern_order),
                                 learningValue = state.learningState.randomPatternOrder.toYesNo(),
                                 testValue = state.testState.randomPatternOrder.toYesNo()
                             )
@@ -169,14 +171,14 @@ private fun SummaryHeaderRow() {
         verticalAlignment = Alignment.CenterVertically
     ) {
         SummaryCell(
-            text = "INFORMACJE O KROKU",
+            text = stringResource(R.string.step_info),
             modifier = Modifier.weight(1f),
             fontWeight = FontWeight.Medium,
             fontSize = 24.sp
         )
 
         SummaryCell(
-            text = "TRYB NAUKI",
+            text = stringResource(R.string.learning_mode_summary),
             modifier = Modifier.weight(1f),
             fontWeight = FontWeight.Medium,
             textAlign = TextAlign.Center,
@@ -184,7 +186,7 @@ private fun SummaryHeaderRow() {
         )
 
         SummaryCell(
-            text = "TRYB TESTU",
+            text = stringResource(R.string.test_mode_summary),
             modifier = Modifier.weight(1f),
             fontWeight = FontWeight.Medium,
             textAlign = TextAlign.Center,
@@ -256,6 +258,7 @@ private fun SummaryCell(
     )
 }
 
+@Composable
 private fun Boolean.toYesNo(): String {
-    return if (this) "Tak" else "Nie"
+    return if (this) stringResource(R.string.yes) else stringResource(R.string.no)
 }

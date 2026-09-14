@@ -191,6 +191,9 @@ fun CreatePatternScreen(
                         ),
                         InfoRowData(
                             text = stringResource(R.string.smooth_info)
+                        ),
+                        InfoRowData(
+                            text = stringResource(R.string.straight_line_info)
                         )
                     ),
                     showSettingsIcon = true,

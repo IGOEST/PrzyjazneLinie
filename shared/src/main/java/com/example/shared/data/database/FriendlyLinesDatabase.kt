@@ -18,7 +18,7 @@ import com.example.shared.data.entities.PointEntity
         LearningStepEntity::class,
         LearningStepPatternEntity::class
     ],
-    version = 6,
+    version = 7,
     exportSchema = false
 )
 abstract class FriendlyLinesDatabase : RoomDatabase() {

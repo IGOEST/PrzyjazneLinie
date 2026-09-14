@@ -314,7 +314,7 @@ fun LearningStepsLearningScreen(
     // INFORMATION DIALOGS (displayed only when their corresponding boolean is true)
     if (showRepetitionsInfo) {
         TemplateInfoDialog(
-            title = stringResource(R.string.num_of_repetitions),
+            title = stringResource(R.string.repetitions),
             info = stringResource(R.string.num_of_repetitions_info),
             onDismiss = {
                 showRepetitionsInfo = false
@@ -324,7 +324,7 @@ fun LearningStepsLearningScreen(
 
     if (showAttemptsInfo) {
         TemplateInfoDialog(
-            title = stringResource(R.string.num_of_attempts),
+            title = stringResource(R.string.attempts),
             info = stringResource(R.string.num_of_attempts_info),
             onDismiss = {
                 showAttemptsInfo = false
@@ -344,7 +344,7 @@ fun LearningStepsLearningScreen(
 
     if (showAccuracyInfo) {
         TemplateInfoDialog(
-            title = stringResource(R.string.level_of_accuracy),
+            title = stringResource(R.string.accuracy),
             info = stringResource(R.string.level_of_accuracy_info),
             onDismiss = {
                 showAccuracyInfo = false
@@ -364,7 +364,7 @@ fun LearningStepsLearningScreen(
 
     if (showRandomOrderInfo) {
         TemplateInfoDialog(
-            title = stringResource(R.string.random_pattern_order),
+            title = stringResource(R.string.random_order),
             info = stringResource(R.string.random_pattern_order_info),
             onDismiss = {
                 showRandomOrderInfo = false

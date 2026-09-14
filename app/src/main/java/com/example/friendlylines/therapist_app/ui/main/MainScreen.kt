@@ -21,6 +21,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -30,6 +32,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -48,6 +51,9 @@ import com.example.friendlylines.therapist_app.ui.theme.Primary1000
 import com.example.friendlylines.therapist_app.ui.theme.Primary300
 import com.example.friendlylines.therapist_app.ui.theme.Primary50
 import com.example.friendlylines.therapist_app.ui.theme.Primary900
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.shared.data.entities.LearningStepEntity
 
 object NavRoutes {
     const val MAIN = "main"
@@ -125,8 +131,16 @@ enum class ExitDestination {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen() {
+fun MainScreen(
+    viewModel: MainScreenViewModel = hiltViewModel()
+) {
+    val activeLearningStep by viewModel.activeLearningStep.collectAsStateWithLifecycle()
+
     val navController = rememberNavController()
+
+    LaunchedEffect(navController.currentBackStackEntryAsState().value) {
+        viewModel.loadActiveLearningStep()
+    }
 
     NavHost(
         navController = navController,
@@ -134,6 +148,7 @@ fun MainScreen() {
     ) {
         composable(NavRoutes.MAIN) {
             MainContent(
+                activeLearningStep = activeLearningStep,
                 onGalleryClick = {navController.navigate(NavRoutes.GALLERY)},
                 onLearningStepsClick = {navController.navigate(NavRoutes.LEARNING_STEPS_LIST)}
             )
@@ -272,7 +287,7 @@ fun MainScreen() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainContent(
-//    activeConfiguration: Pair<String, String>?,
+    activeLearningStep: LearningStepEntity?,
     onLearningStepsClick: () -> Unit,
     onGalleryClick: () -> Unit
 ) {
@@ -303,10 +318,9 @@ fun MainContent(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
-//                    text = activeConfiguration?.let {
-//                        "Aktywny krok: ${it.first} (tryb: ${it.second})"
-//                    } ?: "Brak aktywnego kroku uczenia",
-                        text = stringResource(R.string.active_learning_step),
+                        text = activeLearningStep?.let {
+                            stringResource(R.string.active_learning_step) + " ${it.name}" + " (${if (it.isTest) stringResource(R.string.test_mode) else stringResource(R.string.learning_mode)})"
+                        } ?: stringResource(R.string.no_active_step),
                         fontSize = 24.sp,
                         color = Primary900,
                         textAlign = TextAlign.Left,

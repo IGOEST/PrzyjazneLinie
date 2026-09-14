@@ -150,11 +150,11 @@ class LearningStepsRepository @Inject constructor(
         )
     }
 
-    suspend fun updateLearningStepMode(id: Long, isLearning: Boolean, isTest: Boolean) {
+    suspend fun updateLearningStepMode(id: Long, isTest: Boolean) {
         learningStepsDao.updateMode(
             id = id,
-            isLearning = isLearning,
-            isTest = isTest
+            isTest = isTest,
+            isLearning = !isTest
         )
     }
 

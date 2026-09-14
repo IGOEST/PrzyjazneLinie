@@ -72,6 +72,14 @@ class LearningStepsSettingsViewModel @Inject constructor(
             is LearningStepsSettingsEvent.Summary -> {
                 when (event.event) {
                     LearningStepsSummaryEvent.SaveClicked -> {
+                        _state.update {
+                            it.copy(
+                                showSaveDialog = true
+                            )
+                        }
+                    }
+
+                    LearningStepsSummaryEvent.SaveConfirmed -> {
                         val currentState = _state.value
 
                         val name = currentState.stepName.trim()
@@ -79,6 +87,7 @@ class LearningStepsSettingsViewModel @Inject constructor(
                         if (name.isBlank()) {
                             _state.update {
                                 it.copy(
+                                    showSaveDialog = false,
                                     stepNameError = NameError.BLANK
                                 )
                             }
@@ -95,6 +104,7 @@ class LearningStepsSettingsViewModel @Inject constructor(
                                 if (nameExists) {
                                     _state.update {
                                         it.copy(
+                                            showSaveDialog = false,
                                             stepNameError = NameError.EXISTS
                                         )
                                     }
@@ -118,6 +128,7 @@ class LearningStepsSettingsViewModel @Inject constructor(
 
                                 _state.update {
                                     it.copy(
+                                        showSaveDialog = false,
                                         savedLearningStepId = savedLearningStepId
                                     )
                                 }
@@ -134,6 +145,13 @@ class LearningStepsSettingsViewModel @Inject constructor(
                         }
                     }
 
+                    is LearningStepsSummaryEvent.SaveDialogDismissed -> {
+                        _state.update {
+                            it.copy(
+                                showSaveDialog = false
+                            )
+                        }
+                    }
                 }
             }
 

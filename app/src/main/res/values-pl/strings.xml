@@ -26,7 +26,8 @@
     <string name="draw_start_info">Miejsce, w którym zaczniesz rysować, będzie punktem startowym.</string>
     <string name="simple_pattern_info">Prosty wzór to wzór, który narysowany jest bez odrywania palca od ekranu.</string>
     <string name="complex_pattern_info">Złożony wzór to wzór, który narysowany jest przy co najmniej jednym oderwaniu palca.</string>
-    <string name="smooth_info">Opcja wygładzenie wyrówna linie narysowanego wzoru. </string>
+    <string name="smooth_info">Opcja "Wygładzenie" wyrówna linie narysowanego wzoru. </string>
+    <string name="straight_line_info">Opcja \"Prosta linia\" pozwoli na rysowanie prostych linii.</string>
     <string name="clear_drawing_button_text">WYCZYŚĆ</string>
     <string name="smooth_drawing_text">Wygładzenie</string>
     <string name="straight_line_text">Prosta linia</string>
@@ -169,5 +170,21 @@
     <string name="example_pattern_square">Kwadrat</string>
     <string name="example_pattern_triangle">Trójkąt</string>
     <string name="example_pattern_circle">Koło</string>
+    <string name="repetitions">Powtórzenia</string>
+    <string name="attempts">Próby</string>
+    <string name="accuracy">Dokładność</string>
+    <string name="random_order">Losowa kolejność</string>
+    <string name="yes">Tak</string>
+    <string name="no">Nie</string>
+    <string name="none">Brak</string>
+    <string name="enter_step_name">Wpisz nazwę</string>
+    <string name="step_info">INFORMACJE O KROKU</string>
+    <string name="learning_mode_summary">TRYB NAUKI</string>
+    <string name="test_mode_summary">TRYB TESTU</string>
+    <string name="learned_patterns_number">Liczba uczonych wzorów</string>
+    <string name="learned_patterns">Uczone wzory</string>
+    <string name="copy_learning_step_dialog_message">Czy na pewno chcesz utworzyć kopię konfiguracji tego kroku uczenia?</string>
+    <string name="delete_learning_step_dialog_message">Czy na pewno chcesz usunąć tę konfigurację kroku uczenia?</string>
+    <string name="no_active_step">Brak aktywnego kroku uczenia</string>
 
 </resources>

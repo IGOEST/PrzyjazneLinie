@@ -231,11 +231,11 @@ fun LearningStepsListScreen(
                                             )
                                         )
                                     },
-                                    onModeChange = { isLearning ->
+                                    onModeChange = { isTest ->
                                         viewModel.onEvent(
                                             LearningStepsListEvent.ModeChanged(
                                                 id = learningStep.id,
-                                                isLearning = isLearning
+                                                isTest = isTest
                                             )
                                         )
                                     },
@@ -290,7 +290,7 @@ fun LearningStepsListScreen(
         if (learningStepToEdit != null) {
             TemplateAlertDialog(
                 title = stringResource(R.string.edit_dialog_title),
-                message = stringResource(R.string.edit_dialog_message),
+                message = stringResource(R.string.edit_learning_step_dialog_message),
                 confirmText = stringResource(R.string.edit_button_text),
                 dismissText = stringResource(R.string.dismiss_button_text),
                 onConfirm = {
@@ -312,7 +312,7 @@ fun LearningStepsListScreen(
         if (learningStepToCopy != null) {
             TemplateAlertDialog(
                 title = stringResource(R.string.copy_dialog_title),
-                message = stringResource(R.string.copy_dialog_message),
+                message = stringResource(R.string.copy_learning_step_dialog_message),
                 confirmText = stringResource(R.string.copy_button_text),
                 dismissText = stringResource(R.string.dismiss_button_text),
                 onConfirm = {
@@ -332,7 +332,7 @@ fun LearningStepsListScreen(
         if (learningStepToDelete != null) {
             TemplateAlertDialog(
                 title = stringResource(R.string.delete_dialog_title),
-                message = stringResource(R.string.delete_pattern_config_dialog_message),
+                message = stringResource(R.string.delete_learning_step_dialog_message),
                 confirmText = stringResource(R.string.delete_confirm_button_text),
                 dismissText = stringResource(R.string.dismiss_button_text),
                 onConfirm = {
