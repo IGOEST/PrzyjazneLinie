@@ -2,6 +2,7 @@ package com.example.friendlylines.therapist_app.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,13 +30,23 @@ fun TemplateToggleSwitch(
     height: Dp = 15.dp,
     circleSize: Dp = 24.dp
 ) {
+    val interactionSource = remember {
+        MutableInteractionSource()
+    }
+
     Box(
         modifier = modifier
             .width(width)
             .height(circleSize)
-            .clickable (enabled = enabled) {
-                onCheckedChange(!checked)
-            },
+//            .clickable (enabled = enabled) {
+//                onCheckedChange(!checked)
+//            }
+            .clickable(
+                enabled = enabled,
+                interactionSource = interactionSource,
+                indication = null,
+                onClick = { onCheckedChange(!checked) }
+            ),
         contentAlignment = Alignment.Center
     ) {
         Box(
@@ -70,7 +82,7 @@ fun TemplateToggleSwitch(
                 )
                 .background(
                     color = when {
-                        !enabled -> Neutral300
+                        !enabled -> Color.White
                         checked -> Primary700
                         else -> Color.White
                     },

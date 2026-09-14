@@ -59,7 +59,9 @@ object NavRoutes {
 
     const val LEARNING_STEPS_LIST = "learning_steps/list"
 
-    const val LEARNING_STEPS_CREATE = "learning_steps/create"
+//    const val LEARNING_STEPS_CREATE = "learning_steps/create"
+
+    const val LEARNING_STEPS_CREATE = "learning_steps/create?stepId={stepId}"
 
     const val LEARNING_STEPS_PATTERNS = "learning_steps/patterns"
 
@@ -107,6 +109,14 @@ object NavRoutes {
             "learning_steps/pattern/config/$patternId"
         } else {
             "learning_steps/pattern/config/$patternId?${params.joinToString("&")}"
+        }
+    }
+
+    fun learningStepsCreate(stepId: Long? = null): String {
+        return if (stepId != null) {
+            "learning_steps/create?stepId=$stepId"
+        } else {
+            "learning_steps/create"
         }
     }
 }
@@ -164,10 +174,20 @@ fun MainScreen() {
             )
         }
 
-        composable(route = NavRoutes.LEARNING_STEPS_CREATE) {
+        composable(
+            route = NavRoutes.LEARNING_STEPS_CREATE,
+            arguments = listOf(
+                navArgument("stepId") {
+                    type = NavType.LongType
+                    defaultValue = -1L
+                }
+            )
+        ) { backStackEntry ->
+            val stepId = backStackEntry.arguments ?.getLong("stepId") ?.takeIf { it != -1L }
+
             LearningStepsSettingsScreen(
                 navController = navController,
-                stepId = null,
+                stepId = stepId,
                 onBackClick = {navController.popBackStack()},
                 onHomeClick = {navController.navigate(NavRoutes.MAIN)},
             )

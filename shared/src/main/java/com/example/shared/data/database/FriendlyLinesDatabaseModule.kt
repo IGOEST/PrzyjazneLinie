@@ -5,6 +5,7 @@ import androidx.room3.Room
 import androidx.room3.RoomDatabase
 import androidx.sqlite.SQLiteConnection
 import androidx.sqlite.execSQL
+import com.example.shared.data.daos.LearningStepsDao
 import com.example.shared.data.daos.PatternDao
 import dagger.Module
 import dagger.Provides
@@ -43,5 +44,13 @@ object DatabaseModule {
         database: FriendlyLinesDatabase
     ): PatternDao {
         return database.patternDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideLearningStepsDao(
+        database: FriendlyLinesDatabase
+    ): LearningStepsDao {
+        return database.learningStepsDao()
     }
 }

@@ -163,7 +163,6 @@ fun LearningStepsPatternsScreen(
                         state = listState,
                         modifier = Modifier.weight(1f),
                         contentPadding = PaddingValues(
-                            horizontal = 32.dp,
                             vertical = 16.dp
                         ),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -214,7 +213,7 @@ fun LearningStepsPatternsScreen(
                         }
                     }
 
-                    Spacer(modifier = Modifier.width(16.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
 
                     VerticalScrollbar(
                         modifier = Modifier
@@ -360,7 +359,7 @@ fun LearningStepsPatternsListHeader(
         modifier = modifier
             .fillMaxWidth()
             .padding(
-                start = 64.dp,
+                start = 32.dp,
                 end = 96.dp,
                 top = 16.dp,
                 bottom = 16.dp

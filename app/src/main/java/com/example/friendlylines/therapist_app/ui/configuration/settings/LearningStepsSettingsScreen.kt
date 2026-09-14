@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -25,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.friendlylines.R
@@ -33,6 +35,8 @@ import com.example.friendlylines.therapist_app.ui.components.TemplateTabBar
 import com.example.friendlylines.therapist_app.ui.components.TemplateTopAppBar
 import com.example.friendlylines.therapist_app.ui.configuration.patterns.LearningStepsPatternsScreen
 import com.example.friendlylines.therapist_app.ui.configuration.learning.LearningStepsLearningScreen
+import com.example.friendlylines.therapist_app.ui.configuration.summary.LearningStepsSummaryEvent
+import com.example.friendlylines.therapist_app.ui.configuration.summary.LearningStepsSummaryScreen
 import com.example.friendlylines.therapist_app.ui.configuration.test.LearningStepsTestScreen
 import com.example.friendlylines.therapist_app.ui.main.ExitDestination
 import com.example.friendlylines.therapist_app.ui.main.NavRoutes
@@ -71,9 +75,24 @@ fun LearningStepsSettingsScreen(
     stepId: Long?,
     onBackClick: () -> Unit,
     onHomeClick: () -> Unit,
+    viewModel: LearningStepsSettingsViewModel = hiltViewModel()
 ) {
-    val viewModel: LearningStepsSettingsViewModel = hiltViewModel()
-    val state by viewModel.state.collectAsState()
+    val state by viewModel.state.collectAsStateWithLifecycle()
+
+    LaunchedEffect(state.savedLearningStepId) {
+        state.savedLearningStepId?.let { learningStepId ->
+
+            navController.previousBackStackEntry
+                ?.savedStateHandle
+                ?.set("newLearningStepId", learningStepId)
+
+            navController.popBackStack()
+
+            viewModel.onEvent(
+                LearningStepsSettingsEvent.SaveSuccessHandled
+            )
+        }
+    }
 
     var selectedTab by remember {
         mutableStateOf(LearningStepTab.PATTERNS)
@@ -102,8 +121,11 @@ fun LearningStepsSettingsScreen(
                     .statusBarsPadding()
             ) {
                 TemplateTopAppBar(
-                    //TODO: Wyświetlanie nazwy konfiguracji kroku uczenia przy edycji
-                    text = stringResource(R.string.new_learning_step_header),
+                    text = if (stepId == null) {
+                        stringResource(R.string.new_learning_step_header)
+                    } else {
+                        state.stepName
+                    },
                     onBackClick = {
                         showExitDialog = true
                         exitDestination = ExitDestination.PREVIOUS
@@ -132,7 +154,7 @@ fun LearningStepsSettingsScreen(
                 LearningStepTab.PATTERNS -> {
                     LearningStepsPatternsScreen(
                         navController = navController,
-                        stepId = null,
+                        stepId = stepId,
                         onBackClick = onBackClick,
                         onHomeClick = onHomeClick,
                         onAddPatternClick = { order ->
@@ -175,7 +197,21 @@ fun LearningStepsSettingsScreen(
                 }
 
                 LearningStepTab.SUMMARY -> {
-                    // później
+                    LearningStepsSummaryScreen(
+                        state = state,
+                        onEvent = {
+                            viewModel.onEvent(
+                                LearningStepsSettingsEvent.Summary(it)
+                            )
+                        },
+                        onSaveClick = {
+                            viewModel.onEvent(
+                                LearningStepsSettingsEvent.Summary(
+                                    LearningStepsSummaryEvent.SaveClicked
+                                )
+                            )
+                        }
+                    )
                 }
 
                 else -> {}

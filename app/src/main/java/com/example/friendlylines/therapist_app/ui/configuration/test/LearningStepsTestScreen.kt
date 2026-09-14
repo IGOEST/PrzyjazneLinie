@@ -115,6 +115,9 @@ fun LearningStepsTestScreen(
             TemplateSlider(
                 values = repetitionValues,
                 selectedIndex = repetitionValues.indexOf(draft.repetitions),
+                value = draft.repetitions,
+                minValue = repetitionValues.first(),
+                maxValue = repetitionValues.last(),
                 onValueSelected = { index ->
                     onEvent(
                         LearningStepsTestEvent.SetRepetitions(
@@ -164,7 +167,7 @@ fun LearningStepsTestScreen(
 
         // TIME LIMIT
         LearningSettingRow(
-            title = stringResource(R.string.time_limit),
+            title = stringResource(R.string.time_limit) + " (${draft.timeLimit} s)",
             onInfoClick = {
                 showTimeLimitInfo = true
             }
@@ -172,6 +175,9 @@ fun LearningStepsTestScreen(
             TemplateSlider(
                 values = timeLimitValues,
                 selectedIndex = timeLimitValues.indexOf(draft.timeLimit),
+                value = draft.timeLimit,
+                minValue = timeLimitValues.first(),
+                maxValue = timeLimitValues.last(),
                 onValueSelected = { index ->
                     onEvent(
                         LearningStepsTestEvent.SetTimeLimit(
@@ -181,26 +187,38 @@ fun LearningStepsTestScreen(
                 },
                 showMinusPlus = true,
                 onMinusClick = {
-                    val currentIndex = timeLimitValues.indexOf(draft.timeLimit)
-
-                    if (currentIndex > 0) {
-                        onEvent(
-                            LearningStepsTestEvent.SetTimeLimit(
-                                timeLimitValues[currentIndex - 1]
-                            )
+                    onEvent(
+                        LearningStepsTestEvent.SetTimeLimit(
+                            (draft.timeLimit - 1)
+                                .coerceAtLeast(timeLimitValues.first())
                         )
-                    }
+                    )
+//                    val currentIndex = timeLimitValues.indexOf(draft.timeLimit)
+//
+//                    if (currentIndex > 0) {
+//                        onEvent(
+//                            LearningStepsTestEvent.SetTimeLimit(
+//                                timeLimitValues[currentIndex - 1]
+//                            )
+//                        )
+//                    }
                 },
                 onPlusClick = {
-                    val currentIndex = timeLimitValues.indexOf(draft.timeLimit)
-
-                    if (currentIndex < timeLimitValues.lastIndex) {
-                        onEvent(
-                            LearningStepsTestEvent.SetTimeLimit(
-                                timeLimitValues[currentIndex + 1]
-                            )
+                    onEvent(
+                        LearningStepsTestEvent.SetTimeLimit(
+                            (draft.timeLimit + 1)
+                                .coerceAtMost(timeLimitValues.last())
                         )
-                    }
+                    )
+//                    val currentIndex = timeLimitValues.indexOf(draft.timeLimit)
+//
+//                    if (currentIndex < timeLimitValues.lastIndex) {
+//                        onEvent(
+//                            LearningStepsTestEvent.SetTimeLimit(
+//                                timeLimitValues[currentIndex + 1]
+//                            )
+//                        )
+//                    }
                 },
                 sliderWidth = 320.dp
             )
@@ -240,8 +258,8 @@ fun LearningStepsTestScreen(
                 enabled = false,
                 onCheckedChange = {},
                 modifier = Modifier.size(
-                    width = 52.dp,
-                    height = 32.dp
+                    width = 38.dp,
+                    height = 24.dp
                 )
             )
         }
@@ -258,8 +276,8 @@ fun LearningStepsTestScreen(
                 enabled = false,
                 onCheckedChange = {},
                 modifier = Modifier.size(
-                    width = 52.dp,
-                    height = 32.dp
+                    width = 38.dp,
+                    height = 24.dp
                 )
             )
         }

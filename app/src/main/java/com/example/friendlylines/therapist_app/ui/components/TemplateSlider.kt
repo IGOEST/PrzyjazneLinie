@@ -55,6 +55,10 @@ fun <T> TemplateSlider(
     onValueSelected: (Int) -> Unit,
     modifier: Modifier = Modifier,
 
+    value: Int? = null,
+    minValue: Int? = null,
+    maxValue: Int? = null,
+
     sliderWidth: Dp = 350.dp,
     trackHeight: Dp = 6.dp,
     thumbRadius: Dp = 10.dp,
@@ -99,7 +103,21 @@ fun <T> TemplateSlider(
         }
     }
 
-    val actualIndex = selectedIndex.coerceIn(0, values.lastIndex)
+    //val actualIndex = selectedIndex.coerceIn(0, values.lastIndex)
+
+    val sliderFraction = if (
+        value != null &&
+        minValue != null &&
+        maxValue != null &&
+        maxValue != minValue
+    ) {
+        ((value - minValue).toFloat() / (maxValue - minValue))
+            .coerceIn(0f, 1f)
+    } else {
+        selectedIndex
+            .coerceIn(0, values.lastIndex)
+            .toFloat() / values.lastIndex.coerceAtLeast(1)
+    }
 
     Column(
         modifier = modifier.wrapContentWidth()
@@ -149,7 +167,13 @@ fun <T> TemplateSlider(
                         onMinusClick?.invoke()
                         activateEffect()
                     },
-                    enabled = enabled && actualIndex > 0,
+                    enabled = enabled && when {
+                        value != null && minValue != null ->
+                            value > minValue
+
+                        else ->
+                            selectedIndex > 0
+                    },
                     modifier = Modifier.size(24.dp),
                     defaultTint = Primary700,
                     activeTint = Primary900,
@@ -210,8 +234,8 @@ fun <T> TemplateSlider(
                 val trackY = size.height / 2f
                 val startX = 0f
                 val endX = size.width
-                val selectedPosition = actualIndex.toFloat() / values.lastIndex
-                val thumbX = startX + (endX - startX) * selectedPosition
+                //val selectedPosition = actualIndex.toFloat() / values.lastIndex
+                val thumbX = startX + (endX - startX) * sliderFraction
 
                 // Drag effect
                 if (isActive) {
@@ -266,7 +290,13 @@ fun <T> TemplateSlider(
                         onPlusClick?.invoke()
                         activateEffect()
                     },
-                    enabled = enabled && actualIndex < values.lastIndex,
+                    enabled = enabled && when {
+                        value != null && maxValue != null ->
+                            value < maxValue
+
+                        else ->
+                            selectedIndex < values.lastIndex
+                    },
                     modifier = Modifier.size(24.dp),
                     defaultTint = Primary700,
                     activeTint = Primary900,

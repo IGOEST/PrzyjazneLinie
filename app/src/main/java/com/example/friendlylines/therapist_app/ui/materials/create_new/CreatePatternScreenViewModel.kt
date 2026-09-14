@@ -200,11 +200,7 @@ class CreatePatternScreenViewModel @Inject constructor(
                         savedPatternId = patternId
                     )
                 }
-            } catch (e: Exception) {
-                // Zachowujemy obecne zachowanie:
-                // onError było puste, więc tutaj również
-                // nie pokazujemy żadnego błędu użytkownikowi.
-            }
+            } catch (e: Exception) { }
         }
     }
 

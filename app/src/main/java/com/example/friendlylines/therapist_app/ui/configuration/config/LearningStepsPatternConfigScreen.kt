@@ -482,8 +482,8 @@ fun LearningStepPatternConfigScreen(
                             )
                         )
                     }
+                    onSaveClick(configId)
                 }
-                onSaveClick(configId)
             },
             onDismiss = {
                 showSaveConfigDialog = false
