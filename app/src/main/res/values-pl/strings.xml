@@ -19,6 +19,7 @@
     <string name="add_pattern_text">Dodaj własny wzór</string>
     <string name="delete_dialog_title">Usunąć?</string>
     <string name="delete_pattern_dialog_message">Czy na pewno chcesz usunąć ten wzór? Tej akcji nie można cofnąć.</string>
+    <string name="delete_step_dialog_message">Czy na pewno chcesz usunąć ten krok uczenia? Tej akcji nie można cofnąć.</string>
     <string name="delete_confirm_button_text">USUŃ</string>
     <string name="dismiss_button_text">ANULUJ</string>
     <string name="saved_pop_up_message">Wzór został zapisany.</string>

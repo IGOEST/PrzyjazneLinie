@@ -58,4 +58,12 @@ class LearningStepsListScreenViewModel @Inject constructor(
             loadLearningSteps()
         }
     }
+
+    fun deleteLearningStep(stepId: Long) {
+        viewModelScope.launch {
+            learningStepRepository.deletePatternConfigurations(stepId)
+            learningStepRepository.deleteLearningStep(stepId)
+            loadLearningSteps()
+        }
+    }
 }

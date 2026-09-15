@@ -42,7 +42,7 @@ import androidx.compose.material.icons.outlined.AddCircle
 @Composable
 fun LearningStepListArea(
     learningSteps: List<LearningStepEntity>,
-    onDeleteClick: (LearningStepEntity) -> Unit = {},
+    onDeleteClick: (LearningStepEntity) -> Unit,
     onActiveStepClick: (LearningStepEntity) -> Unit = {},
     onModeChange: (LearningStepEntity, Boolean) -> Unit = { _, _ -> },
     onCreateClick: () -> Unit = {},
@@ -70,7 +70,7 @@ fun LearningStepListArea(
                 LearningStepListItem(
                     learningStep = learningStep,
                     onDeleteClick = {
-                        onDeleteClick(learningStep)
+                        // TO DO
                     },
                     onActiveStepClick = {
                         onActiveStepClick(learningStep)
@@ -100,7 +100,7 @@ fun LearningStepListArea(
 @Composable
 private fun LearningStepListItem(
     learningStep: LearningStepEntity,
-    onDeleteClick: () -> Unit,
+    onDeleteClick: (LearningStepEntity) -> Unit,
     onActiveStepClick: () -> Unit,
     onModeChange: (Boolean) -> Unit,
     onEditClick: () -> Unit,

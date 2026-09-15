@@ -73,6 +73,10 @@ fun LearningStepsListScreen(
         mutableStateOf(false)
     }
 
+    var showDeleteDialog by remember {
+        mutableStateOf(false)
+    }
+
     var selectedStepId by remember {
         mutableStateOf<Long?>(null)
     }
@@ -205,6 +209,29 @@ fun LearningStepsListScreen(
                 },
                 onDismiss = {
                     showEditDialog = false
+                    selectedStepId = null
+                }
+            )
+        }
+
+        if (showDeleteDialog) {
+            TemplateAlertDialog(
+                title = stringResource(R.string.delete_dialog_title),
+                message = stringResource(R.string.delete_step_dialog_message),
+                confirmText = stringResource(R.string.delete_confirm_button_text),
+                dismissText = stringResource(R.string.dismiss_button_text),
+                onConfirm = {
+                    val stepId = selectedStepId
+
+                    showDeleteDialog = false
+                    selectedStepId = null
+
+                    if (stepId != null) {
+                        viewModel.deleteLearningStep(stepId)
+                    }
+                },
+                onDismiss = {
+                    showDeleteDialog = false
                     selectedStepId = null
                 }
             )
