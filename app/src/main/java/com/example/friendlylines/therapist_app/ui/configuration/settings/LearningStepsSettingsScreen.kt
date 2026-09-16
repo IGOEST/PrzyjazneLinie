@@ -9,7 +9,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Checklist
 import androidx.compose.material.icons.filled.ListAlt
+import androidx.compose.material.icons.filled.PendingActions
 import androidx.compose.material.icons.filled.Photo
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.Settings
@@ -52,19 +54,19 @@ enum class LearningStepTab(
     ),
     LEARNING(
         title = R.string.learning_tab_text,
-        icon = Icons.Default.Settings
-    ),
-    TEST(
-        title = R.string.test_tab_text,
         icon = Icons.Default.School
     ),
     REINFORCEMENTS(
         title = R.string.reinforcements_tab_text,
         icon = Icons.Default.ThumbUp
     ),
+    TEST(
+        title = R.string.test_tab_text,
+        icon = Icons.Default.PendingActions
+    ),
     SUMMARY(
         title = R.string.summary_tab_text,
-        icon = Icons.Default.ListAlt
+        icon = Icons.Default.Checklist
     )
 }
 
