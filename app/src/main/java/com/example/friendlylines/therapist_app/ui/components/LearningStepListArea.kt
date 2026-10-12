@@ -100,7 +100,7 @@ fun LearningStepListArea(
 @Composable
 private fun LearningStepListItem(
     learningStep: LearningStepEntity,
-    onDeleteClick: (LearningStepEntity) -> Unit,
+    onDeleteClick: () -> Unit, //(LearningStepEntity) -> Unit,
     onActiveStepClick: () -> Unit,
     onModeChange: (Boolean) -> Unit,
     onEditClick: () -> Unit,
