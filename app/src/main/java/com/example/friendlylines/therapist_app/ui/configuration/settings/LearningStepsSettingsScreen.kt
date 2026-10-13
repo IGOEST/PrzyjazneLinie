@@ -1,6 +1,5 @@
 package com.example.friendlylines.therapist_app.ui.configuration.settings
 
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.activity.compose.BackHandler
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
@@ -10,7 +9,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Checklist
 import androidx.compose.material.icons.filled.ListAlt
+import androidx.compose.material.icons.filled.PendingActions
 import androidx.compose.material.icons.filled.Photo
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.Settings
@@ -25,13 +26,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.friendlylines.R
 import com.example.friendlylines.therapist_app.ui.components.TemplateAlertDialog
 import com.example.friendlylines.therapist_app.ui.components.TemplateTabBar
 import com.example.friendlylines.therapist_app.ui.components.TemplateTopAppBar
-import com.example.friendlylines.therapist_app.ui.configuration.patterns.LearningStepsPatternsScreen
 import com.example.friendlylines.therapist_app.ui.configuration.learning.LearningStepsLearningScreen
+import com.example.friendlylines.therapist_app.ui.configuration.patterns.LearningStepsPatternsScreen
+import com.example.friendlylines.therapist_app.ui.configuration.reinforcement.LearningStepsReinforcementScreen
+import com.example.friendlylines.therapist_app.ui.configuration.summary.LearningStepsSummaryEvent
 import com.example.friendlylines.therapist_app.ui.configuration.summary.LearningStepsSummaryScreen
 import com.example.friendlylines.therapist_app.ui.configuration.test.LearningStepsTestScreen
 import com.example.friendlylines.therapist_app.ui.main.ExitDestination
@@ -49,19 +54,19 @@ enum class LearningStepTab(
     ),
     LEARNING(
         title = R.string.learning_tab_text,
-        icon = Icons.Default.Settings
-    ),
-    TEST(
-        title = R.string.test_tab_text,
         icon = Icons.Default.School
     ),
     REINFORCEMENTS(
         title = R.string.reinforcements_tab_text,
         icon = Icons.Default.ThumbUp
     ),
+    TEST(
+        title = R.string.test_tab_text,
+        icon = Icons.Default.PendingActions
+    ),
     SUMMARY(
         title = R.string.summary_tab_text,
-        icon = Icons.Default.ListAlt
+        icon = Icons.Default.Checklist
     )
 }
 
@@ -71,11 +76,22 @@ fun LearningStepsSettingsScreen(
     stepId: Long?,
     onBackClick: () -> Unit,
     onHomeClick: () -> Unit,
-    settingsViewModel: LearningStepsSettingsViewModel = hiltViewModel()
+    viewModel: LearningStepsSettingsViewModel = hiltViewModel()
 ) {
-    LaunchedEffect(stepId) {
-        if (stepId != null) {
-            settingsViewModel.loadLearningStep(stepId)
+    val state by viewModel.state.collectAsStateWithLifecycle()
+
+    LaunchedEffect(state.savedLearningStepId) {
+        state.savedLearningStepId?.let { learningStepId ->
+
+            navController.previousBackStackEntry
+                ?.savedStateHandle
+                ?.set("newLearningStepId", learningStepId)
+
+            navController.popBackStack()
+
+            viewModel.onEvent(
+                LearningStepsSettingsEvent.SaveSuccessHandled
+            )
         }
     }
 
@@ -106,8 +122,11 @@ fun LearningStepsSettingsScreen(
                     .statusBarsPadding()
             ) {
                 TemplateTopAppBar(
-                    //TODO: Wyświetlanie nazwy konfiguracji kroku uczenia przy edycji
-                    text = stringResource(R.string.new_learning_step_header),
+                    text = if (stepId == null) {
+                        stringResource(R.string.new_learning_step_header)
+                    } else {
+                        state.stepName
+                    },
                     onBackClick = {
                         showExitDialog = true
                         exitDestination = ExitDestination.PREVIOUS
@@ -137,7 +156,6 @@ fun LearningStepsSettingsScreen(
                     LearningStepsPatternsScreen(
                         navController = navController,
                         stepId = stepId,
-                        settingsViewModel = settingsViewModel,
                         onBackClick = onBackClick,
                         onHomeClick = onHomeClick,
                         onAddPatternClick = { order ->
@@ -149,37 +167,54 @@ fun LearningStepsSettingsScreen(
                         },
                         onNextClick = {
                             selectedTab = LearningStepTab.LEARNING
-                        }
+                        },
+                        onEvent = { viewModel.onEvent(LearningStepsSettingsEvent.Patterns(it)) },
+                        draft = state.patternState
                     )
                 }
 
                 LearningStepTab.LEARNING -> {
                     LearningStepsLearningScreen(
-                        settingsViewModel = settingsViewModel,
                         onNextClick = {
                             selectedTab = LearningStepTab.TEST
-                        }
+                        },
+                        onEvent = { viewModel.onEvent(LearningStepsSettingsEvent.Learning(it)) },
+                        draft = state.learningState
                     )
                 }
 
                 LearningStepTab.TEST -> {
                     LearningStepsTestScreen(
-                        settingsViewModel = settingsViewModel,
+                        onNextClick = {
+                            selectedTab = LearningStepTab.REINFORCEMENTS
+                        },
+                        onEvent ={ viewModel.onEvent(LearningStepsSettingsEvent.Test(it)) },
+                        draft = state.testState
+                    )
+                }
+
+                LearningStepTab.REINFORCEMENTS -> {
+                    LearningStepsReinforcementScreen(
                         onNextClick = {
                             selectedTab = LearningStepTab.SUMMARY
                         }
                     )
                 }
 
-                LearningStepTab.REINFORCEMENTS -> {
-                    // później
-                }
-
                 LearningStepTab.SUMMARY -> {
                     LearningStepsSummaryScreen(
-                        settingsViewModel = settingsViewModel,
-                        onSaved = {
-                            onBackClick()
+                        state = state,
+                        onEvent = {
+                            viewModel.onEvent(
+                                LearningStepsSettingsEvent.Summary(it)
+                            )
+                        },
+                        onSaveClick = {
+                            viewModel.onEvent(
+                                LearningStepsSettingsEvent.Summary(
+                                    LearningStepsSummaryEvent.SaveClicked
+                                )
+                            )
                         }
                     )
                 }
@@ -187,6 +222,29 @@ fun LearningStepsSettingsScreen(
                 else -> {}
             }
         }
+    }
+
+    if (state.showSaveDialog) {
+        TemplateAlertDialog(
+            title = stringResource(R.string.save_config_dialog_title),
+            confirmText = stringResource(R.string.save_button_text),
+            message = null,
+            dismissText = stringResource(R.string.dismiss_button_text),
+            onConfirm = {
+                viewModel.onEvent(
+                    LearningStepsSettingsEvent.Summary(
+                        LearningStepsSummaryEvent.SaveConfirmed
+                    )
+                )
+            },
+            onDismiss = {
+                viewModel.onEvent(
+                    LearningStepsSettingsEvent.Summary(
+                        LearningStepsSummaryEvent.SaveDialogDismissed
+                    )
+                )
+            }
+        )
     }
 
     if (showExitDialog) {

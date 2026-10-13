@@ -12,9 +12,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.ArrowForwardIos
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -25,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.friendlylines.R
 import com.example.friendlylines.therapist_app.ui.components.TemplateButton
 import com.example.friendlylines.therapist_app.ui.components.TemplateClickableIcon
@@ -35,22 +38,18 @@ import com.example.friendlylines.therapist_app.ui.theme.InfoActive
 import com.example.friendlylines.therapist_app.ui.theme.InfoDefault
 import com.example.friendlylines.therapist_app.ui.theme.Neutral300
 import com.example.friendlylines.therapist_app.ui.theme.Primary50
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shared.data.drafts.AccuracyLevel
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.ui.unit.sp
-import com.example.friendlylines.therapist_app.ui.configuration.settings.LearningStepsSettingsViewModel
+import com.example.shared.data.drafts.LearningStepsTestDraft
 
 @Composable
 fun LearningStepsTestScreen(
     onNextClick: () -> Unit,
-    settingsViewModel: LearningStepsSettingsViewModel
+    onEvent: (LearningStepsTestEvent) -> Unit,
+    draft: LearningStepsTestDraft
 ) {
 
-    val testRepetitions by settingsViewModel.testRepetitions.collectAsStateWithLifecycle()
-    val testTimeLimit by settingsViewModel.testTimeLimit.collectAsStateWithLifecycle()
-    val testAccuracy by settingsViewModel.testAccuracy.collectAsStateWithLifecycle()
+    // STATES - sliders and switches
+    //val draft by viewModel.draft.collectAsStateWithLifecycle()
 
     // SLIDER VALUES
     val repetitionValues = listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
@@ -107,23 +106,32 @@ fun LearningStepsTestScreen(
         ) {
             TemplateSlider(
                 values = repetitionValues,
-                selectedIndex = repetitionValues.indexOf(testRepetitions),
+                selectedIndex = repetitionValues.indexOf(draft.repetitions),
+                value = draft.repetitions,
+                minValue = repetitionValues.first(),
+                maxValue = repetitionValues.last(),
                 onValueSelected = { index ->
-                    settingsViewModel.setTestRepetitions(
-                        repetitionValues[index]
+                    onEvent(
+                        LearningStepsTestEvent.SetRepetitions(
+                            repetitionValues[index]
+                        )
                     )
                 },
                 showMinusPlus = true,
                 onMinusClick = {
-                    settingsViewModel.setTestRepetitions(
-                        (testRepetitions - 1)
-                            .coerceAtLeast(repetitionValues.first())
+                    onEvent(
+                        LearningStepsTestEvent.SetRepetitions(
+                            (draft.repetitions - 1)
+                                .coerceAtLeast(repetitionValues.first())
+                        )
                     )
                 },
                 onPlusClick = {
-                    settingsViewModel.setTestRepetitions(
-                        (testRepetitions + 1)
-                            .coerceAtMost(repetitionValues.last())
+                    onEvent(
+                        LearningStepsTestEvent.SetRepetitions(
+                            (draft.repetitions + 1)
+                                .coerceAtMost(repetitionValues.last())
+                        )
                     )
                 },
                 sliderWidth = 320.dp
@@ -151,37 +159,40 @@ fun LearningStepsTestScreen(
 
         // TIME LIMIT
         LearningSettingRow(
-            title = stringResource(R.string.time_limit),
+            title = stringResource(R.string.time_limit) + " (${draft.timeLimit} s)",
             onInfoClick = {
                 showTimeLimitInfo = true
             }
         ) {
             TemplateSlider(
                 values = timeLimitValues,
-                selectedIndex = timeLimitValues.indexOf(testTimeLimit),
+                selectedIndex = timeLimitValues.indexOf(draft.timeLimit),
+                value = draft.timeLimit,
+                minValue = timeLimitValues.first(),
+                maxValue = timeLimitValues.last(),
                 onValueSelected = { index ->
-                    settingsViewModel.setTestTimeLimit(
-                        timeLimitValues[index]
+                    onEvent(
+                        LearningStepsTestEvent.SetTimeLimit(
+                            timeLimitValues[index]
+                        )
                     )
                 },
                 showMinusPlus = true,
                 onMinusClick = {
-                    val currentIndex = timeLimitValues.indexOf(testTimeLimit)
-
-                    if (currentIndex > 0) {
-                        settingsViewModel.setTestTimeLimit(
-                            timeLimitValues[currentIndex - 1]
+                    onEvent(
+                        LearningStepsTestEvent.SetTimeLimit(
+                            (draft.timeLimit - 1)
+                                .coerceAtLeast(timeLimitValues.first())
                         )
-                    }
+                    )
                 },
                 onPlusClick = {
-                    val currentIndex = timeLimitValues.indexOf(testTimeLimit)
-
-                    if (currentIndex < timeLimitValues.lastIndex) {
-                        settingsViewModel.setTestTimeLimit(
-                            timeLimitValues[currentIndex + 1]
+                    onEvent(
+                        LearningStepsTestEvent.SetTimeLimit(
+                            (draft.timeLimit + 1)
+                                .coerceAtMost(timeLimitValues.last())
                         )
-                    }
+                    )
                 },
                 sliderWidth = 320.dp
             )
@@ -196,10 +207,12 @@ fun LearningStepsTestScreen(
         ) {
             TemplateSlider(
                 values = accuracyValues,
-                selectedIndex = testAccuracy.ordinal,
+                selectedIndex = draft.accuracyLevel.ordinal,
                 onValueSelected = { index ->
-                    settingsViewModel.setTestAccuracy(
-                        AccuracyLevel.entries[index]
+                    onEvent(
+                        LearningStepsTestEvent.SetAccuracyLevel(
+                            AccuracyLevel.entries[index]
+                        )
                     )
                 },
                 showMinusPlus = false,
@@ -219,8 +232,8 @@ fun LearningStepsTestScreen(
                 enabled = false,
                 onCheckedChange = {},
                 modifier = Modifier.size(
-                    width = 52.dp,
-                    height = 32.dp
+                    width = 38.dp,
+                    height = 24.dp
                 )
             )
         }
@@ -237,8 +250,8 @@ fun LearningStepsTestScreen(
                 enabled = false,
                 onCheckedChange = {},
                 modifier = Modifier.size(
-                    width = 52.dp,
-                    height = 32.dp
+                    width = 38.dp,
+                    height = 24.dp
                 )
             )
         }

@@ -1,6 +1,5 @@
 package com.example.friendlylines.therapist_app.ui.materials.create_new
 
-import android.annotation.SuppressLint
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -65,7 +64,6 @@ import com.example.friendlylines.therapist_app.ui.materials.models.toNormalizedS
 import com.example.friendlylines.therapist_app.ui.theme.Primary1000
 import com.example.friendlylines.therapist_app.ui.theme.Primary50
 import java.lang.System.currentTimeMillis
-import com.example.friendlylines.therapist_app.ui.components.NameError
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -76,7 +74,7 @@ fun CreatePatternScreen(
     onSaveSuccess: (Long) -> Unit,
 ) {
     val rightListState = rememberLazyListState()
-    val rightScrollAreaState = rememberScrollAreaState(rightListState)
+//    val rightScrollAreaState = rememberScrollAreaState(rightListState)
 
     val viewModel: CreatePatternScreenViewModel = hiltViewModel()
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -89,31 +87,11 @@ fun CreatePatternScreen(
         mutableStateListOf<Offset>()
     }
 
-//    var smoothingEnabled by remember {
-//        mutableStateOf(false)
-//    }
-//
-//    var straightLineEnabled by remember {
-//        mutableStateOf(false)
-//    }
-
     var straightLineStart by remember {
         mutableStateOf<Offset?>(null)
     }
 
-     val isComplexPattern = strokes.size >= 2
-//
-//    var showSaveDialog by remember {
-//        mutableStateOf(false)
-//    }
-//
-//    var patternName by remember {
-//        mutableStateOf("")
-//    }
-//
-//    var patternNameError by remember {
-//        mutableStateOf<PatternNameError?>(null)
-//    }
+    val isComplexPattern = strokes.size >= 2
 
     var canvasSize by remember {
         mutableStateOf(IntSize.Zero)
@@ -123,23 +101,11 @@ fun CreatePatternScreen(
         mutableStateOf(false)
     }
 
-//    var showExitDialog by remember {
-//        mutableStateOf(false)
-//    }
-//
-//    var exitDestination by remember {
-//        mutableStateOf<ExitDestination?>(null)
-//    }
-
     BackHandler {
         viewModel.onEvent(
             CreatePatternScreenEvent.ExitRequested
         )
     }
-//    BackHandler {
-//        showExitDialog = true
-//        exitDestination = ExitDestination.PREVIOUS
-//    }
 
     LaunchedEffect(state.savedPatternId) {
         val patternId = state.savedPatternId ?: return@LaunchedEffect
@@ -182,8 +148,6 @@ fun CreatePatternScreen(
                             ExitDestination.PREVIOUS
                         )
                     )
-//                    showExitDialog = true
-//                    exitDestination = ExitDestination.PREVIOUS
                 },
                 onHomeClick = {
                     viewModel.onEvent(
@@ -191,8 +155,6 @@ fun CreatePatternScreen(
                             ExitDestination.HOME
                         )
                     )
-//                    showExitDialog = true
-//                    exitDestination = ExitDestination.HOME
                 }
             )
         }
@@ -207,7 +169,6 @@ fun CreatePatternScreen(
                 ),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            // Informacje
             Box(
                 modifier = Modifier
                     .weight(1f)
@@ -230,6 +191,9 @@ fun CreatePatternScreen(
                         ),
                         InfoRowData(
                             text = stringResource(R.string.smooth_info)
+                        ),
+                        InfoRowData(
+                            text = stringResource(R.string.straight_line_info)
                         )
                     ),
                     showSettingsIcon = true,
@@ -265,7 +229,6 @@ fun CreatePatternScreen(
                                 } else {
                                     currentStroke.add(offset)
                                 }
-//                                currentStroke.add(offset)
                             },
                             onDrag = { change, _ ->
                                 if (drawingBlocked)
@@ -273,7 +236,6 @@ fun CreatePatternScreen(
 
                                 val position = change.position
                                 if (position.isInside(canvasSize)) {
-                                    //currentStroke.add(position)
                                     if (state.straightLineEnabled) {
                                         currentStroke.clear()
                                         currentStroke.add(position)
@@ -290,7 +252,6 @@ fun CreatePatternScreen(
                                         end = position,
                                         rectangle = canvasSize.toRectangle()
                                     )
-                                    //currentStroke.add(clipped)
                                     if (state.straightLineEnabled) {
                                         currentStroke.clear()
                                         currentStroke.add(clipped)
@@ -310,12 +271,6 @@ fun CreatePatternScreen(
                                             }
                                         )
                                     )
-//                                        strokes.add(
-//                                            DrawingStroke(
-//                                                points = currentStroke.toList()
-//                                                //points = currentStroke.map {it.position}
-//                                            )
-//                                        )
                                     currentStroke.clear()
                                     straightLineStart = null
                                     drawingBlocked = true
@@ -323,15 +278,6 @@ fun CreatePatternScreen(
                             },
                             onDragEnd = {
                                 drawingBlocked = false
-//                                    if (currentStroke.isNotEmpty()) {
-//                                        strokes.add(
-//                                            DrawingStroke(
-//                                                points = currentStroke.toList()
-//                                                //points = currentStroke.map {it.position}
-//                                            )
-//                                        )
-//                                    }
-//                                    currentStroke.clear()
                                 if (state.straightLineEnabled) {
                                     val start = straightLineStart
                                     val end = currentStroke.lastOrNull()
@@ -403,7 +349,6 @@ fun CreatePatternScreen(
                                     viewModel.onEvent(
                                         CreatePatternScreenEvent.SmoothingEnabledChanged(it)
                                     )
-//                                    smoothingEnabled = it
                                 },
                                 modifier = Modifier.size(
                                     width = 38.dp,
@@ -437,7 +382,6 @@ fun CreatePatternScreen(
                                     viewModel.onEvent(
                                         CreatePatternScreenEvent.StraightLineEnabledChanged(it)
                                     )
-//                                    straightLineEnabled = it
                                 },
                                 modifier = Modifier.size(
                                     width = 38.dp,
@@ -458,7 +402,6 @@ fun CreatePatternScreen(
 
                     item { Spacer(Modifier.height(24.dp)) }
 
-                    // Przycisk wyczyść
                     item {
                         TemplateButton(
                             modifier = Modifier
@@ -501,7 +444,6 @@ fun CreatePatternScreen(
                                 viewModel.onEvent(
                                     CreatePatternScreenEvent.SaveClicked
                                 )
-                                //showSaveDialog = true
                             },
                             text = stringResource(R.string.save_button_text),
                             icon = Icons.Default.Save
@@ -523,17 +465,12 @@ fun CreatePatternScreen(
                 viewModel.onEvent(
                     CreatePatternScreenEvent.PatternNameChanged(it)
                 )
-//                patternName = it
-//                patternNameError = null
             },
             nameError = state.patternNameError,
             onDismiss = {
                 viewModel.onEvent(
                     CreatePatternScreenEvent.SaveDismissed
                 )
-//                showSaveDialog = false
-//                patternName = ""
-//                patternNameError = null
             },
             onSave = {
                 val normalizedStrokes = strokes.map { stroke ->
@@ -547,52 +484,6 @@ fun CreatePatternScreen(
                         createdAt = currentTimeMillis()
                     )
                 )
-//                val name = state.patternName.trim()
-//                if (name.isBlank()) {
-//                    viewModel.onEvent(
-//                        CreatePatternScreenEvent.PatternBlankName
-//                    )
-////                    patternNameError = PatternNameError.BLANK
-//                    return@TemplateSaveDialog
-//                }
-//                viewModel.checkPatternName(
-//                    name = name
-//                ) { exists ->
-//                    if (exists) {
-//                        viewModel.onEvent(
-//                            CreatePatternScreenEvent.PatternNameExists
-//                        )
-////                        patternNameError = PatternNameError.EXISTS
-//                        return@checkPatternName
-//                    }
-//
-//                    val normalizedStrokes = strokes.map { stroke ->
-//                        stroke.toNormalizedStroke(canvasSize)
-//                    }
-//
-//                    viewModel.savePattern(
-//                        name = name.trim(),
-//                        isExample = false,
-//                        isComplex = strokes.size >= 2,
-//                        createdAt = currentTimeMillis(),
-//                        strokes = normalizedStrokes,
-//                        smoothingEnabled = state.smoothingEnabled,
-//                        onSuccess = { patternId ->
-//                            viewModel.onEvent(
-//                                CreatePatternScreenEvent.SaveDismissed
-//                            )
-////                            showSaveDialog = false
-////                            patternName = ""
-////                            patternNameError = null
-//
-//                            strokes.clear()
-//                            currentStroke.clear()
-//
-//                            onSaveSuccess(patternId)
-//                        },
-//                        onError = {}
-//                    )
-//                }
             }
         )
     }
@@ -607,20 +498,11 @@ fun CreatePatternScreen(
                 viewModel.onEvent(
                     CreatePatternScreenEvent.ExitConfirmed
                 )
-//                showExitDialog = false
-//                when (exitDestination) {
-//                    ExitDestination.PREVIOUS -> onBackClick()
-//                    ExitDestination.HOME -> onHomeClick()
-//                    null -> Unit
-//                }
-//                exitDestination = null
             },
             onDismiss = {
                 viewModel.onEvent(
                     CreatePatternScreenEvent.ExitDismissed
                 )
-//                showExitDialog = false
-//                exitDestination = null
             }
         )
     }

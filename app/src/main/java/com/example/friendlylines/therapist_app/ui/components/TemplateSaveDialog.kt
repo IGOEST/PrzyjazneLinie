@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.friendlylines.R
-import com.example.friendlylines.therapist_app.ui.components.NameError
+import com.example.friendlylines.therapist_app.ui.materials.models.NameError
 import com.example.friendlylines.therapist_app.ui.theme.Error
 import com.example.friendlylines.therapist_app.ui.theme.Neutral300
 import com.example.friendlylines.therapist_app.ui.theme.Primary1000

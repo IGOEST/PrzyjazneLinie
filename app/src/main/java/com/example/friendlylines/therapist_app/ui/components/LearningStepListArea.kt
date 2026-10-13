@@ -1,7 +1,6 @@
 package com.example.friendlylines.therapist_app.ui.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -20,29 +19,28 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.FileCopy
+import androidx.compose.material.icons.outlined.AddCircle
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.example.friendlylines.therapist_app.ui.theme.Primary900
-import com.example.shared.data.entities.LearningStepEntity
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.text.font.FontWeight
-import com.example.friendlylines.therapist_app.ui.theme.Primary1000
-import com.example.friendlylines.therapist_app.ui.theme.Primary500
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.friendlylines.R
-import com.example.shared.data.entities.LearningStepMode
-import androidx.compose.material.icons.outlined.AddCircle
+import com.example.friendlylines.therapist_app.ui.theme.Primary1000
+import com.example.friendlylines.therapist_app.ui.theme.Primary500
+import com.example.friendlylines.therapist_app.ui.theme.Primary900
+import com.example.shared.data.entities.LearningStepEntity
 
 
 @Composable
 fun LearningStepListArea(
     learningSteps: List<LearningStepEntity>,
-    onDeleteClick: (LearningStepEntity) -> Unit,
+    onDeleteClick: (LearningStepEntity) -> Unit = {},
     onActiveStepClick: (LearningStepEntity) -> Unit = {},
     onModeChange: (LearningStepEntity, Boolean) -> Unit = { _, _ -> },
     onCreateClick: () -> Unit = {},
@@ -69,9 +67,6 @@ fun LearningStepListArea(
 
                 LearningStepListItem(
                     learningStep = learningStep,
-                    onDeleteClick = {
-                        // TO DO
-                    },
                     onActiveStepClick = {
                         onActiveStepClick(learningStep)
                     },
@@ -84,7 +79,10 @@ fun LearningStepListArea(
                     },
                     onCopyClick = {
                         // later
-                    }
+                    },
+                    onDeleteClick = {
+                        onDeleteClick(learningStep)
+                    },
                 )
             }
             item {
@@ -100,11 +98,11 @@ fun LearningStepListArea(
 @Composable
 private fun LearningStepListItem(
     learningStep: LearningStepEntity,
-    onDeleteClick: (LearningStepEntity) -> Unit,
-    onActiveStepClick: () -> Unit,
-    onModeChange: (Boolean) -> Unit,
+    onActiveStepClick: (Boolean) -> Unit,
     onEditClick: () -> Unit,
-    onCopyClick: () -> Unit
+    onCopyClick: () -> Unit,
+    onDeleteClick: () -> Unit,
+    onModeChange: (Boolean) -> Unit,
 ) {
     Row(
         modifier = Modifier
@@ -115,20 +113,16 @@ private fun LearningStepListItem(
                 shape = RoundedCornerShape(10.dp)
             )
             .background(
-                color = if (learningStep.activeStep) {
-                    Primary500
-                } else {
-                    Color.White
-                },
+                color = if (learningStep.isActive) Primary500 else Color.White,
                 shape = RoundedCornerShape(10.dp)
             )
             .padding(horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         TemplateCheckbox(
-            checked = learningStep.activeStep,
-            onCheckedChange = {
-                onActiveStepClick()
+            checked = learningStep.isActive,
+            onCheckedChange = { isActive ->
+                onActiveStepClick(isActive)
             },
             modifier = Modifier.size(18.dp)
         )
@@ -154,7 +148,7 @@ private fun LearningStepListItem(
         Spacer(modifier = Modifier.width(8.dp))
 
         TemplateToggleSwitch(
-            checked = learningStep.mode == LearningStepMode.TEST.name,
+            checked = learningStep.isTest,
             onCheckedChange = onModeChange,
             modifier = Modifier
         )

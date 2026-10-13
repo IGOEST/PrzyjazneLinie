@@ -2,22 +2,18 @@ package com.example.friendlylines.therapist_app.ui.materials.create_new
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.friendlylines.therapist_app.ui.components.NameError
-import com.example.friendlylines.therapist_app.ui.materials.models.toNormalizedStroke
+import com.example.friendlylines.therapist_app.ui.main.ExitDestination
 import com.example.shared.data.entities.PatternWithStrokes
 import com.example.shared.data.models.Point
 import com.example.shared.data.repositories.PatternRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.lang.System.currentTimeMillis
 import javax.inject.Inject
-import com.example.friendlylines.therapist_app.ui.main.ExitDestination
+import com.example.friendlylines.therapist_app.ui.materials.models.NameError
 
 @HiltViewModel
 class CreatePatternScreenViewModel @Inject constructor(
@@ -201,11 +197,7 @@ class CreatePatternScreenViewModel @Inject constructor(
                         savedPatternId = patternId
                     )
                 }
-            } catch (e: Exception) {
-                // Zachowujemy obecne zachowanie:
-                // onError było puste, więc tutaj również
-                // nie pokazujemy żadnego błędu użytkownikowi.
-            }
+            } catch (e: Exception) { }
         }
     }
 

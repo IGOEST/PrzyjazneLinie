@@ -1,6 +1,6 @@
 package com.example.friendlylines.therapist_app.ui.configuration.patterns
 
-import android.annotation.SuppressLint
+//import com.example.friendlylines.therapist_app.ui.configuration.config.LearningStepsPatternConfigDraft
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -36,8 +36,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.composables.core.ScrollArea
 import com.composables.core.Thumb
@@ -48,14 +46,12 @@ import com.example.friendlylines.therapist_app.ui.components.LearningStepsPatter
 import com.example.friendlylines.therapist_app.ui.components.TemplateAlertDialog
 import com.example.friendlylines.therapist_app.ui.components.TemplateButton
 import com.example.friendlylines.therapist_app.ui.components.TemplateSearchBox
-//import com.example.friendlylines.therapist_app.ui.configuration.config.LearningStepsPatternConfigDraft
-import com.example.friendlylines.therapist_app.ui.configuration.settings.LearningStepTab
-import com.example.friendlylines.therapist_app.ui.configuration.settings.LearningStepsSettingsViewModel
 import com.example.friendlylines.therapist_app.ui.main.NavRoutes
 import com.example.friendlylines.therapist_app.ui.theme.Primary50
 import com.example.friendlylines.therapist_app.ui.theme.Primary700
 import com.example.friendlylines.therapist_app.ui.theme.Primary900
 import com.example.shared.data.drafts.LearningStepsPatternConfigDraft
+import com.example.shared.data.drafts.LearningStepsPatternsDraft
 
 enum class MoveDirection {
     UP,
@@ -70,27 +66,14 @@ fun LearningStepsPatternsScreen(
     onHomeClick: () -> Unit,
     onAddPatternClick: (Int) -> Unit,
     onNextClick: () -> Unit,
-    settingsViewModel: LearningStepsSettingsViewModel
+    onEvent: (LearningStepsPatternsEvent)    -> Unit,
+    draft: LearningStepsPatternsDraft
 ) {
+    val patterns = draft.patterns
+    val scrollToConfigId = draft.scrollToConfigId
+
     val listState = rememberLazyListState()
     val scrollAreaState = rememberScrollAreaState(listState)
-
-    var scrollToConfigId by remember {
-        mutableStateOf<Long?>(null)
-    }
-
-    val parentEntry = remember(navController.currentBackStackEntry) {
-        navController.getBackStackEntry(
-            NavRoutes.LEARNING_STEPS_CREATE
-        )
-    }
-
-    val newConfigId by parentEntry
-        .savedStateHandle
-        .getStateFlow<Long?>("newConfigId", null)
-        .collectAsStateWithLifecycle()
-
-    val patterns by settingsViewModel.patterns.collectAsStateWithLifecycle()
 
     var searchQuery by remember {
         mutableStateOf("")
@@ -121,22 +104,6 @@ fun LearningStepsPatternsScreen(
         mutableStateOf<LearningStepsPatternConfigDraft?>(null)
     }
 
-    LaunchedEffect(patterns, newConfigId) {
-        val configId = newConfigId ?: return@LaunchedEffect
-
-        val index = patterns.indexOfFirst {
-            it.id == configId
-        }
-
-        if (index >= 0) {
-            listState.animateScrollToItem(index)
-
-            parentEntry
-                .savedStateHandle
-                .set<Long?>("newConfigId", null)
-        }
-    }
-
     LaunchedEffect(scrollToConfigId, patterns) {
         val configId = scrollToConfigId ?: return@LaunchedEffect
 
@@ -146,7 +113,9 @@ fun LearningStepsPatternsScreen(
 
         if (index >= 0) {
             listState.animateScrollToItem(index)
-            scrollToConfigId = null
+            onEvent(
+                LearningStepsPatternsEvent.ScrollToConfigHandled
+            )
         }
     }
 
@@ -193,7 +162,6 @@ fun LearningStepsPatternsScreen(
                         state = listState,
                         modifier = Modifier.weight(1f),
                         contentPadding = PaddingValues(
-                            horizontal = 32.dp,
                             vertical = 16.dp
                         ),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -208,21 +176,27 @@ fun LearningStepsPatternsScreen(
                                 canMoveUp = index > 0,
                                 canMoveDown = index < patterns.lastIndex,
                                 onEnabledChange = { enabled ->
-                                    settingsViewModel.setPatternEnabled(
-                                        configId = pattern.id,
-                                        enabled = enabled
+                                    onEvent(
+                                        LearningStepsPatternsEvent.SetPatternEnabled(
+                                            configId = pattern.id,
+                                            enabled = enabled
+                                        )
                                     )
                                 },
                                 onMoveUpClick = {
-                                    settingsViewModel.movePattern(
-                                        configId = pattern.id,
-                                        direction = MoveDirection.UP
+                                    onEvent(
+                                        LearningStepsPatternsEvent.MovePattern(
+                                            configId = pattern.id,
+                                            direction = MoveDirection.UP
+                                        )
                                     )
                                 },
                                 onMoveDownClick = {
-                                    settingsViewModel.movePattern(
-                                        configId = pattern.id,
-                                        direction = MoveDirection.DOWN
+                                    onEvent(
+                                        LearningStepsPatternsEvent.MovePattern(
+                                            configId = pattern.id,
+                                            direction = MoveDirection.DOWN
+                                        )
                                     )
                                 },
                                 onEditClick = {
@@ -238,7 +212,7 @@ fun LearningStepsPatternsScreen(
                         }
                     }
 
-                    Spacer(modifier = Modifier.width(16.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
 
                     VerticalScrollbar(
                         modifier = Modifier
@@ -289,10 +263,11 @@ fun LearningStepsPatternsScreen(
             dismissText = stringResource(R.string.dismiss_button_text),
             onConfirm = {
                 patternConfigToCopy?.let { pattern ->
-                    val newConfigId = settingsViewModel.copyPattern(pattern.id)
-                    if (newConfigId != null) {
-                        scrollToConfigId = newConfigId
-                    }
+                    onEvent(
+                        LearningStepsPatternsEvent.CopyPattern(
+                            configId = pattern.id
+                        )
+                    )
                 }
                 patternConfigToCopy = null
             },
@@ -310,7 +285,11 @@ fun LearningStepsPatternsScreen(
             dismissText = stringResource(R.string.dismiss_button_text),
             onConfirm = {
                 patternConfigToDelete?.let { pattern ->
-                    settingsViewModel.deletePattern(pattern.id)
+                    onEvent(
+                        LearningStepsPatternsEvent.DeletePattern(
+                            configId = pattern.id
+                        )
+                    )
                 }
                 patternConfigToDelete = null
             },
@@ -379,7 +358,7 @@ fun LearningStepsPatternsListHeader(
         modifier = modifier
             .fillMaxWidth()
             .padding(
-                start = 64.dp,
+                start = 32.dp,
                 end = 96.dp,
                 top = 16.dp,
                 bottom = 16.dp

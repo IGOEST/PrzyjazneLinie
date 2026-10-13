@@ -9,7 +9,7 @@ import com.example.shared.data.drafts.PatternWidth
 import com.example.shared.data.drafts.toDp
 import com.example.shared.data.models.toPatternDrawing
 import com.example.shared.data.drafts.PatternConfigOptions
-import com.example.shared.data.repositories.LearningStepRepository
+//import com.example.shared.data.repositories.LearningStepRepository
 import com.example.shared.data.repositories.PatternRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -21,11 +21,13 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import androidx.compose.ui.geometry.Offset
-import com.example.shared.data.entities.LearningStepMode
+//import com.example.shared.data.entities.LearningStepMode
+//import com.example.shared.data.entities.LearningStepMode
+import com.example.shared.data.repositories.LearningStepsRepository
 
 @HiltViewModel
 class ChildViewModel  @Inject constructor(
-    private val learningStepRepository: LearningStepRepository,
+    private val learningStepRepository: LearningStepsRepository,
     private val patternRepository: PatternRepository
 )  : ViewModel() {
 
@@ -233,14 +235,15 @@ class ChildViewModel  @Inject constructor(
                 if (activePatterns.isEmpty()) return@launch
 
                 var patternResults = mutableListOf<PatternResult>()
-                val testMode = (step.mode == LearningStepMode.TEST.name)
-                val repetitions = if (testMode) step.testRepetitions else step.repetitions
+                //val testMode = (step.mode == LearningStepMode.TEST.name)
+                val testMode = step.isTest
+                val repetitions = if (testMode) step.testRepetitions else step.learningRepetitions
                 val learningStepResult = LearningStepResult(
                     name = step.name,
                     testMode = testMode,
-                    showStartingPoint = if (testMode) false else step.startingPointEnabled,
-                    timeLimit = if (testMode) step.testTimeLimit else step.timeLimit,
-                    attempts = if (testMode) 1 else step.attempts
+                    showStartingPoint = if (testMode) false else step.learningStartingPointEnabled,
+                    timeLimit = if (testMode) step.testTimeLimit else step.learningTimeLimit,
+                    attempts = if (testMode) 1 else step.learningAttempts
                 )
                 for (p in activePatterns) {
                     for (i in 0 until repetitions) {
@@ -275,7 +278,7 @@ class ChildViewModel  @Inject constructor(
                     }
                 }
 
-                val preparedResults = preparePatterns(patternResults, step.randomPatternOrder, testMode)
+                val preparedResults = preparePatterns(patternResults, step.learningRandomPatternOrder, testMode)
 
                 _state.update { it.copy(
                     patternResults = preparedResults,

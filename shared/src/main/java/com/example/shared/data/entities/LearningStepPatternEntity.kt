@@ -2,12 +2,10 @@ package com.example.shared.data.entities
 
 import androidx.room3.Entity
 import androidx.room3.ForeignKey
+import androidx.room3.ForeignKey.Companion.CASCADE
 import androidx.room3.Index
 import androidx.room3.PrimaryKey
 
-// Represents a pattern assigned to a specific learning step
-// Stores configuration of a pattern inside a learning step
-// Actual pattern data is stored in PatternEntity
 @Entity(
     tableName = "learning_step_patterns",
     foreignKeys = [
@@ -15,18 +13,18 @@ import androidx.room3.PrimaryKey
             entity = LearningStepEntity::class,
             parentColumns = ["id"],
             childColumns = ["learningStepId"],
-            onDelete = ForeignKey.CASCADE // deletes the configuration when the learning step is deleted
+            onDelete = CASCADE
         ),
         ForeignKey(
             entity = PatternEntity::class,
             parentColumns = ["id"],
             childColumns = ["patternId"],
-            onDelete = ForeignKey.CASCADE // deletes the configuration when the referenced pattern is deleted
+            onDelete = CASCADE
         )
     ],
     indices = [
-        Index("learningStepId"),
-        Index("patternId")
+        Index(value = ["learningStepId"]),
+        Index(value = ["patternId"])
     ]
 )
 data class LearningStepPatternEntity(

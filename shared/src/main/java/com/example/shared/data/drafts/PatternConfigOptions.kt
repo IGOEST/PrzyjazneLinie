@@ -73,12 +73,10 @@ object PatternConfigOptions {
     )
 
     fun getPatternAndWritingColor(name: String?): ColorOption {
-        return patternAndWriting.find { it.key == name }
-            ?: patternAndWriting.first()
+        return patternAndWriting.find { it.key == name } ?: patternAndWriting.first()
     }
 
     fun getBackgroundColor(name: String?): ColorOption {
-        return background.find { it.key == name }
-            ?: background.first()
+        return background.find { it.key == name } ?: background.first()
     }
 }

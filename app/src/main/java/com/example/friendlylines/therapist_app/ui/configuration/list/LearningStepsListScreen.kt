@@ -1,19 +1,23 @@
 package com.example.friendlylines.therapist_app.ui.configuration.list
 
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.outlined.AddCircle
@@ -21,6 +25,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,27 +36,31 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.composables.core.ScrollArea
+import com.composables.core.Thumb
+import com.composables.core.VerticalScrollbar
+import com.composables.core.rememberScrollAreaState
 import com.example.friendlylines.R
-import com.example.friendlylines.therapist_app.ui.components.LearningStepListArea
+import com.example.friendlylines.therapist_app.ui.components.LearningStepsListItem
+import com.example.friendlylines.therapist_app.ui.components.LearningStepsListItemAdd
+import com.example.friendlylines.therapist_app.ui.components.TemplateAlertDialog
 import com.example.friendlylines.therapist_app.ui.components.TemplateButton
 import com.example.friendlylines.therapist_app.ui.components.TemplateCheckbox
 import com.example.friendlylines.therapist_app.ui.components.TemplateClickableIcon
 import com.example.friendlylines.therapist_app.ui.components.TemplateInfoDialog
 import com.example.friendlylines.therapist_app.ui.components.TemplateSearchBox
 import com.example.friendlylines.therapist_app.ui.components.TemplateTopAppBar
+import com.example.friendlylines.therapist_app.ui.main.NavRoutes
 import com.example.friendlylines.therapist_app.ui.theme.InfoActive
 import com.example.friendlylines.therapist_app.ui.theme.InfoDefault
 import com.example.friendlylines.therapist_app.ui.theme.Neutral300
 import com.example.friendlylines.therapist_app.ui.theme.Primary50
 import com.example.friendlylines.therapist_app.ui.theme.Primary700
 import com.example.friendlylines.therapist_app.ui.theme.Primary900
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.ui.platform.LocalLifecycleOwner
-import com.example.friendlylines.therapist_app.ui.components.TemplateAlertDialog
-import com.example.friendlylines.therapist_app.ui.main.NavRoutes
+import com.example.shared.data.entities.LearningStepEntity
 
 @Composable
 fun LearningStepsListScreen(
@@ -61,58 +70,92 @@ fun LearningStepsListScreen(
     onCreateClick: () -> Unit,
     viewModel: LearningStepsListScreenViewModel = hiltViewModel()
 ) {
-    var searchQuery by remember {
-        mutableStateOf("")
+    val listState = rememberLazyListState()
+    val scrollAreaState = rememberScrollAreaState(listState)
+
+    val state by viewModel.state.collectAsStateWithLifecycle()
+
+    val copySuffix = stringResource(R.string.copy_text)
+
+    LaunchedEffect(Unit) {
+        viewModel.loadLearningSteps()
+    }
+
+    LaunchedEffect(state.learningSteps) {
+        val newLearningStepId =
+            navController.currentBackStackEntry
+                ?.savedStateHandle
+                ?.get<Long>("newLearningStepId")
+
+        if (newLearningStepId != null) {
+            val index = state.learningSteps.indexOfFirst {
+                it.id == newLearningStepId
+            }
+
+            if (index >= 0) {
+                listState.animateScrollToItem(index)
+
+                navController.currentBackStackEntry
+                    ?.savedStateHandle
+                    ?.remove<Long>("newLearningStepId")
+            }
+        }
+    }
+
+    LaunchedEffect(state.learningSteps, state.copiedLearningStepId) {
+        val copiedId = state.copiedLearningStepId ?: return@LaunchedEffect
+
+        val index = state.learningSteps.indexOfFirst {
+            it.id == copiedId
+        }
+
+        if (index >= 0) {
+            listState.animateScrollToItem(index)
+
+            viewModel.onEvent(
+                LearningStepsListEvent.CopiedLearningStepHandled
+            )
+        }
     }
 
     var showInfoDialog by remember {
         mutableStateOf(false)
     }
 
-    var showEditDialog by remember {
-        mutableStateOf(false)
-    }
-
-    var showDeleteDialog by remember {
-        mutableStateOf(false)
-    }
-
-    var selectedStepId by remember {
-        mutableStateOf<Long?>(null)
-    }
-
     var hideExampleSteps by remember {
         mutableStateOf(false)
     }
 
-    val learningSteps by viewModel.learningSteps.collectAsStateWithLifecycle()
-
-    val lifecycleOwner = LocalLifecycleOwner.current
-
-    val visibleLearningSteps = if (hideExampleSteps) {
-        learningSteps.filter { !it.isExample }
-    } else {
-        learningSteps
+    var learningStepToEdit by remember {
+        mutableStateOf<LearningStepEntity?>(null)
     }
 
-    val filteredLearningSteps = visibleLearningSteps.filter { step ->
-        step.name.contains(
-            searchQuery.trim(),
-            ignoreCase = true
-        )
+    var learningStepToCopy by remember {
+        mutableStateOf<LearningStepEntity?>(null)
     }
 
-    DisposableEffect(lifecycleOwner) {
-        val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_RESUME) {
-                viewModel.loadLearningSteps()
+    var learningStepToDelete by remember {
+        mutableStateOf<LearningStepEntity?>(null)
+    }
+
+    val filteredLearningSteps = remember(
+        state.learningSteps,
+        state.searchQuery,
+        hideExampleSteps) {
+        val steps = if (state.searchQuery.isBlank()) {
+            state.learningSteps
+        } else {
+            state.learningSteps.filter {
+                it.name.contains(
+                    state.searchQuery.trim(),
+                    ignoreCase = true
+                )
             }
         }
 
-        lifecycleOwner.lifecycle.addObserver(observer)
-
-        onDispose {
-            lifecycleOwner.lifecycle.removeObserver(observer)
+        if (hideExampleSteps) {
+            steps.filter { !it.isExample }
+        } else { steps
         }
     }
 
@@ -132,9 +175,11 @@ fun LearningStepsListScreen(
                 .padding(padding)
         ) {
             LearningStepsListToolbar(
-                searchQuery = searchQuery,
+                searchQuery = state.searchQuery,
                 onSearchQueryChange = {
-                    searchQuery = it
+                    viewModel.onEvent(
+                        LearningStepsListEvent.SearchQueryChanged(it)
+                    )
                 },
                 onCreateClick = onCreateClick,
                 onInfoClick = {
@@ -154,27 +199,86 @@ fun LearningStepsListScreen(
                 }
             )
 
-            LearningStepListArea(
-                learningSteps = filteredLearningSteps,
-                modifier = Modifier.weight(1f),
-                onEditClick = { step ->
-                    selectedStepId = step.id
-                    showEditDialog = true
-                },
-                onDeleteClick = { step ->
-                    // later
-                },
-                onActiveStepClick = { step ->
-                    viewModel.setActiveStep(step.id)
-                },
-                onModeChange = { step, isTest ->
-                    viewModel.setMode(
-                        stepId = step.id,
-                        isTest = isTest
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        horizontal = 32.dp
                     )
-                },
-                onCreateClick = onCreateClick
-            )
+            ) {
+                ScrollArea(
+                    state = scrollAreaState,
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        LazyColumn(
+                            state = listState,
+                            modifier = Modifier.weight(1f),
+                            contentPadding = PaddingValues(
+                                vertical = 16.dp
+                            ),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            items(
+                                items = filteredLearningSteps,
+                                key = { it.id }
+                            ) { learningStep ->
+                                LearningStepsListItem(
+                                    learningStep = learningStep,
+                                    onEnabledChange = { isActive ->
+                                        viewModel.onEvent(
+                                            LearningStepsListEvent.ActiveChanged(
+                                                id = learningStep.id,
+                                                isActive = isActive
+                                            )
+                                        )
+                                    },
+                                    onModeChange = { isTest ->
+                                        viewModel.onEvent(
+                                            LearningStepsListEvent.ModeChanged(
+                                                id = learningStep.id,
+                                                isTest = isTest
+                                            )
+                                        )
+                                    },
+                                    onEditClick = {
+                                        learningStepToEdit = learningStep
+                                    },
+                                    onCopyClick = {
+                                        learningStepToCopy = learningStep
+                                    },
+                                    onDeleteClick = {
+                                        learningStepToDelete = learningStep
+                                    }
+                                )
+                            }
+
+                            item {
+                                LearningStepsListItemAdd(
+                                    onClick = onCreateClick
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        VerticalScrollbar(
+                            modifier = Modifier
+                                .fillMaxHeight()
+                                .width(4.dp)
+                        ) {
+                            Thumb(
+                                Modifier.background(
+                                    color = Primary700,
+                                    shape = RoundedCornerShape(2.dp)
+                                )
+                            )
+                        }
+                    }
+                }
+            }
         }
 
         if (showInfoDialog) {
@@ -187,52 +291,66 @@ fun LearningStepsListScreen(
             )
         }
 
-        if (showEditDialog) {
+        if (learningStepToEdit != null) {
             TemplateAlertDialog(
                 title = stringResource(R.string.edit_dialog_title),
                 message = stringResource(R.string.edit_learning_step_dialog_message),
                 confirmText = stringResource(R.string.edit_button_text),
                 dismissText = stringResource(R.string.dismiss_button_text),
                 onConfirm = {
-                    val stepId = selectedStepId
-
-                    showEditDialog = false
-                    selectedStepId = null
-
-                    if (stepId != null) {
+                    learningStepToEdit?.let { learningStep ->
                         navController.navigate(
                             NavRoutes.learningStepsCreate(
-                                stepId = stepId
+                                stepId = learningStep.id
                             )
                         )
                     }
+                    learningStepToEdit = null
                 },
                 onDismiss = {
-                    showEditDialog = false
-                    selectedStepId = null
+                    learningStepToEdit = null
                 }
             )
         }
 
-        if (showDeleteDialog) {
+        if (learningStepToCopy != null) {
+            TemplateAlertDialog(
+                title = stringResource(R.string.copy_dialog_title),
+                message = stringResource(R.string.copy_learning_step_dialog_message),
+                confirmText = stringResource(R.string.copy_button_text),
+                dismissText = stringResource(R.string.dismiss_button_text),
+                onConfirm = {
+                    learningStepToCopy?.let { learningStep ->
+                        viewModel.onEvent(
+                            LearningStepsListEvent.CopyClicked(
+                                id = learningStep.id,
+                                copySuffix = copySuffix)
+                        )
+                    }
+                    learningStepToCopy = null
+                },
+                onDismiss = {
+                    learningStepToCopy = null
+                }
+            )
+        }
+
+        if (learningStepToDelete != null) {
             TemplateAlertDialog(
                 title = stringResource(R.string.delete_dialog_title),
-                message = stringResource(R.string.delete_step_dialog_message),
+                message = stringResource(R.string.delete_learning_step_dialog_message),
                 confirmText = stringResource(R.string.delete_confirm_button_text),
                 dismissText = stringResource(R.string.dismiss_button_text),
                 onConfirm = {
-                    val stepId = selectedStepId
-
-                    showDeleteDialog = false
-                    selectedStepId = null
-
-                    if (stepId != null) {
-                        viewModel.deleteLearningStep(stepId)
+                    learningStepToDelete?.let { learningStep ->
+                        viewModel.onEvent(
+                            LearningStepsListEvent.DeleteClicked(learningStep.id)
+                        )
                     }
+                    learningStepToDelete = null
                 },
                 onDismiss = {
-                    showDeleteDialog = false
-                    selectedStepId = null
+                    learningStepToDelete = null
                 }
             )
         }
@@ -301,8 +419,10 @@ fun LearningStepsListHeader(
         modifier = modifier
             .fillMaxWidth()
             .padding(
-                horizontal = 32.dp,
-                vertical = 16.dp
+                start = 32.dp,
+                end = 96.dp,
+                top = 16.dp,
+                bottom = 16.dp
             ),
         verticalAlignment = Alignment.CenterVertically
     ) {

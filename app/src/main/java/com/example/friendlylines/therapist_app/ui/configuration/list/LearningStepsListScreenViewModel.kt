@@ -2,68 +2,105 @@ package com.example.friendlylines.therapist_app.ui.configuration.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.shared.data.entities.LearningStepEntity
-import com.example.shared.data.entities.LearningStepMode
-import com.example.shared.data.repositories.LearningStepRepository
+import com.example.shared.data.repositories.LearningStepsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+
 @HiltViewModel
 class LearningStepsListScreenViewModel @Inject constructor(
-    private val learningStepRepository: LearningStepRepository
+    private val learningStepsRepository: LearningStepsRepository
 ) : ViewModel() {
 
-    // contains all learning steps saved in the database
-    private val _learningSteps = MutableStateFlow<List<LearningStepEntity>>(emptyList())
+    private val _state = MutableStateFlow(LearningStepsListState())
 
-    // exposes the saved learning steps to the screen
-    val learningSteps: StateFlow<List<LearningStepEntity>> =
-        _learningSteps.asStateFlow()
+    val state: StateFlow<LearningStepsListState> = _state.asStateFlow()
 
-    // loads learning steps from the database
-    fun loadLearningSteps() {
-        viewModelScope.launch {
-            _learningSteps.value = learningStepRepository.getAllLearningSteps()
-        }
+    init {
+        loadLearningSteps()
     }
 
-    // mark step as active
-    fun setActiveStep(stepId: Long) {
-        viewModelScope.launch {
-            learningStepRepository.setActiveStep(stepId)
-            loadLearningSteps()
-        }
-    }
+    fun onEvent(event: LearningStepsListEvent) {
+        when (event) {
+            is LearningStepsListEvent.ActiveChanged -> {
+                viewModelScope.launch {
+                    learningStepsRepository.updateLearningStepActive(
+                        id = event.id,
+                        isActive = event.isActive
+                    )
 
-    fun setMode(
-        stepId: Long,
-        isTest: Boolean
-    ) {
-        viewModelScope.launch {
-            val mode = if (isTest) {
-                LearningStepMode.TEST.name
-            } else {
-                LearningStepMode.LEARNING.name
+                    loadLearningSteps()
+                }
             }
 
-            learningStepRepository.updateLearningStepMode(
-                learningStepId = stepId,
-                mode = mode
-            )
+            is LearningStepsListEvent.ModeChanged -> {
+                viewModelScope.launch {
+                    learningStepsRepository.updateLearningStepMode(
+                        id = event.id,
+                        isTest = event.isTest
+                    )
 
-            loadLearningSteps()
+                    loadLearningSteps()
+                }
+            }
+
+            is LearningStepsListEvent.CopyClicked -> {
+                viewModelScope.launch {
+                    val newLearningStepId = learningStepsRepository.copyLearningStep(
+                        id = event.id,
+                        copySuffix = event.copySuffix
+                    )
+
+                    _state.update {
+                        it.copy(
+                            copiedLearningStepId = newLearningStepId
+                        )
+                    }
+
+                    loadLearningSteps()
+                }
+            }
+
+            is LearningStepsListEvent.DeleteClicked -> {
+                viewModelScope.launch {
+                    learningStepsRepository.deleteLearningStep(event.id)
+                    loadLearningSteps()
+                }
+            }
+
+            is LearningStepsListEvent.CopiedLearningStepHandled -> {
+                _state.update {
+                    it.copy(copiedLearningStepId = null)
+                }
+            }
+
+            is LearningStepsListEvent.SearchQueryChanged -> {
+                _state.update {
+                    it.copy(searchQuery = event.query)
+                }
+            }
         }
     }
 
-    fun deleteLearningStep(stepId: Long) {
+    fun loadLearningSteps() {
         viewModelScope.launch {
-            learningStepRepository.deletePatternConfigurations(stepId)
-            learningStepRepository.deleteLearningStep(stepId)
-            loadLearningSteps()
+            _state.update {
+                it.copy(isLoading = true)
+            }
+
+            val learningSteps = learningStepsRepository.getAllLearningSteps()
+
+            _state.update {
+                it.copy(
+                    learningSteps = learningSteps,
+                    isLoading = false
+                )
+            }
         }
     }
 }

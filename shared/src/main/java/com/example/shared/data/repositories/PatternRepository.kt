@@ -72,6 +72,10 @@ class PatternRepository @Inject constructor(
         return patternDao.getPatternWithStrokes(patternId)
     }
 
+    suspend fun getExamplePatternByKey(key: String): PatternEntity? {
+        return patternDao.getExamplePatternByKey(key)
+    }
+
     suspend fun deletePattern(patternId: Long) {
         patternDao.deletePatternById(patternId)
     }
