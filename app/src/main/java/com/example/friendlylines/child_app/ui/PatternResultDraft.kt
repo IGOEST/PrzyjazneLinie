@@ -31,5 +31,8 @@ data class PatternResult(
     val correctCoverage: Int = 0,
     val lineOutOfBounds: Int = 0,
     val shapeMatch: Int = 0,
-    val correctStartingPoint: Boolean = true
+    val correctStartingPoint: Boolean = true,
+    var lastAttemptTime: Double = 0.0,
+    var totalTime: Double = 0.0,
+    var attempts: Int
 )

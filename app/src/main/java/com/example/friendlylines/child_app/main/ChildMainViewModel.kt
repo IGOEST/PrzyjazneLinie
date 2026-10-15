@@ -1,5 +1,6 @@
 package com.example.friendlylines.child_app.main
 
+import android.os.SystemClock
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.friendlylines.child_app.ui.LearningStepResult
@@ -58,6 +59,8 @@ class ChildViewModel  @Inject constructor(
         }
     }
 
+    // Finger actions functions
+
     private fun handlePointerDown(position: Offset) {
         finishTimerJob?.cancel()
         _state.update { currentState ->
@@ -81,6 +84,8 @@ class ChildViewModel  @Inject constructor(
     private fun handlePointerUp() {
         startFinishTimer()  // timer after trace is finished, in case user continues drawing
     }
+
+    // TIMER functions (time limit)
 
     private fun startFinishTimer() {
         finishTimerJob?.cancel()
@@ -106,6 +111,28 @@ class ChildViewModel  @Inject constructor(
             delay(millis)
             goToNextPattern()
         }
+    }
+
+    // Time is counted for whole pattern and last (or successful) attempt
+    private fun finishAttempt() {
+        val limitMillis = (_state.value.learningStepResult?.timeLimit ?: return) * 1000L
+        val remaining = (timeLimitRemainingMillis ?: return) -
+                (System.currentTimeMillis() - timerStartedAt)
+        val s = (limitMillis - remaining).coerceIn(0L, limitMillis) / 1000.0
+
+        val result = _state.value.patternResults
+            .getOrNull(_state.value.currentPattern) ?: return
+        result.totalTime += s - 1.5   // substract finish timer
+        result.lastAttemptTime = s - 1.5
+    }
+
+    // TODO: Restarts if pattern is wrong and there are attempts left
+    private fun restartAttempt() {
+        finishAttempt()
+        finishTimerJob?.cancel()
+        _state.update { it.copy(userStrokes = emptyList()) }
+        //new time limit
+        startTimeLimitTimer(_state.value.learningStepResult?.timeLimit ?: 0)
     }
 
     private fun handleToggleMenu() {
@@ -152,6 +179,7 @@ class ChildViewModel  @Inject constructor(
     }
 
     private fun goToNextPattern() {
+        finishAttempt()
         gameTimerJob?.cancel()
         finishTimerJob?.cancel()
         timeLimitRemainingMillis = null
@@ -210,7 +238,7 @@ class ChildViewModel  @Inject constructor(
 
     private fun loadPatternDrawing(index: Int, state: GameState) {
         val patternResult = state.patternResults.getOrNull(index) ?: return
-        
+
         // Start time limit for the new pattern
         startTimeLimitTimer(state.learningStepResult?.timeLimit ?: 0)
 
@@ -271,7 +299,8 @@ class ChildViewModel  @Inject constructor(
                                     patternId = p.patternId,
                                     patternName = patternEntity.name,
                                     originalName = patternEntity.name,
-                                    config = config
+                                    config = config,
+                                    attempts = 1
                                 )
                             )
                         }
@@ -282,7 +311,7 @@ class ChildViewModel  @Inject constructor(
 
                 _state.update { it.copy(
                     patternResults = preparedResults,
-                    learningStepResult = learningStepResult
+                    learningStepResult = learningStepResult,
                 ) }
             } catch (_: Exception) {}
         }
@@ -303,6 +332,7 @@ class ChildViewModel  @Inject constructor(
         var count = 1
         for (p in prepared) {
             p.patternName = p.originalName + " " + count
+            p.totalTime = 0.0
             count++
         }
 
