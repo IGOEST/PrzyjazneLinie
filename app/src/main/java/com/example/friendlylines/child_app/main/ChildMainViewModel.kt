@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import androidx.compose.ui.geometry.Offset
+import com.example.shared.data.entities.LearningStepEntity
 //import com.example.shared.data.entities.LearningStepMode
 //import com.example.shared.data.entities.LearningStepMode
 import com.example.shared.data.repositories.LearningStepsRepository
@@ -43,8 +44,14 @@ class ChildViewModel  @Inject constructor(
     private var isFinishTimerActive = false
 
     init {
-        loadActiveStepData()
+    viewModelScope.launch {
+        learningStepRepository.observeActiveStep().collect { step ->
+            if (step != null) {
+                loadActiveStepData(step)
+            }
+        }
     }
+}
 
     fun onEvent(event: ChildMainEvent) {
         when (event) {
@@ -252,10 +259,9 @@ class ChildViewModel  @Inject constructor(
     }
 
 
-    private fun loadActiveStepData() {
+    private fun loadActiveStepData(step: LearningStepEntity) {
         viewModelScope.launch {
             try {
-                val step = learningStepRepository.getActiveStep()
                 val activePatterns = learningStepRepository.getPatternConfigurations(step.id)
                     .filter { it.isEnabled }
                     .sortedBy { it.order }
@@ -300,7 +306,8 @@ class ChildViewModel  @Inject constructor(
                                     patternName = patternEntity.name,
                                     originalName = patternEntity.name,
                                     config = config,
-                                    attempts = 1
+                                    attempts = 1,
+                                    exampleKey = patternEntity.exampleKey
                                 )
                             )
                         }
@@ -329,11 +336,15 @@ class ChildViewModel  @Inject constructor(
         }
 
         // assigning numbers
-        var count = 1
+        val countsByPatternId = mutableMapOf<Long, Int>()
+
         for (p in prepared) {
-            p.patternName = p.originalName + " " + count
+            val number = (countsByPatternId[p.patternId] ?: 0) + 1
+            countsByPatternId[p.patternId] = number
+
+            p.displayNumber = number
+            p.patternName = "${p.originalName} $number"
             p.totalTime = 0.0
-            count++
         }
 
         return prepared

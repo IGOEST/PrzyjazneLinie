@@ -53,6 +53,7 @@ import com.example.friendlylines.therapist_app.ui.theme.Primary50
 import com.example.friendlylines.therapist_app.ui.theme.Primary900
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.friendlylines.name_mapping.ExampleStepsNames
 import com.example.shared.data.entities.LearningStepEntity
 
 object NavRoutes {
@@ -318,8 +319,14 @@ fun MainContent(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
-                        text = activeLearningStep?.let {
-                            stringResource(R.string.active_learning_step) + " ${it.name}" + " (${if (it.isTest) stringResource(R.string.test_mode) else stringResource(R.string.learning_mode)})"
+                        text = activeLearningStep?.let { step ->
+                            val translatedName = if (step.isExample) {
+                                ExampleStepsNames.exampleLearningStepNameFor(step.name)
+                            } else {
+                                step.name
+                            }
+
+                            stringResource(R.string.active_learning_step) + " $translatedName" + " (${if (step.isTest) stringResource(R.string.test_mode) else stringResource(R.string.learning_mode)})"
                         } ?: stringResource(R.string.no_active_step),
                         fontSize = 24.sp,
                         color = Primary900,

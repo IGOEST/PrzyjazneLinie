@@ -117,6 +117,9 @@ class PatternRepository @Inject constructor(
     ): List<Point> {
         if (isEmpty()) return this
 
+        require(referenceSize > 0f)
+        require(margin in 0f..<0.5f)
+
         val minX = minOf { it.x }
         val maxX = maxOf { it.x }
         val minY = minOf { it.y }
@@ -125,14 +128,16 @@ class PatternRepository @Inject constructor(
         val width = maxX - minX
         val height = maxY - minY
 
-        if (width <= 0f && height <= 0f) {
-            return this
+        val targetSize = referenceSize * (1f - 2f * margin)
+        val largestDimension = maxOf(width, height)
+
+        if (largestDimension <= 0f) {
+            return map {
+                Point(referenceSize/2f, referenceSize/2f)
+            }
         }
 
-        val targetSize = referenceSize * (1f - 2f * margin)
-
-        val scale = targetSize / maxOf(width, height)
-
+        val scale = targetSize / largestDimension
         val scaledWidth = width * scale
         val scaledHeight = height * scale
 

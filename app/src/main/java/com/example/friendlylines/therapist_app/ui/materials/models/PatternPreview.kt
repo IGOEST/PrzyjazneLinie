@@ -29,25 +29,24 @@ fun PatternPreview(
             strokes = drawing.strokes
         ) ?: return@Canvas
 
-        if (bounds.width <= 0f || bounds.height <= 0f) {
-            return@Canvas
-        }
-
         val padding = 10.dp.toPx()
 
-        val availableWidth = size.width - 2f * padding
-        val availableHeight = size.height - 2f * padding
+        val availableWidth = (size.width - 2f * padding).coerceAtLeast(1f)
+        val availableHeight = (size.height - 2f * padding).coerceAtLeast(1f)
+
+        // for vertical and horizontal lines
+        val effectiveWidth = bounds.width.coerceAtLeast(0.001f)
+        val effectiveHeight = bounds.height.coerceAtLeast(0.001f)
 
         val scale = minOf(
-            availableWidth / bounds.width,
-            availableHeight / bounds.height
+            availableWidth / effectiveWidth,
+            availableHeight / effectiveHeight
         )
 
         val drawingWidth = bounds.width * scale
         val drawingHeight = bounds.height * scale
 
         val offsetX = (size.width - drawingWidth) / 2f
-
         val offsetY = (size.height - drawingHeight) / 2f
 
         drawing.strokes.forEach { stroke ->

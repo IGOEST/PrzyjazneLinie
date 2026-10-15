@@ -113,7 +113,15 @@ fun ResultsScreen(
                         selectedPattern = picked ?: patterns.first()
                     },
                     label = "",
-                    optionLabel = { it?.patternName ?: "" },
+                    optionLabel = { pattern ->
+                        pattern?.let {
+                            val name = it.exampleKey?.let { key ->
+                                ExamplePatternNames.examplePatternNameFor(key)
+                            } ?: it.originalName
+
+                            "$name ${it.displayNumber}"
+                        } ?: ""
+                    },
                     width = 300.dp,
                     height = 44.dp
                 )

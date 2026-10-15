@@ -16,6 +16,9 @@ object ExamplePatternNames {
             "horizontal_line" -> stringResource(R.string.example_pattern_horizontal_line)
             "diagonal_line_down" -> stringResource(R.string.example_pattern_diagonal_line_down)
             "diagonal_line_up" -> stringResource(R.string.example_pattern_diagonal_line_up)
+            "curve_line" -> stringResource(R.string.example_pattern_curve_line)
+            "ellipse" -> stringResource(R.string.example_pattern_ellipse)
+            "rectangle" -> stringResource(R.string.example_pattern_rectangle)
             else -> key
         }
     }

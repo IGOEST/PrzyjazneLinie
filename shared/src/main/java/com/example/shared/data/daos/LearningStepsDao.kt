@@ -10,6 +10,7 @@ import androidx.room3.Update
 import com.example.shared.data.entities.LearningStepEntity
 import com.example.shared.data.entities.LearningStepPatternEntity
 import com.example.shared.data.entities.LearningStepWithPatterns
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface LearningStepsDao {
@@ -115,4 +116,7 @@ interface LearningStepsDao {
         deleteLearningStepPatterns(stepId)
         deleteLearningStep(stepId)
     }
+
+    @Query("SELECT * FROM learning_steps WHERE isActive = 1 LIMIT 1")
+    fun observeActiveStep(): Flow<LearningStepEntity?>
 }

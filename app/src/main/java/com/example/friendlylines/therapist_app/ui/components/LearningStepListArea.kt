@@ -1,6 +1,8 @@
 package com.example.friendlylines.therapist_app.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -20,8 +22,10 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.FileCopy
 import androidx.compose.material.icons.outlined.AddCircle
+import androidx.compose.material.icons.outlined.AddCircleOutline
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -31,6 +35,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.friendlylines.R
+import com.example.friendlylines.name_mapping.ExampleStepsNames
 import com.example.friendlylines.therapist_app.ui.theme.Primary1000
 import com.example.friendlylines.therapist_app.ui.theme.Primary500
 import com.example.friendlylines.therapist_app.ui.theme.Primary900
@@ -96,7 +101,7 @@ fun LearningStepListArea(
 }
 
 @Composable
-private fun LearningStepListItem(
+fun LearningStepListItem(
     learningStep: LearningStepEntity,
     onActiveStepClick: (Boolean) -> Unit,
     onEditClick: () -> Unit,
@@ -104,6 +109,12 @@ private fun LearningStepListItem(
     onDeleteClick: () -> Unit,
     onModeChange: (Boolean) -> Unit,
 ) {
+    val translatedName = if (learningStep.isExample) {
+        ExampleStepsNames.exampleLearningStepNameFor(learningStep.name)
+    } else {
+        learningStep.name
+    }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -130,7 +141,7 @@ private fun LearningStepListItem(
         Spacer(modifier = Modifier.width(16.dp))
 
         Text(
-            text = learningStep.name,
+            text = translatedName,
             color = Primary1000,
             fontSize = 24.sp,
             fontWeight = FontWeight.Normal,
@@ -193,9 +204,14 @@ private fun LearningStepListItem(
 }
 
 @Composable
-private fun CreateLearningStepListItem(
-    onClick: () -> Unit
+fun CreateLearningStepListItem(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
+    val interactionSource = remember {
+        MutableInteractionSource()
+    }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -208,11 +224,16 @@ private fun CreateLearningStepListItem(
                 color = Color.White,
                 shape = RoundedCornerShape(10.dp)
             )
-            .padding(horizontal = 16.dp),
+            .padding(horizontal = 16.dp)
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null,
+                onClick = onClick
+            ),
         verticalAlignment = Alignment.CenterVertically
     ) {
         TemplateClickableIcon(
-            icon = Icons.Outlined.AddCircle,
+            icon = Icons.Outlined.AddCircleOutline,
             contentDescription = stringResource(R.string.create_learning_step),
             onClick = onClick,
             modifier = Modifier.size(36.dp)

@@ -7,7 +7,7 @@ import com.example.friendlylines.R
 object  ExampleStepsNames {
     @Composable
     fun exampleLearningStepNameFor(key: String): String {
-        return when (key) {
+        return when (key.lowercase()) {
             "easy" -> stringResource(R.string.example_learning_step_easy)
             "medium" -> stringResource(R.string.example_learning_step_medium)
             "hard" -> stringResource(R.string.example_learning_step_hard)

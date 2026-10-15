@@ -161,10 +161,13 @@
     <string name="example_pattern_horizontal_line">Horizontal line</string>
     <string name="example_pattern_diagonal_line_down">Diagonal line down</string>
     <string name="example_pattern_diagonal_line_up">Diagonal line up</string>
+    <string name="example_pattern_curve_line">Curve line</string>
+    <string name="example_pattern_rectangle">Rectangle</string>
+    <string name="example_pattern_ellipse">Ellipse</string>
 
     <string name="example_learning_step_easy">Easy (example step)</string>
-<   string name="example_learning_step_medium">Medium (example step)</string>
-<   string name="example_learning_step_hard">Hard (example step)</string>
+    <string name="example_learning_step_medium">Medium (example step)</string>
+    <string name="example_learning_step_hard">Hard (example step)</string>
 
     <string name="straight_line_info">The \"Straight line\" option will allow for drawing straight lines.</string>
     <string name="repetitions">Repetitions</string>

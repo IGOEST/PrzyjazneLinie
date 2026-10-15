@@ -18,7 +18,8 @@
             android:exported="true"
             android:label="@string/title_therapist"
             android:screenOrientation="landscape"
-            android:windowSoftInputMode="adjustResize">
+            android:windowSoftInputMode="adjustResize"
+            android:taskAffinity="com.example.friendlylines.therapist">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -30,7 +31,8 @@
             android:exported="true"
             android:label="@string/title_child"
             android:screenOrientation="landscape"
-            android:windowSoftInputMode="adjustResize">
+            android:windowSoftInputMode="adjustResize"
+            android:taskAffinity="com.example.friendlylines.child">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

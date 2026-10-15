@@ -41,11 +41,25 @@ object ExamplePatterns {
             strokes = exampleDiagonalLineUp()
         ),
         ExamplePattern(
+            key = "curve_line",
+            name = "Curve line",
+            isComplex = false,
+            smoothingEnabled = true,
+            strokes = exampleCurveLine()
+        ),
+        ExamplePattern(
             key = "square",
             name = "Square",
             isComplex = false,
             smoothingEnabled = false,
             strokes = exampleSquare()
+        ),
+        ExamplePattern(
+            key = "rectangle",
+            name = "Rectangle",
+            isComplex = false,
+            smoothingEnabled = false,
+            strokes = exampleRectangle()
         ),
         ExamplePattern(
             key = "triangle",
@@ -60,6 +74,13 @@ object ExamplePatterns {
             isComplex = false,
             smoothingEnabled = false,
             strokes = exampleCircle()
+        ),
+        ExamplePattern(
+            key = "ellipse",
+            name = "Ellipse",
+            isComplex = false,
+            smoothingEnabled = false,
+            strokes = exampleEllipse()
         )
     )
 
@@ -68,6 +89,15 @@ object ExamplePatterns {
             listOf(
                 Point(50f, 0f),
                 Point(50f, 100f)
+            )
+        )
+    }
+
+    private fun exampleHorizontalLine(): List<List<Point>> {
+        return listOf(
+            listOf(
+                Point(0f, 50f),
+                Point(100f, 50f)
             )
         )
     }
@@ -90,13 +120,31 @@ object ExamplePatterns {
         )
     }
 
-    private fun exampleHorizontalLine(): List<List<Point>> {
-        return listOf(
-            listOf(
-                Point(0f, 50f),
-                Point(100f, 50f)
+    private fun exampleCurveLine(): List<List<Point>> {
+        val points = mutableListOf<Point>()
+
+        val centerX = 50f
+        val topY = 15f
+        val bottomY = 85f
+        val radiusX = 35f
+        val radiusY = 35f
+        val numberOfPoints = 48
+
+        points.add(Point(centerX - radiusX, topY))
+
+        for (i in 0..numberOfPoints) {
+            val angle = 2f * Math.PI.toFloat() * i / numberOfPoints
+
+            points.add(
+                Point(
+                    x = centerX + radiusX * kotlin.math.cos(angle),
+                    y = topY + radiusY * kotlin.math.sin(angle)
+                )
             )
-        )
+        }
+
+        points.add(Point(centerX + radiusX, topY))
+        return listOf(points)
     }
 
     private fun exampleSquare(): List<List<Point>> {
@@ -107,6 +155,18 @@ object ExamplePatterns {
                 Point(100f, 100f),
                 Point(0f, 100f),
                 Point(0f, 0f)
+            )
+        )
+    }
+
+    private fun exampleRectangle(): List<List<Point>> {
+        return listOf(
+            listOf(
+                Point(20f, 10f),
+                Point(80f, 10f),
+                Point(80f, 90f),
+                Point(20f, 90f),
+                Point(20f, 10f)
             )
         )
     }
@@ -138,6 +198,30 @@ object ExamplePatterns {
                 Point(
                     x = centerX + radius * kotlin.math.cos(angle),
                     y = centerY + radius * kotlin.math.sin(angle)
+                )
+            )
+        }
+
+        return listOf(points)
+    }
+
+    private fun exampleEllipse(): List<List<Point>> {
+        val points = mutableListOf<Point>()
+
+        val centerX = 50f
+        val centerY = 50f
+        val radiusX = 40f
+        val radiusY = 25f
+
+        val numberOfPoints = 64
+
+        for (i in 0..numberOfPoints) {
+            val angle = 2f * Math.PI.toFloat() * i / numberOfPoints
+
+            points.add(
+                Point(
+                    x = centerX + radiusX * kotlin.math.cos(angle),
+                    y = centerY + radiusY * kotlin.math.sin(angle)
                 )
             )
         }

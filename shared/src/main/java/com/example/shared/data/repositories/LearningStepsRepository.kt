@@ -16,12 +16,18 @@ import com.example.shared.data.examples.ExampleLearningSteps
 import com.example.shared.data.examples.ExamplePatternConfiguration
 import com.example.shared.data.models.PatternItem
 import com.example.shared.data.models.toPatternDrawing
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class LearningStepsRepository @Inject constructor(
     private val learningStepsDao: LearningStepsDao,
     private val patternRepository: PatternRepository
 ) {
+
+    fun observeActiveStep(): Flow<LearningStepEntity?> {
+        return learningStepsDao.observeActiveStep()
+    }
+
     // SAVING
     suspend fun saveLearningStep(draft: LearningStepsDraft): Long {
 

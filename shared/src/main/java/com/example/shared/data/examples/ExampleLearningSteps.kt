@@ -15,7 +15,7 @@ object ExampleLearningSteps {
             ExampleLearningStep(
                 key = "easy",
                 step = LearningStepEntity(
-                    name = "Easy",
+                    name = "easy",
                     isActive = true,
                     isLearning = true,
                     isTest = false,
@@ -35,12 +35,12 @@ object ExampleLearningSteps {
                     testStartingPointEnabled = false,
                     testRandomPatternOrder = false
                 ),
-                patternKeys = listOf("square")
+                patternKeys = listOf("vertical_line", "horizontal_line")
             ),
             ExampleLearningStep(
                 key = "medium",
                 step = LearningStepEntity(
-                    name = "Medium",
+                    name = "medium",
                     isActive = false,
                     isLearning = true,
                     isTest = false,
@@ -60,12 +60,12 @@ object ExampleLearningSteps {
                     testStartingPointEnabled = false,
                     testRandomPatternOrder = false
                 ),
-                patternKeys = listOf("square", "triangle")
+                patternKeys = listOf("diagonal_line_down", "diagonal_line_up", "curve_line")
             ),
             ExampleLearningStep(
                 key = "hard",
                 step = LearningStepEntity(
-                    name = "Hard",
+                    name = "hard",
                     isActive = false,
                     isLearning = true,
                     isTest = false,
@@ -85,7 +85,7 @@ object ExampleLearningSteps {
                     testStartingPointEnabled = false,
                     testRandomPatternOrder = false
                 ),
-                patternKeys = listOf("square", "triangle", "circle")
+                patternKeys = listOf("square", "triangle", "circle", "rectangle", "ellipse")
             )
         )
     }

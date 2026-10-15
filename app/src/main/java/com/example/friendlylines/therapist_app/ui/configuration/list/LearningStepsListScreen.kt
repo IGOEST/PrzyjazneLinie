@@ -44,8 +44,9 @@ import com.composables.core.Thumb
 import com.composables.core.VerticalScrollbar
 import com.composables.core.rememberScrollAreaState
 import com.example.friendlylines.R
-import com.example.friendlylines.therapist_app.ui.components.LearningStepsListItem
-import com.example.friendlylines.therapist_app.ui.components.LearningStepsListItemAdd
+import com.example.friendlylines.therapist_app.ui.components.CreateLearningStepListItem
+import com.example.friendlylines.therapist_app.ui.components.LearningStepListArea
+import com.example.friendlylines.therapist_app.ui.components.LearningStepListItem
 import com.example.friendlylines.therapist_app.ui.components.TemplateAlertDialog
 import com.example.friendlylines.therapist_app.ui.components.TemplateButton
 import com.example.friendlylines.therapist_app.ui.components.TemplateCheckbox
@@ -225,9 +226,9 @@ fun LearningStepsListScreen(
                                 items = filteredLearningSteps,
                                 key = { it.id }
                             ) { learningStep ->
-                                LearningStepsListItem(
+                                LearningStepListItem(
                                     learningStep = learningStep,
-                                    onEnabledChange = { isActive ->
+                                    onActiveStepClick = { isActive ->
                                         viewModel.onEvent(
                                             LearningStepsListEvent.ActiveChanged(
                                                 id = learningStep.id,
@@ -256,7 +257,7 @@ fun LearningStepsListScreen(
                             }
 
                             item {
-                                LearningStepsListItemAdd(
+                                CreateLearningStepListItem(
                                     onClick = onCreateClick
                                 )
                             }

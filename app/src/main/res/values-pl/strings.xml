@@ -176,6 +176,9 @@
     <string name="example_pattern_horizontal_line">Linia pozioma</string>
     <string name="example_pattern_diagonal_line_down">Linia ukośna w dół</string>
     <string name="example_pattern_diagonal_line_up">Linia ukośna w górę</string>
+    <string name="example_pattern_curve_line">Linia krzywa</string>
+    <string name="example_pattern_rectangle">Prostokąt</string>
+    <string name="example_pattern_ellipse">Elipsa</string>
 
     <string name="example_learning_step_easy">Łatwy (przykładowy krok)</string>
     <string name="example_learning_step_medium">Średni (przykładowy krok)</string>
