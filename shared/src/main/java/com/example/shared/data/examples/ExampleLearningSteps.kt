@@ -4,6 +4,7 @@ import com.example.shared.data.drafts.AccuracyLevel
 import com.example.shared.data.entities.LearningStepEntity
 
 data class ExampleLearningStep (
+    val key: String,
     val step: LearningStepEntity,
     val patternKeys: List<String>
 )
@@ -12,6 +13,7 @@ object ExampleLearningSteps {
     fun create(): List<ExampleLearningStep> {
         return listOf(
             ExampleLearningStep(
+                key = "easy",
                 step = LearningStepEntity(
                     name = "Easy",
                     isActive = true,
@@ -36,6 +38,7 @@ object ExampleLearningSteps {
                 patternKeys = listOf("square")
             ),
             ExampleLearningStep(
+                key = "medium",
                 step = LearningStepEntity(
                     name = "Medium",
                     isActive = false,
@@ -60,6 +63,7 @@ object ExampleLearningSteps {
                 patternKeys = listOf("square", "triangle")
             ),
             ExampleLearningStep(
+                key = "hard",
                 step = LearningStepEntity(
                     name = "Hard",
                     isActive = false,

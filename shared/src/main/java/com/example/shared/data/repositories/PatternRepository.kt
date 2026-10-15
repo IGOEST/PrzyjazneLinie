@@ -6,17 +6,10 @@ import com.example.shared.data.entities.PatternWithStrokes
 import com.example.shared.data.entities.PointEntity
 import com.example.shared.data.entities.StrokeEntity
 import com.example.shared.data.models.Point
+import com.example.shared.data.examples.ExamplePatterns
 import javax.inject.Inject
 
 private const val EXAMPLE_CANVAS_SIZE = 1000f
-
-private data class ExamplePattern(
-    val key: String,
-    val name: String,
-    val isComplex: Boolean,
-    val smoothingEnabled: Boolean,
-    val strokes: List<List<Point>>
-)
 
 class PatternRepository @Inject constructor(
     private val patternDao: PatternDao
@@ -85,8 +78,7 @@ class PatternRepository @Inject constructor(
     }
 
     suspend fun insertExamplePatterns() {
-        val examplePatterns = examplePatterns()
-        examplePatterns.forEachIndexed { index, example ->
+        ExamplePatterns.all.forEachIndexed { index, example ->
             if (!patternDao.examplePatternExists(example.key)) {
                 val normalizedStrokes = example.strokes.map { stroke ->
                     stroke
@@ -106,78 +98,6 @@ class PatternRepository @Inject constructor(
                 )
             }
         }
-    }
-
-    private fun examplePatterns(): List<ExamplePattern> {
-        return listOf(
-            ExamplePattern(
-                key = "square",
-                name = "Square",
-                isComplex = false,
-                smoothingEnabled = false,
-                strokes = exampleSquare()
-            ),
-            ExamplePattern(
-                key = "triangle",
-                name = "Triangle",
-                isComplex = false,
-                smoothingEnabled = false,
-                strokes = exampleTriangle()
-            ),
-            ExamplePattern(
-                key = "circle",
-                name = "Circle",
-                isComplex = false,
-                smoothingEnabled = false,
-                strokes = exampleCircle()
-            )
-        )
-    }
-
-    private fun exampleSquare(): List<List<Point>> {
-        return listOf(
-            listOf(
-                Point(0f, 0f),
-                Point(100f, 0f),
-                Point(100f, 100f),
-                Point(0f, 100f),
-                Point(0f, 0f)
-            )
-        )
-    }
-
-    private fun exampleTriangle(): List<List<Point>> {
-        return listOf(
-            listOf(
-                Point(50f, 0f),
-                Point(100f, 100f),
-                Point(0f, 100f),
-                Point(50f, 0f)
-            )
-        )
-    }
-
-    private fun exampleCircle(): List<List<Point>> {
-        val points = mutableListOf<Point>()
-
-        val centerX = 50f
-        val centerY = 50f
-        val radius = 50f
-
-        val numberOfPoints = 64
-
-        for (i in 0..numberOfPoints) {
-            val angle = 2f * Math.PI.toFloat() * i / numberOfPoints
-
-            points.add(
-                Point(
-                    x = centerX + radius * kotlin.math.cos(angle),
-                    y = centerY + radius * kotlin.math.sin(angle)
-                )
-            )
-        }
-
-        return listOf(points)
     }
 
     fun Point.normalize(
