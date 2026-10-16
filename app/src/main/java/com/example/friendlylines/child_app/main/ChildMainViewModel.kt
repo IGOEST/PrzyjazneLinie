@@ -26,6 +26,7 @@ import com.example.shared.data.entities.LearningStepEntity
 //import com.example.shared.data.entities.LearningStepMode
 //import com.example.shared.data.entities.LearningStepMode
 import com.example.shared.data.repositories.LearningStepsRepository
+import com.example.friendlylines.child_app.assessment.ShapeCorrectness
 
 @HiltViewModel
 class ChildViewModel  @Inject constructor(
@@ -35,6 +36,11 @@ class ChildViewModel  @Inject constructor(
 
     private val _state = MutableStateFlow(GameState())
     val state: StateFlow<GameState> = _state.asStateFlow()
+
+    private val shapeCorrectness = ShapeCorrectness(
+        sampleCount = 32,
+        correctThreshold = 0.80f
+    )
 
     private var gameTimerJob: Job? = null
     private var finishTimerJob: Job? = null

@@ -125,15 +125,12 @@ object ExamplePatterns {
 
         val centerX = 50f
         val topY = 15f
-        val bottomY = 85f
         val radiusX = 35f
-        val radiusY = 35f
+        val radiusY = 60f
         val numberOfPoints = 48
 
-        points.add(Point(centerX - radiusX, topY))
-
         for (i in 0..numberOfPoints) {
-            val angle = 2f * Math.PI.toFloat() * i / numberOfPoints
+            val angle = Math.PI.toFloat() * i / numberOfPoints
 
             points.add(
                 Point(
@@ -143,7 +140,6 @@ object ExamplePatterns {
             )
         }
 
-        points.add(Point(centerX + radiusX, topY))
         return listOf(points)
     }
 
