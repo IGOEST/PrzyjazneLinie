@@ -6,5 +6,6 @@ data class GalleryScreenState(
     val patterns: List<PatternItem> = emptyList(),
     val hideExamplePatterns: Boolean = false,
     val patternToDelete: PatternItem? = null,
-    val scrollToPatternId: Long? = null
+    val scrollToPatternId: Long? = null,
+    val isLoading: Boolean = true
 )

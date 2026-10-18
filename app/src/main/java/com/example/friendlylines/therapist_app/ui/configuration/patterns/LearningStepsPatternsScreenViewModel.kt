@@ -66,6 +66,34 @@ class LearningStepsPatternsScreenViewModel @Inject constructor() : ViewModel() {
                     )
                 }
 
+                is LearningStepsPatternsEvent.SetPatternLearning -> {
+                    state.copy(
+                        patterns = state.patterns.map { pattern ->
+                            if (pattern.id == event.configId) {
+                                pattern.copy(
+                                    isLearning = event.isLearning
+                                )
+                            } else {
+                                pattern
+                            }
+                        }
+                    )
+                }
+
+                is LearningStepsPatternsEvent.SetPatternTest -> {
+                    state.copy(
+                        patterns = state.patterns.map { pattern ->
+                            if (pattern.id == event.configId) {
+                                pattern.copy(
+                                    isTest = event.isTest
+                                )
+                            } else {
+                                pattern
+                            }
+                        }
+                    )
+                }
+
                 is LearningStepsPatternsEvent.MovePattern -> {
                     val currentIndex = state.patterns.indexOfFirst {
                         it.id == event.configId

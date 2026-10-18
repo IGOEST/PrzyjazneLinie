@@ -4,10 +4,7 @@ import com.example.friendlylines.therapist_app.ui.configuration.learning.Learnin
 import com.example.friendlylines.therapist_app.ui.configuration.patterns.LearningStepsPatternsEvent
 import com.example.friendlylines.therapist_app.ui.configuration.summary.LearningStepsSummaryEvent
 import com.example.friendlylines.therapist_app.ui.configuration.test.LearningStepsTestEvent
-import com.example.friendlylines.therapist_app.ui.main.ExitDestination
-import com.example.friendlylines.therapist_app.ui.materials.create_new.CreatePatternScreenEvent
-import com.example.shared.data.drafts.LearningStepsLearningDraft
-import com.example.shared.data.drafts.LearningStepsPatternConfigDraft
+import com.example.friendlylines.therapist_app.navigation.ExitDestination
 
 sealed class LearningStepsSettingsEvent {
     data class Patterns(val event: LearningStepsPatternsEvent): LearningStepsSettingsEvent()

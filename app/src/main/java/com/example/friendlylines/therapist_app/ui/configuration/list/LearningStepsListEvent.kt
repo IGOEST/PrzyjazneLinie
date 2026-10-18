@@ -7,4 +7,5 @@ sealed class LearningStepsListEvent {
     data class DeleteClicked(val id: Long) : LearningStepsListEvent()
     data object CopiedLearningStepHandled : LearningStepsListEvent()
     data class SearchQueryChanged(val query: String) : LearningStepsListEvent()
+    data class HideExampleStepsChanged(val hide: Boolean) : LearningStepsListEvent()
 }

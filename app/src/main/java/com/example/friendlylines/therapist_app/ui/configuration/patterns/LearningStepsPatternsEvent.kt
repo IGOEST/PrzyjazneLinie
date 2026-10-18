@@ -5,6 +5,8 @@ import com.example.shared.data.drafts.PatternWidth
 import com.example.shared.data.models.PatternItem
 
 sealed class LearningStepsPatternsEvent {
+    data class SetPatternLearning(val configId: Long, val isLearning: Boolean) : LearningStepsPatternsEvent()
+    data class SetPatternTest(val configId: Long, val isTest: Boolean) : LearningStepsPatternsEvent()
     data class SetPatternEnabled(val configId: Long, val enabled: Boolean) : LearningStepsPatternsEvent()
     data class MovePattern(val configId: Long, val direction: MoveDirection) : LearningStepsPatternsEvent()
     data class DeletePattern(val configId: Long) : LearningStepsPatternsEvent()

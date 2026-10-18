@@ -4,7 +4,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.friendlylines.R
 import com.example.friendlylines.child_app.ui.GameDrawingScreen
 import com.example.friendlylines.child_app.ui.InformationScreen
 import com.example.friendlylines.child_app.ui.MainMenuScreen
@@ -25,8 +27,13 @@ fun ChildMainScreen(viewModel: ChildViewModel = hiltViewModel()) {
         }
         "main" -> {
             MainMenuScreen(
-                "Do Dodania",
-                "Do Dodania",
+                activeStep = state.learningStepResult?.name ?: "",
+                mode = when (state.learningStepResult?.testMode) {
+                    true -> stringResource(R.string.test_mode)
+                    false -> stringResource(R.string.learning_mode)
+                    else -> ""
+                },
+                canPlay = !(state.learningStepResult == null || state.patternResults.isEmpty()),
                 onPlayClick = { viewModel.onEvent(ChildMainEvent.GoToNextScreen) }
             )
         }

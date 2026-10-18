@@ -1,7 +1,6 @@
 package com.example.shared.data.daos
 
 import androidx.room3.Dao
-import androidx.room3.Delete
 import androidx.room3.Insert
 import androidx.room3.OnConflictStrategy
 import androidx.room3.Query
@@ -61,6 +60,12 @@ interface LearningStepsDao {
 
     @Query("SELECT * FROM learning_steps WHERE isActive = 1 LIMIT 1")
     suspend fun getActiveStep(): LearningStepEntity
+
+    @Query("SELECT * FROM learning_steps WHERE isActive = 1 LIMIT 1")
+    suspend fun getActiveStepForHomeScreen(): LearningStepEntity?
+
+    @Query("SELECT COUNT(*) FROM learning_step_patterns WHERE learningStepId = :learningStepId")
+    suspend fun getLearningStepPatternCount(learningStepId: Long): Int
 
     // returns all patterns assigned to a learning step ordered
     @Query("SELECT * FROM learning_step_patterns WHERE learningStepId = :learningStepId ORDER BY `order` ASC")

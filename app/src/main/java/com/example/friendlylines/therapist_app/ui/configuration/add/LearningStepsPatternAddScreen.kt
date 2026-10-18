@@ -1,15 +1,13 @@
 package com.example.friendlylines.therapist_app.ui.configuration.add
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForwardIos
@@ -24,28 +22,31 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.composables.core.rememberScrollAreaState
 import com.example.friendlylines.R
-import com.example.friendlylines.therapist_app.ui.components.PatternListArea
+import com.example.friendlylines.components.LoadingScreen
+import com.example.friendlylines.theme.FriendlyLinesColors
+import com.example.friendlylines.theme.FriendlyLinesTextStyles
+import com.example.friendlylines.theme.scaled
+import com.example.friendlylines.therapist_app.backgrounds.PlainBackground
+import com.example.friendlylines.therapist_app.navigation.ExitDestination
+import com.example.friendlylines.therapist_app.navigation.TemplateTopAppBar
 import com.example.friendlylines.therapist_app.ui.components.TemplateAlertDialog
 import com.example.friendlylines.therapist_app.ui.components.TemplateButton
-import com.example.friendlylines.therapist_app.ui.components.TemplateTopAppBar
-import com.example.friendlylines.therapist_app.ui.main.ExitDestination
+import com.example.friendlylines.therapist_app.ui.materials.components.PatternListArea
 import com.example.friendlylines.therapist_app.ui.materials.gallery.GalleryScreenViewModel
-//import com.example.friendlylines.therapist_app.ui.materials.models.PatternItem
-import com.example.friendlylines.therapist_app.ui.theme.Primary1000
-import com.example.friendlylines.therapist_app.ui.theme.Primary50
-import  com.example.shared.data.models.PatternItem
+import com.example.shared.data.models.PatternItem
+
+private val CONTENT_PADDING = 20.dp
 
 @Composable
 fun LearningStepsPatternAddScreen(
     navController: NavController,
+    stepId: Long?,
     configId: Long?,
     selectedPatternId: Long?,
     order: Int?,
@@ -88,7 +89,7 @@ fun LearningStepsPatternAddScreen(
     }
 
     Scaffold(
-        containerColor = Primary50,
+        containerColor = FriendlyLinesColors.PrimaryFriendlyLines.P50,
         topBar = {
             TemplateTopAppBar(
                 text = stringResource(R.string.pattern_text) + " " + "$patternNumber",
@@ -99,80 +100,88 @@ fun LearningStepsPatternAddScreen(
                 onHomeClick = {
                     showExitDialog = true
                     exitDestination = ExitDestination.HOME
-                }
+                },
+                infoTitle = stringResource(R.string.info_dialog_title),
+                infoMessage = stringResource(R.string.learning_steps_pattern_add_screen_info)
             )
         }
     ) { padding ->
-        Column(
-            modifier = Modifier
+        val content: @Composable () -> Unit = {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .padding(CONTENT_PADDING.scaled()),
+                verticalArrangement = Arrangement.spacedBy(32.dp.scaled())
+            ) {
+                Row (
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    Text(
+                        text = stringResource(R.string.select_pattern_text),
+                        style = FriendlyLinesTextStyles.bodyRegular,
+                        color = FriendlyLinesColors.PrimaryFriendlyLines.P900
+                    )
+                }
+
+                PatternListArea(
+                    patterns = galleryState.patterns,
+                    gridState = gridState,
+                    scrollAreaState = scrollAreaState,
+                    onCreateClick = {},
+                    onDeleteClick = {},
+                    onPatternClick = { pattern ->
+                        selectedPattern = pattern
+                    },
+                    showAddPatternItem = false,
+                    showBorder = true,
+                    showDeleteBotton = false,
+                    isPatternSelected = { pattern ->
+                        selectedPattern?.pattern?.id == pattern.pattern.id
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight()
+                        .weight(1f)
+                )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = stringResource(R.string.selected_pattern_text) + " " + (selectedPattern?.pattern?.name ?: "-"),
+                        style = FriendlyLinesTextStyles.bodyRegular,
+                        color = FriendlyLinesColors.PrimaryFriendlyLines.P900
+                    )
+
+                    TemplateButton(
+                        enabled = selectedPattern != null,
+                        onClick = {
+                            selectedPattern?.let {
+                                onNextClick(it.pattern.id)
+                            }
+                        },
+                        text = stringResource(R.string.next_button_text),
+                        icon = Icons.Filled.ArrowForwardIos
+                    )
+                }
+            }
+        }
+
+        if (galleryState.isLoading) {
+            PlainBackground(modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(
-                    horizontal = 32.dp,
-                    vertical = 16.dp
-                )
-        ) {
-            Text(
-                text = stringResource(R.string.select_pattern_text),
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Normal,
-                color = Primary1000
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            PatternListArea(
-                patterns = galleryState.patterns,
-                gridState = gridState,
-                scrollAreaState = scrollAreaState,
-                onCreateClick = {},
-                onDeleteClick = {},
-                onPatternClick = { pattern ->
-                    selectedPattern = pattern
-                },
-                showAddPatternItem = false,
-                showBorder = true,
-                showDeleteBotton = false,
-                isPatternSelected = { pattern ->
-                    selectedPattern?.pattern?.id == pattern.pattern.id
-                },
-                modifier = Modifier
-                    .fillMaxWidth(1f)
-                    .fillMaxHeight(1f)
-                    .weight(1f)
-                    .align(Alignment.CenterHorizontally)
-            )
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = stringResource(R.string.selected_pattern_text) + " " + (selectedPattern?.pattern?.name ?: "-"),
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Normal,
-                    color = Primary1000,
-                    modifier = Modifier.weight(1f)
-                )
-
-                Spacer(modifier = Modifier.weight(1f))
-
-                TemplateButton(
-                    modifier = Modifier
-                        .wrapContentWidth()
-                        .height(54.dp),
-                    enabled = selectedPattern != null,
-                    onClick = {
-                        selectedPattern?.let {
-                            onNextClick(it.pattern.id)
-                        }
-                    },
-                    text = stringResource(R.string.next_button_text),
-                    icon = Icons.Default.ArrowForwardIos
-                )
-            }
+            ) { LoadingScreen() }
+        } else {
+            PlainBackground(modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+            ) { content() }
         }
     }
 

@@ -3,12 +3,14 @@ package com.example.friendlylines.therapist_app.ui.configuration.settings
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.friendlylines.therapist_app.ui.configuration.learning.LearningStepsLearningScreenViewModel
+import com.example.friendlylines.therapist_app.components.NameError
+import com.example.friendlylines.therapist_app.ui.configuration.learning.LearningStepsLearningEvent
 import com.example.friendlylines.therapist_app.ui.configuration.patterns.LearningStepsPatternsScreenViewModel
 import com.example.friendlylines.therapist_app.ui.configuration.summary.LearningStepsSummaryEvent
-import com.example.friendlylines.therapist_app.ui.configuration.test.LearningStepsTestScreenViewModel
-import com.example.friendlylines.therapist_app.ui.materials.models.NameError
+import com.example.friendlylines.therapist_app.ui.configuration.test.LearningStepsTestEvent
 import com.example.shared.data.drafts.LearningStepsDraft
+import com.example.shared.data.drafts.LearningStepsLearningDraft
+import com.example.shared.data.drafts.LearningStepsTestDraft
 import com.example.shared.data.repositories.LearningStepsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,7 +27,6 @@ class LearningStepsSettingsViewModel @Inject constructor(
 ) : ViewModel() {
     private val stepId: Long? = savedStateHandle.get<Long>("stepId") ?.takeIf { it != -1L }
     private val _state = MutableStateFlow(LearningStepsSettingsState())
-
     val state: StateFlow<LearningStepsSettingsState> = _state.asStateFlow()
 
     init {
@@ -48,25 +49,11 @@ class LearningStepsSettingsViewModel @Inject constructor(
             }
 
             is LearningStepsSettingsEvent.Learning -> {
-                _state.update {
-                    it.copy(
-                        learningState = LearningStepsLearningScreenViewModel.reduce(
-                            it.learningState,
-                            event.event
-                        )
-                    )
-                }
+                onLearningEvent(event)
             }
 
             is LearningStepsSettingsEvent.Test -> {
-                _state.update {
-                    it.copy(
-                        testState = LearningStepsTestScreenViewModel.reduce(
-                            it.testState,
-                            event.event
-                        )
-                    )
-                }
+                onTestEvent(event)
             }
 
             is LearningStepsSettingsEvent.Summary -> {
@@ -132,7 +119,7 @@ class LearningStepsSettingsViewModel @Inject constructor(
                                         savedLearningStepId = savedLearningStepId
                                     )
                                 }
-                            } catch (e: Exception) { }
+                            } catch (e: Exception) { throw e }
                         }
                     }
 
@@ -177,16 +164,158 @@ class LearningStepsSettingsViewModel @Inject constructor(
 
     private fun loadLearningStep(stepId: Long) {
         viewModelScope.launch {
-            val draft = learningStepsRepository.getLearningStep(stepId) ?: return@launch
-
             _state.update {
                 it.copy(
-                    stepName = draft.name,
-                    patternState = draft.patterns,
-                    learningState = draft.learning,
-                    testState = draft.test
+                    isLoading = true
                 )
             }
+
+            try {
+                val draft = learningStepsRepository.getLearningStep(stepId) ?: return@launch
+
+                if (draft != null) {
+                    _state.update {
+                        it.copy(
+                            stepName = draft.name,
+                            patternState = draft.patterns,
+                            learningState = draft.learning,
+                            testState = draft.test
+                        )
+                    }
+                    _state.update {
+                        it.copy(
+                            isLoading = false
+                        )
+                    }
+                } else {
+                    _state.update {
+                        it.copy(
+                            isLoading = false
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                _state.update {
+                    it.copy(
+                        isLoading = false
+                    )
+                }
+            }
+        }
+    }
+
+    fun onTestEvent(event: LearningStepsSettingsEvent.Test) {
+        when (event.event) {
+            is LearningStepsTestEvent.OverrideLearning ->
+                setTestOverridesLearning(event.event.override)
+
+            is LearningStepsTestEvent.SetRepetitions ->
+                updateTestParameters {
+                    it.copy(repetitions = event.event.value)
+                }
+
+            is LearningStepsTestEvent.SetTimeLimit ->
+                updateTestParameters {
+                    it.copy(timeLimit = event.event.value)
+                }
+
+            is LearningStepsTestEvent.SetAccuracyLevel ->
+                updateTestParameters {
+                    it.copy(accuracyLevel = event.event.value)
+                }
+        }
+    }
+
+    fun deriveTestParameters(
+        learning: LearningStepsLearningDraft
+    ): LearningStepsTestDraft {
+        return LearningStepsTestDraft(
+            overridesLearning = false,
+            repetitions = learning.repetitions,
+            attempts = 1,
+            timeLimit = learning.timeLimit,
+            accuracyLevel = learning.accuracyLevel,
+            startingPointEnabled = false,
+            randomPatternOrder = false
+        )
+    }
+
+    fun onLearningEvent(event: LearningStepsSettingsEvent.Learning) {
+        when (val learningEvent = event.event) {
+            is LearningStepsLearningEvent.SetRepetitions ->
+                updateLearningParameters{
+                    it.copy(repetitions = learningEvent.value)
+                }
+
+            is LearningStepsLearningEvent.SetAttempts ->
+                updateLearningParameters {
+                    it.copy(attempts = learningEvent.value)
+                }
+
+            is LearningStepsLearningEvent.SetTimeLimit ->
+                updateLearningParameters {
+                    it.copy(timeLimit = learningEvent.value)
+                }
+
+            is LearningStepsLearningEvent.SetAccuracyLevel ->
+                updateLearningParameters {
+                    it.copy(accuracyLevel = learningEvent.value)
+                }
+
+            is LearningStepsLearningEvent.SetRandomPatternOrder ->
+                updateLearningParameters {
+                    it.copy(randomPatternOrder = learningEvent.enabled)
+                }
+
+            is LearningStepsLearningEvent.SetStartingPointEnabled ->
+                updateLearningParameters {
+                    it.copy(startingPointEnabled = learningEvent.enabled)
+                }
+        }
+    }
+
+    fun updateLearningParameters(
+        transform: (LearningStepsLearningDraft) -> LearningStepsLearningDraft
+    ) {
+        _state.update { current ->
+            val nextLearning = transform(current.learningState)
+
+            val nextTest =
+                if (current.testState.overridesLearning) {
+                    current.testState
+                } else {
+                    deriveTestParameters(nextLearning)
+                }
+
+            current.copy(
+                learningState = nextLearning,
+                testState = nextTest
+            )
+        }
+    }
+
+    fun updateTestParameters(
+        transform: (LearningStepsTestDraft) -> LearningStepsTestDraft
+    ) {
+        _state.update { current ->
+            current.copy(
+                testState = transform(current.testState)
+            )
+        }
+    }
+
+    fun setTestOverridesLearning(overridesLearning: Boolean) {
+        _state.update { current ->
+            val nextTest =
+                if (overridesLearning) {
+                    current.testState.copy(overridesLearning = true)
+                } else {
+                    deriveTestParameters(current.learningState)
+                }
+
+            current.copy(
+                testState = nextTest
+            )
         }
     }
 }

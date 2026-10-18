@@ -2,26 +2,30 @@ package com.example.friendlylines.child_app.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Icon
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
-import com.example.friendlylines.child_app.ui.theme.Success
-import com.example.friendlylines.child_app.ui.theme.White
-import androidx.compose.ui.res.stringResource
-import com.example.friendlylines.R
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.MenuOpen
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.Icon
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import com.example.friendlylines.R
+import com.example.friendlylines.theme.FriendlyLinesColors
+import com.example.friendlylines.theme.scaled
+
+private val BUTTON_SIZE = 56.dp
 
 enum class IconType(val contentDescription: Int) {
     Play(R.string.child_play),
@@ -45,7 +49,7 @@ fun TemplateChildButton(
     icon: IconType,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    size: Dp = 64.dp,
+    size: Dp = BUTTON_SIZE.scaled(),
     iconSizeFraction: Float = 0.9f,
     contentDescription: Int = icon.contentDescription,
     enabled: Boolean = true
@@ -54,14 +58,18 @@ fun TemplateChildButton(
         modifier = modifier
             .size(size)
             .clip(CircleShape)
-            .background(White)
-            .clickable(enabled = enabled) { onClick() },
+            .background(FriendlyLinesColors.Shades.White)
+            .clickable(
+                enabled = enabled,
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() }
+            ) { onClick() },
         contentAlignment = Alignment.Center
     ) {
         Icon(
             imageVector = icon.toImageVector(),
             contentDescription = stringResource(contentDescription),
-            tint = Success,
+            tint = FriendlyLinesColors.States.Success,
             modifier = Modifier.size(size * iconSizeFraction)
         )
     }

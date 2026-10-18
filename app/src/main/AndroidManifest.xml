@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <application
-        android:name = ".therapist_app.ui.main.FriendlyLinesApp"
+        android:name = ".main.FriendlyLinesApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -14,9 +14,10 @@
         android:theme="@style/Theme.FriendlyLines">
 
         <activity
-            android:name=".therapist_app.ui.main.MainActivity"
+            android:name=".main.TherapistActivity"
             android:exported="true"
             android:label="@string/title_therapist"
+            android:launchMode="singleTask"
             android:screenOrientation="landscape"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
@@ -29,6 +30,7 @@
             android:name=".child_app.main.ChildActivity"
             android:exported="true"
             android:label="@string/title_child"
+            android:launchMode="singleTask"
             android:screenOrientation="landscape"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>

@@ -10,6 +10,7 @@ import com.example.shared.data.entities.PatternEntity
 import com.example.shared.data.entities.PatternWithStrokes
 import com.example.shared.data.entities.PointEntity
 import com.example.shared.data.entities.StrokeEntity
+import com.example.shared.data.entities.StrokeWithPoints
 
 @Dao
 interface PatternDao {
@@ -35,6 +36,10 @@ interface PatternDao {
     @Transaction
     @Query("SELECT * FROM patterns WHERE id = :patternId")
     suspend fun getPatternWithStrokes(patternId: Long): PatternWithStrokes?
+
+    @Transaction
+    @Query("SELECT * FROM strokes WHERE id = :strokeId")
+    suspend fun getStrokeWithPoints(strokeId: Long): StrokeWithPoints?
 
     @Transaction
     @Query("SELECT * FROM patterns WHERE id = :patternId")
@@ -74,7 +79,7 @@ interface PatternDao {
 
         val strokeIds = insertStrokes(strokesWithPatternId)
 
-        val pointsWithStrokeIds = pointsByStroke.mapIndexed { strokeIndex, points ->
+        val pointsWithStrokeIds = pointsByStroke.flatMapIndexed { strokeIndex, points ->
             val strokeId = strokeIds[strokeIndex]
 
             points.map { point ->
@@ -82,7 +87,7 @@ interface PatternDao {
                     strokeId = strokeId
                 )
             }
-        }.flatten()
+        }
 
         insertPoints(pointsWithStrokeIds)
 

@@ -8,10 +8,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,12 +22,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.example.friendlylines.therapist_app.ui.theme.Neutral300
-import com.example.friendlylines.therapist_app.ui.theme.Primary700
-import com.example.friendlylines.therapist_app.ui.theme.Primary900
+import com.example.friendlylines.theme.FriendlyLinesColors
+import com.example.friendlylines.theme.FriendlyLinesModalShape
+import com.example.friendlylines.theme.FriendlyLinesTextStyles
+import com.example.friendlylines.theme.scaled
+
+private val BUTTON_HEIGHT = 54.dp
+private val BUTTON_ICON_SIZE = 24.dp
+private val BUTTON_ICON_TEXT_GAP = 10.dp
+private val BUTTON_CONTENT_PADDING_HORIZONTAL = 20.dp
+private val BUTTON_CONTENT_PADDING_VERTICAL = 12.dp
+private val BUTTON_SHADOW_ELEVATION = 2.dp
 
 @Composable
 fun TemplateButton(
@@ -37,12 +45,12 @@ fun TemplateButton(
     onClick: () -> Unit,
     text: String,
     icon: ImageVector?,
-    defaultColor: Color = Primary700,
-    activeColor: Color = Primary900,
-    disabledColor: Color = Neutral300,
-    defaultContentColor: Color = Color.White,
-    activeContentColor: Color = Color.White,
-    disabledContentColor: Color = Color.White
+    defaultColor: Color = FriendlyLinesColors.PrimaryFriendlyLines.P700,
+    activeColor: Color = FriendlyLinesColors.PrimaryFriendlyLines.P900,
+    disabledColor: Color = FriendlyLinesColors.Neutral.N300,
+    defaultContentColor: Color = FriendlyLinesColors.Shades.White,
+    activeContentColor: Color = FriendlyLinesColors.Shades.White,
+    disabledContentColor: Color = FriendlyLinesColors.Shades.White
 ) {
     val interactionSource = remember {
         MutableInteractionSource()
@@ -68,8 +76,8 @@ fun TemplateButton(
                 if (!isDialogButton) {
                     Modifier
                         .shadow(
-                            elevation = 2.dp,
-                            shape = RoundedCornerShape(10.dp)
+                            elevation = BUTTON_SHADOW_ELEVATION,
+                            shape = FriendlyLinesModalShape
                         )
                 } else {
                     Modifier
@@ -77,20 +85,21 @@ fun TemplateButton(
             )
             .background(
                 color = backgroundColor,
-                shape = RoundedCornerShape(10.dp)
+                shape = FriendlyLinesModalShape
             )
             .clickable(
                 enabled = enabled,
                 interactionSource = interactionSource,
                 indication = null,
                 onClick = onClick
-            ),
+            )
+            .heightIn(min = BUTTON_HEIGHT.scaled()),
         contentAlignment = Alignment.Center
     ) {
         Row(
             modifier = Modifier.padding(
-                horizontal = 16.dp,
-                vertical = 8.dp
+                horizontal = BUTTON_CONTENT_PADDING_HORIZONTAL.scaled(),
+                vertical = BUTTON_CONTENT_PADDING_VERTICAL.scaled()
             ),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
@@ -100,16 +109,19 @@ fun TemplateButton(
                     imageVector = icon,
                     contentDescription = null,
                     tint = contentColor,
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(BUTTON_ICON_SIZE.scaled())
                 )
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(BUTTON_ICON_TEXT_GAP.scaled()))
             }
 
             Text(
                 text = text,
                 color = contentColor,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Medium
+                style = FriendlyLinesTextStyles.button,
+                maxLines = 2,
+                softWrap = true,
+                textAlign = TextAlign.Center,
+                overflow = TextOverflow.Ellipsis
             )
         }
     }

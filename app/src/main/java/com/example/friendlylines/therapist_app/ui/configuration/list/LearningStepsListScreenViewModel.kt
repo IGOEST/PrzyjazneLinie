@@ -21,6 +21,9 @@ class LearningStepsListScreenViewModel @Inject constructor(
 
     val state: StateFlow<LearningStepsListState> = _state.asStateFlow()
 
+    private val _canPlay = MutableStateFlow(false)
+    val canPlay = _canPlay.asStateFlow()
+
     init {
         loadLearningSteps()
     }
@@ -34,7 +37,7 @@ class LearningStepsListScreenViewModel @Inject constructor(
                         isActive = event.isActive
                     )
 
-                    loadLearningSteps()
+                    refreshList()
                 }
             }
 
@@ -45,7 +48,7 @@ class LearningStepsListScreenViewModel @Inject constructor(
                         isTest = event.isTest
                     )
 
-                    loadLearningSteps()
+                    refreshList()
                 }
             }
 
@@ -59,14 +62,14 @@ class LearningStepsListScreenViewModel @Inject constructor(
                         )
                     }
 
-                    loadLearningSteps()
+                    refreshList()
                 }
             }
 
             is LearningStepsListEvent.DeleteClicked -> {
                 viewModelScope.launch {
                     learningStepsRepository.deleteLearningStep(event.id)
-                    loadLearningSteps()
+                    refreshList()
                 }
             }
 
@@ -81,23 +84,73 @@ class LearningStepsListScreenViewModel @Inject constructor(
                     it.copy(searchQuery = event.query)
                 }
             }
+
+            is LearningStepsListEvent.HideExampleStepsChanged -> {
+                _state.update {
+                    it.copy(
+                        hideExampleSteps = event.hide
+                    )
+                }
+            }
         }
     }
 
     fun loadLearningSteps() {
         viewModelScope.launch {
             _state.update {
-                it.copy(isLoading = true)
-            }
-
-            val learningSteps = learningStepsRepository.getAllLearningSteps()
-
-            _state.update {
                 it.copy(
-                    learningSteps = learningSteps,
-                    isLoading = false
+                    isLoading = true
                 )
             }
+
+            try {
+                refreshList()
+
+                _state.update {
+                    it.copy(
+                        isLoading = false
+                    )
+                }
+            } catch (e: Exception) {
+                _state.update {
+                    it.copy(
+                        isLoading = false
+                    )
+                }
+
+                throw e
+            } finally {
+                _state.update {
+                    it.copy(isLoading = false)
+                }
+            }
         }
+    }
+
+    private suspend fun refreshList() {
+        val learningSteps = learningStepsRepository.getAllLearningSteps()
+
+        val activeStep = learningSteps.firstOrNull { it.isActive }
+
+        val canPlay = activeStep?.let { step ->
+            learningStepsRepository
+                .getPatternConfigurations(step.id)
+                .any { pattern ->
+                    pattern.isEnabled &&
+                            if (step.isTest) {
+                                pattern.isTest
+                            } else {
+                                pattern.isLearning
+                            }
+                }
+        } ?: false
+
+        _state.update {
+            it.copy(
+                learningSteps = learningSteps
+            )
+        }
+
+        _canPlay.value = canPlay
     }
 }

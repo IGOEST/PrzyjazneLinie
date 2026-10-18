@@ -1,6 +1,5 @@
 package com.example.friendlylines.therapist_app.ui.materials.gallery
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shared.data.repositories.PatternRepository
@@ -86,24 +85,56 @@ class GalleryScreenViewModel @Inject constructor(
         }
     }
 
-    private suspend fun loadPatterns() {
-        val patterns = patternRepository.getAllPatterns()
+    private suspend fun refreshGallery() {
+        try {
+            val patterns = patternRepository.getAllPatterns()
 
-        val patternItems = patterns.mapNotNull { pattern ->
-            val patternWithStrokes = patternRepository.getPattern(pattern.id)
+            val patternItems = patterns.mapNotNull { pattern ->
+                val patternWithStrokes = patternRepository.getPattern(pattern.id)
 
-            patternWithStrokes?.let {
-                PatternItem(
-                    pattern = pattern,
-                    drawing = it.toPatternDrawing()
+                patternWithStrokes?.let {
+                    PatternItem(
+                        pattern = pattern,
+                        drawing = it.toPatternDrawing()
+                    )
+                }
+            }
+
+            _state.update {
+                it.copy(
+                    patterns = patternItems,
                 )
             }
+        } catch (e: Exception) {
+            throw e
         }
+    }
 
-        _state.update {
-            it.copy(
-                patterns = patternItems
-            )
+    private fun loadPatterns() {
+        viewModelScope.launch {
+            _state.update {
+                it.copy(
+                    isLoading = true
+                )
+            }
+
+            try {
+                refreshGallery()
+
+                _state.update {
+                    it.copy(
+                        isLoading = false
+                    )
+                }
+            } catch (e: Exception) {
+                _state.update {
+                    it.copy(
+                        isLoading = false
+                    )
+                }
+
+                throw e
+            }
         }
     }
 
@@ -112,7 +143,7 @@ class GalleryScreenViewModel @Inject constructor(
 
         viewModelScope.launch {
             patternRepository.deletePattern(pattern.pattern.id)
-            loadPatterns()
+            refreshGallery()
 
             _state.update {
                 it.copy(

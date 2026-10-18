@@ -39,6 +39,7 @@ class LearningStepsRepository @Inject constructor(
             learningRandomPatternOrder = draft.learning.randomPatternOrder,
 
             // Test
+            overridesLearning = draft.test.overridesLearning,
             testRepetitions = draft.test.repetitions,
             testAttempts = draft.test.attempts,
             testTimeLimit = draft.test.timeLimit,
@@ -57,7 +58,9 @@ class LearningStepsRepository @Inject constructor(
                 backgroundColor = patternDraft.backgroundColor?.key,
                 patternVariety = patternDraft.patternVariety,
                 order = patternDraft.order,
-                isEnabled = patternDraft.isEnabled
+                isEnabled = patternDraft.isEnabled,
+                isLearning = patternDraft.isLearning,
+                isTest = patternDraft.isTest
             )
         }
 
@@ -96,7 +99,9 @@ class LearningStepsRepository @Inject constructor(
                     },
                     patternVariety = patternConfig.patternVariety,
                     order = patternConfig.order,
-                    isEnabled = patternConfig.isEnabled
+                    isEnabled = patternConfig.isEnabled,
+                    isLearning = patternConfig.isLearning,
+                    isTest = patternConfig.isTest
                 )
             }
 
@@ -117,6 +122,7 @@ class LearningStepsRepository @Inject constructor(
                 randomPatternOrder = learningStep.learningRandomPatternOrder
             ),
             test = LearningStepsTestDraft(
+                overridesLearning = learningStep.overridesLearning,
                 repetitions = learningStep.testRepetitions,
                 attempts = learningStep.testAttempts,
                 timeLimit = learningStep.testTimeLimit,
@@ -136,6 +142,10 @@ class LearningStepsRepository @Inject constructor(
     // returns active learning step
     suspend fun getActiveStep(): LearningStepEntity {
         return learningStepsDao.getActiveStep()
+    }
+
+    suspend fun getActiveStepForHomeScreen(): LearningStepEntity? {
+        return learningStepsDao.getActiveStepForHomeScreen()
     }
 
     // returns all pattern configurations belonging to a learning step
@@ -178,6 +188,7 @@ class LearningStepsRepository @Inject constructor(
             learningStartingPointEnabled = draft.learning.startingPointEnabled,
             learningRandomPatternOrder = draft.learning.randomPatternOrder,
 
+            overridesLearning = draft.test.overridesLearning,
             testRepetitions = draft.test.repetitions,
             testAttempts = draft.test.attempts,
             testTimeLimit = draft.test.timeLimit,
@@ -197,7 +208,9 @@ class LearningStepsRepository @Inject constructor(
                 backgroundColor = patternDraft.backgroundColor?.key,
                 patternVariety = patternDraft.patternVariety,
                 order = patternDraft.order,
-                isEnabled = patternDraft.isEnabled
+                isEnabled = patternDraft.isEnabled,
+                isLearning = patternDraft.isLearning,
+                isTest = patternDraft.isTest
             )
         }
 

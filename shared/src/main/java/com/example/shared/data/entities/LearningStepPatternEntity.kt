@@ -42,5 +42,7 @@ data class LearningStepPatternEntity(
     val patternVariety: Boolean,
 
     val order: Int,
-    val isEnabled: Boolean
+    val isEnabled: Boolean,
+    val isLearning: Boolean,
+    val isTest: Boolean
 )

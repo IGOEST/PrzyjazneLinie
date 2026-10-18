@@ -12,10 +12,10 @@ data class LearningStepEntity(
 
     val name: String,
 
-    val isActive: Boolean = false,
+    val isActive: Boolean,
     val isLearning: Boolean = true,
     val isTest: Boolean = false,
-    val isExample: Boolean = false,
+    val isExample: Boolean,
 
     // Learning settings
     val learningRepetitions: Int,
@@ -26,6 +26,7 @@ data class LearningStepEntity(
     val learningRandomPatternOrder: Boolean,
 
     // Test settings
+    val overridesLearning: Boolean,
     val testRepetitions: Int,
     val testAttempts: Int,
     val testTimeLimit: Int,

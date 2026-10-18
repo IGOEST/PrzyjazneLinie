@@ -1,6 +1,6 @@
 package com.example.friendlylines.therapist_app.ui.materials.create_new
 
-import com.example.friendlylines.therapist_app.ui.main.ExitDestination
+import com.example.friendlylines.therapist_app.navigation.ExitDestination
 import com.example.shared.data.models.Point
 
 sealed class CreatePatternScreenEvent {
@@ -14,8 +14,7 @@ sealed class CreatePatternScreenEvent {
     data object SaveDismissed : CreatePatternScreenEvent()
     data class SaveConfirmed(val strokes: List<List<Point>>, val isComplex: Boolean, val createdAt: Long) : CreatePatternScreenEvent()
     data object SaveSuccessHandled : CreatePatternScreenEvent()
-    data object ExitRequested : CreatePatternScreenEvent()
-    data class ExitToDestination(val destination: ExitDestination) : CreatePatternScreenEvent()
+    data class ExitRequested(val destination: ExitDestination) : CreatePatternScreenEvent()
     data object ExitConfirmed : CreatePatternScreenEvent()
     data object ExitDismissed : CreatePatternScreenEvent()
     data object ExitNavigationHandled : CreatePatternScreenEvent()

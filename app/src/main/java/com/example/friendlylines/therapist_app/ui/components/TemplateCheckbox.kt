@@ -6,7 +6,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Icon
@@ -17,9 +16,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.example.friendlylines.therapist_app.ui.theme.Neutral300
-import com.example.friendlylines.therapist_app.ui.theme.Primary50
-import com.example.friendlylines.therapist_app.ui.theme.Primary700
+import com.example.friendlylines.theme.FriendlyLinesColors
+import com.example.friendlylines.theme.FriendlyLinesShapes
+import com.example.friendlylines.theme.scaled
+
+private val CHECKBOX_CHECK_ICON_SIZE = 18.dp
 
 @Composable
 fun TemplateCheckbox(
@@ -27,12 +28,12 @@ fun TemplateCheckbox(
     onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    defaultBorderColor: Color = Primary700,
-    checkedBorderColor: Color = Primary700,
-    disabledBorderColor: Color = Neutral300,
-    defaultBackgroundColor: Color = Primary50,
-    checkedBackgroundColor: Color = Primary700,
-    disabledBackgroundColor: Color = Primary50,
+    defaultBorderColor: Color = FriendlyLinesColors.PrimaryFriendlyLines.P700,
+    checkedBorderColor: Color = FriendlyLinesColors.PrimaryFriendlyLines.P700,
+    disabledBorderColor: Color = FriendlyLinesColors.Neutral.N300,
+    defaultBackgroundColor: Color = FriendlyLinesColors.PrimaryFriendlyLines.P50,
+    checkedBackgroundColor: Color = FriendlyLinesColors.PrimaryFriendlyLines.P700,
+    disabledBackgroundColor: Color = FriendlyLinesColors.PrimaryFriendlyLines.P50,
     checkmarkColor: Color = Color.White
 ) {
     val interactionSource = remember {
@@ -55,12 +56,12 @@ fun TemplateCheckbox(
 
     Box(
         modifier = modifier
-            .clip(RoundedCornerShape(4.dp))
+            .clip(FriendlyLinesShapes.extraSmall)
             .background(backgroundColor)
             .border(
-                width = 2.dp,
+                width = 2.dp.scaled(),
                 color = borderColor,
-                shape = RoundedCornerShape(4.dp)
+                shape = FriendlyLinesShapes.extraSmall
             )
             .clickable(
                 enabled = enabled,
@@ -74,10 +75,10 @@ fun TemplateCheckbox(
     ) {
         if (checked) {
             Icon(
-                imageVector = Icons.Default.Check,
+                imageVector = Icons.Filled.Check,
                 contentDescription = null,
                 tint = checkmarkColor,
-                modifier = Modifier.size(18.dp)
+                modifier = Modifier.size(CHECKBOX_CHECK_ICON_SIZE.scaled())
             )
         }
     }

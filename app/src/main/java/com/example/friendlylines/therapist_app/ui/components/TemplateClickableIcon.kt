@@ -13,9 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.example.friendlylines.therapist_app.ui.theme.Neutral300
-import com.example.friendlylines.therapist_app.ui.theme.Primary700
-import com.example.friendlylines.therapist_app.ui.theme.Primary900
+import com.example.friendlylines.theme.FriendlyLinesColors
 
 @Composable
 fun TemplateClickableIcon(
@@ -23,9 +21,9 @@ fun TemplateClickableIcon(
     contentDescription: String?,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    defaultTint: Color = Primary700,
-    activeTint: Color = Primary900,
-    disabledTint: Color = Neutral300,
+    defaultTint: Color = FriendlyLinesColors.PrimaryFriendlyLines.P700,
+    activeTint: Color = FriendlyLinesColors.PrimaryFriendlyLines.P900,
+    disabledTint: Color = FriendlyLinesColors.Neutral.N300,
     enabled: Boolean = true,
 ) {
     val interactionSource = remember {

@@ -10,6 +10,7 @@ data class PatternConfig(
     val patternThickness: String,
     val patternThicknessDp: Dp,
     val smoothingEnabled: Boolean,
+    val patternVariety: Boolean
 )
 
 data class LearningStepResult(
@@ -20,7 +21,8 @@ data class LearningStepResult(
     val showStartingPoint: Boolean,
     val testMode: Boolean,
     val timeLimit: Int,
-    val attempts: Int
+    val attempts: Int,
+    val randomPatternOrder: Boolean
 )
 
 data class PatternResult(

@@ -11,15 +11,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForwardIos
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.friendlylines.R
+import com.example.friendlylines.theme.FriendlyLinesColors
+import com.example.friendlylines.theme.scaled
 import com.example.friendlylines.therapist_app.ui.components.TemplateButton
-import com.example.friendlylines.therapist_app.ui.theme.Primary50
+
+private val CONTENT_PADDING = 20.dp
 
 @Composable
 fun LearningStepsReinforcementScreen(
@@ -28,10 +30,9 @@ fun LearningStepsReinforcementScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Primary50)
+            .background(FriendlyLinesColors.PrimaryFriendlyLines.P50)
             .padding(
-                horizontal = 24.dp,
-                vertical = 16.dp
+                CONTENT_PADDING.scaled()
             ),
         verticalArrangement = Arrangement.Bottom,
         horizontalAlignment = Alignment.End
@@ -43,7 +44,7 @@ fun LearningStepsReinforcementScreen(
             TemplateButton(
                 modifier = Modifier
                     .wrapContentWidth()
-                    .height(54.dp),
+                    .height(54.dp.scaled()),
                 enabled = true,
                 onClick = onNextClick,
                 text = stringResource(R.string.next_button_text),

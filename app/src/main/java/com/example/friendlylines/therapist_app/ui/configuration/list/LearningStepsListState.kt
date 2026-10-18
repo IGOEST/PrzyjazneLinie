@@ -7,4 +7,5 @@ data class LearningStepsListState(
     val isLoading: Boolean = false,
     val copiedLearningStepId: Long? = null,
     val searchQuery: String = "",
+    val hideExampleSteps: Boolean = false
 )

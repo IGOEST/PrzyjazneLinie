@@ -11,5 +11,7 @@ data class LearningStepsPatternConfigDraft(
     val backgroundColor: ColorOption? = null,
     val patternVariety: Boolean = false,
     val order: Int,
-    val isEnabled: Boolean = true
+    val isEnabled: Boolean = true,
+    val isLearning: Boolean = true,
+    val isTest: Boolean = true
 )

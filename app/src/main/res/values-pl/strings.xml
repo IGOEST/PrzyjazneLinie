@@ -8,10 +8,10 @@
 
     <string name="change_app_DEVEL">Zmień moduł</string>
 
-    <string name="main_screen_header">Przyjazne Linie - Ustawienia</string>
+    <string name="home_screen_header">Przyjazne Linie - Ustawienia</string>
     <string name="pattern_gallery_button_text">GALERIA WZORÓW</string>
     <string name="learning_steps_button_text">KROKI UCZENIA</string>
-    <string name="main_screen_info">“Jeśli chcesz konfigurować zadania dla uczniów, wybierz kroki uczenia - podstawowe wzory będą już dostępne.
+    <string name="home_screen_mascot_info">“Jeśli chcesz konfigurować zadania dla uczniów, wybierz kroki uczenia - podstawowe wzory będą już dostępne.
                                             W galerii wzorów możesz stworzyć własny wzór.”</string>
 
     <string name="pattern_gallery_header">Galeria Wzorów</string>
@@ -43,10 +43,10 @@
     <string name="exit_confirm_button_text">WYJDŹ</string>
 
     <string name="learning_steps_header">Kroki Uczenia</string>
-    <string name="search_box_text">Wyszukaj</string>
+    <string name="search_box_text">Szukaj</string>
     <string name="learning_steps_info">Przejrzyj przykłady lub utwórz nowy krok uczenia korzystając z przycisku obok.</string>
     <string name="create_button_text">UTWÓRZ</string>
-    <string name="info_dialog_title">Informacje</string>
+    <string name="info_dialog_title">Info</string>
     <string name="steps_list_header_name">Nazwa kroku uczenia</string>
     <string name="hide_exemplary_steps">Ukryj przykładowe kroki</string>
     <string name="list_header_actions">Akcje</string>
@@ -186,5 +186,48 @@
     <string name="copy_learning_step_dialog_message">Czy na pewno chcesz utworzyć kopię konfiguracji tego kroku uczenia?</string>
     <string name="delete_learning_step_dialog_message">Czy na pewno chcesz usunąć tę konfigurację kroku uczenia?</string>
     <string name="no_active_step">Brak aktywnego kroku uczenia</string>
+    <string name="topbar_back_description">" Wstecz"</string>
+    <string name="topbar_home_description">Strona główna</string>
+    <string name="home_screen_info_message">Aplikacja Przyjazne Linie to aplikacja wspomagająca rozwój motoryki małej.\n\nNa początku przygotuj potrzebne do nauki wzory w Galerii Wzorów. Następnie stwórz Kroki Uczenia, czyli zestawy ćwiczeń, w których wybiera się materiały (wzory) z listy wcześniej utworzonych oraz ustala sposób ich wykorzystania. Użyj przycisków poniżej, aby zarządzać wzorami lub krokami uczenia używanymi podczas sesji z dzieckiem.</string>
+    <string name="therapist_home_gallery_info_meassage">" Otwiera galerię wzorów, w której możesz przeglądać i dodawać i wzory używane do nauki."</string>
+    <string name="therapist_home_learning_steps_info_message">Otwiera listę kroków uczenia - konfigurowalnych zestawów ćwiczeń łączących wzory, ustawienia oraz test dla dziecka</string>
+    <string name="pattern_gallery_screen_info_message">Tutaj możesz przeglądać wzory.\n\nAby stworzyć własny wzór, kliknij pierwszy element na liście poniżej.\n\nWzory można też usuwać (klikając ikonę kosza w prawym górnym rogu wzoru). Usuwać można tylko własne wzory, wzory przykładowe są zawsze dostępne i nie można ich usunąć.</string>
+    <string name="learning_step_create_new_info_message">Kliknij tutaj, aby przejść do tworzenia zupełnie nowego kroku uczenia.</string>
+    <string name="learning_steps_play_info_message">Uruchamia sesję z użyciem aktualnie aktywnego kroku uczenia (podświetlonego na zielono) w wybranym trybie (uczenie/test).</string>
+    <string name="learning_steps_play_button_text">URUCHOM</string>
+    <string name="hide_exemplary_steps_info_message">" Gdy zaznaczone, przykładowe kroki uczenia dołączone do aplikacji są ukrywane - widoczne są tylko kroki utworzone samodzielnie."</string>
+    <string name="learning_steps_header_label_info_message">Lista kroków uczenia poniżej. Zaznacz checkbox wiersza, aby ustawić go jako aktywny krok używany po naciśnięciu „URUCHOM”.</string>
+    <string name="learning_steps_header_mode_label">Tryb</string>
+    <string name="learning_steps_header_mode_label_info_meassage">" Przełącza krok między trybem uczenia (z podpowiedziami i wzmocnieniami) a trybem testu (bez wsparcia)."</string>
+    <string name="learning_steps_header_actions_label_info_meassage">Edytuj, kopiuj lub usuń krok uczenia za pomocą tych akcji. Usuwanie i edycja są niedostępne dla kroków przykładowych</string>
+    <string name="learning_steps_list_screen_info_message">" Kroki uczenia to zestawy ćwiczeń przygotowane na podstawie wcześniej dodanych materiałów edukacyjnych.\n\nTutaj zarządzasz krokami uczenia: tworzysz nowe, edytujesz, kopiujesz lub usuwasz istniejące, zmieniasz tryb (uczenie/test) oraz uruchamiasz sesję z dzieckiem dla wybranego aktualnie kroku (podświetlonego na zielono)"</string>
+    <string name="copy_icon_description">Kopiuj</string>
+    <string name="delete_icon_description">Usuń</string>
+    <string name="edit_icon_description">Edytuj</string>
+    <string name="cannot_play_dialog_title">Nie można uruchomić</string>
+    <string name="cannot_play_dialog_message">Aktywny krok uczenia nie ma wystarczającej liczby wzorów skonfigurowanych dla wybranego trybu. Dodaj materiały, aby móc go uruchomić.</string>
+    <string name="pattern_add_button_info_message">Dodaje kolejny wzór do tego kroku uczenia, dla którego będziesz mógł skonfigurować właściwości używane podczas gry.</string>
+    <string name="pattern_list_header_actions_label_info_message">Użyj tych akcji, aby edytować, kopiować lub usuwać krok nauki. Możesz też użyć strzałek, aby przesuwać wzór w górę/w dół listy i zmieniać kolejność w kórej wzory są wyświetlane podczas gry.</string>
+    <string name="patterns_list_header_learning">W uczeniu</string>
+    <string name="patterns_list_header_test">W teście</string>
+    <string name="learning_steps_pattern_help">Do kroku uczenia nie dodano jeszcze żadnych wzorów. Aby to zrobić, kliknij przycisk „DODAJ WZÓR”.</string>
+    <string name="hide_exemplary_patterns_info_message">" Gdy zaznaczone, przykładowe wzory dołączone do aplikacji są ukrywane - widoczne są tylko wzory utworzone samodzielnie."</string>
+    <string name="learning_steps_patterns_tab_info_message">Dodaj wzory, króre będą używane w tym kroku uczenia.</string>
+    <string name="learning_steps_learning_tab_info_message">Skonfiguruj, jak wygląda i przebiega każda próba podczas uczenia oraz jakie wsparcie otrzymuje dziecko.</string>
+    <string name="learning_steps_reinforcements_tab_info_message">Wybierz wzmocnienia słowne, wizualne i końcowe, które pomogą dziecku utrwalić zdobytą wiedzę.</string>
+    <string name="learning_steps_test_tab_info_message">Skonfiguruj ustawienia testu dla dziecka — domyślnie takie same jak w uczeniu, ale możesz je zmienić.</string>
+    <string name="learning_steps_summary_tab_info_message">" Sprawdź podsumowanie skonfigurowanego kroku uczenia, nadaj mu nazwę i zapisz."</string>
+    <string name="learning_trial_settings_header">Ustawienia próby</string>
+    <string name="learning_trial_setting_info_message">Kontroluje sposób prezentowania każdej próby dziecku: liczbę powtórzeń każdego wzoru, liczbę prób dla każdego wzoru, limit czasu i losową kolejność wzorów.</string>
+    <string name="learning_learning_settings_info_message">" Kontroluje wsparcie udzielane podczas uczenia: poziom dokładności i punkt startowy."</string>
+    <string name="learning_learning_settings_header">Ustawienia uczenia</string>
+    <string name="learning_steps_pattern_add_screen_info">Wybierz wzór z poniższej listy, aby ustawić jego właściwości, które będą używane podczas gry.</string>
+    <string name="learning_steps_pattern_config_screen_info">Skonfiguruj właściwości wzoru: grubość wzoru, kolor wzoru, kolor rysowania, kolor tła i różnorodność wzoru. Te właściwości będą używane do wyświetlania wzoru podczas gry.</string>
+    <string name="learning_steps_test_override_label">" Zmień dla TESTU"</string>
+    <string name="learning_steps_test_override_info_message">Włącz, aby użyć innych ustawień dla testu niż dla uczenia. Gdy wyłączone, test korzysta z ustawień uczenia widocznych na karcie „Uczenie”.</string>
+    <string name="learning_steps_test_override_hint_message">Aby zmienić te ustawienia, zaznacz pole wyboru na górze ekranu. W przeciwnym razie w teście będą obowiązywać te same ustawienia co w uczeniu.</string>
+    <string name="learning_steps_test_random_order_banner_info">W trybie TESTU losowa kolejność wzorów jest wyłączona. Podczas gry wzory będą pokazywane w kolejności ustalonej przez ich pozycję na liście w zakładce WZORY.</string>
+    <string name="learning_steps_test_no_hints_banner_info">W trybie testu nie używa się podpowiedzi (punktu startowego) i wzmocnień, a terapeuta nie pomaga i nie rozmawia z dzieckiem, aż do zakończenia testu.</string>
+    <string name="child_home_cannot_play_message">" Brak materiałów skonfigurowanych dla tego kroku"</string>
 
 </resources>

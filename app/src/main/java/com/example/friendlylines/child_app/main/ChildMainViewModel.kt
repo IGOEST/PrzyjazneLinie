@@ -9,7 +9,6 @@ import com.example.shared.data.drafts.PatternWidth
 import com.example.shared.data.drafts.toDp
 import com.example.shared.data.models.toPatternDrawing
 import com.example.shared.data.drafts.PatternConfigOptions
-//import com.example.shared.data.repositories.LearningStepRepository
 import com.example.shared.data.repositories.PatternRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -21,8 +20,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import androidx.compose.ui.geometry.Offset
-//import com.example.shared.data.entities.LearningStepMode
-//import com.example.shared.data.entities.LearningStepMode
 import com.example.shared.data.repositories.LearningStepsRepository
 
 @HiltViewModel
@@ -223,19 +220,20 @@ class ChildViewModel  @Inject constructor(
         }
     }
 
-
     private fun loadActiveStepData() {
         viewModelScope.launch {
             try {
                 val step = learningStepRepository.getActiveStep()
                 val activePatterns = learningStepRepository.getPatternConfigurations(step.id)
-                    .filter { it.isEnabled }
+                    .filter {
+                        it.isEnabled && if(step.isTest) it.isTest else it.isLearning
+                    }
                     .sortedBy { it.order }
 
                 if (activePatterns.isEmpty()) return@launch
 
                 var patternResults = mutableListOf<PatternResult>()
-                //val testMode = (step.mode == LearningStepMode.TEST.name)
+//                val testMode = (step.mode == LearningStepMode.TEST.name)
                 val testMode = step.isTest
                 val repetitions = if (testMode) step.testRepetitions else step.learningRepetitions
                 val learningStepResult = LearningStepResult(
@@ -243,7 +241,8 @@ class ChildViewModel  @Inject constructor(
                     testMode = testMode,
                     showStartingPoint = if (testMode) false else step.learningStartingPointEnabled,
                     timeLimit = if (testMode) step.testTimeLimit else step.learningTimeLimit,
-                    attempts = if (testMode) 1 else step.learningAttempts
+                    attempts = if (testMode) 1 else step.learningAttempts,
+                    randomPatternOrder = if (testMode) false else step.learningRandomPatternOrder
                 )
                 for (p in activePatterns) {
                     for (i in 0 until repetitions) {
@@ -264,6 +263,7 @@ class ChildViewModel  @Inject constructor(
                                 patternThickness = p.width,
                                 patternThicknessDp = widthEnum.toDp(),
                                 smoothingEnabled = patternEntity.smoothingEnabled,
+                                patternVariety = p.patternVariety
                             )
 
                             patternResults.add(

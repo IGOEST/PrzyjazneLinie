@@ -1,52 +1,41 @@
 package com.example.friendlylines.therapist_app.ui.components
 
-import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.gestures.detectHorizontalDragGestures
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddBox
 import androidx.compose.material.icons.filled.IndeterminateCheckBox
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.example.friendlylines.therapist_app.ui.theme.InfoActive
-import com.example.friendlylines.therapist_app.ui.theme.InfoDefault
-import com.example.friendlylines.therapist_app.ui.theme.Neutral300
-import com.example.friendlylines.therapist_app.ui.theme.Primary1000
-import com.example.friendlylines.therapist_app.ui.theme.Primary300
-import com.example.friendlylines.therapist_app.ui.theme.Primary700
-import com.example.friendlylines.therapist_app.ui.theme.Primary900
-import com.example.friendlylines.therapist_app.ui.theme.SliderBG
-import com.example.friendlylines.therapist_app.ui.theme.SliderGlow
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import com.example.friendlylines.theme.FriendlyLinesColors
+import com.example.friendlylines.theme.FriendlyLinesTextStyles
+import com.example.friendlylines.theme.SliderBG
+import com.example.friendlylines.theme.scaled
 import kotlin.math.roundToInt
-import kotlin.time.Duration.Companion.milliseconds
+
+val SLIDER_WIDTH = 350.dp
+private val LABELS_SPACING = 3.dp
+private val HEADER_SPACING = 4.dp
+private val ICONS_SPACING = 12.dp
+private val ICONS_SIZE = 24.dp
+private val SLIDER_HEIGHT = 25.dp
+private val SLIDER_HORIZONTAL_PADDING = 3.dp
 
 @Composable
 fun <T> TemplateSlider(
@@ -59,64 +48,64 @@ fun <T> TemplateSlider(
     minValue: Int? = null,
     maxValue: Int? = null,
 
-    sliderWidth: Dp = 350.dp,
-    trackHeight: Dp = 6.dp,
-    thumbRadius: Dp = 10.dp,
+    sliderWidth: Dp? = null,
 
     enabled: Boolean = true,
 
     showHeader: Boolean = false,
+    showInfoIcon: Boolean = false,
+    infoTitle: String? = null,
+    infoMessage: String? = null,
     headerText: String? = null,
-    headerIcon: ImageVector? = null,
-    headerIconContentDescription: String? = null,
-    onHeaderIconClick: (() -> Unit)? = null,
 
     showMinusPlus: Boolean = false,
     onMinusClick: (() -> Unit)? = null,
     onPlusClick: (() -> Unit)? = null,
 
-    activeColor: Color = Primary700,
-    activeEffectColor: Color = SliderGlow,
+    activeColor: Color = FriendlyLinesColors.PrimaryFriendlyLines.P700,
     inactiveColor: Color = SliderBG,
-    labelColor: Color = Primary900,
-    headerTitleColor: Color = Primary1000,
+    labelColor: Color = FriendlyLinesColors.PrimaryFriendlyLines.P900,
+    headerTitleColor: Color = FriendlyLinesColors.PrimaryFriendlyLines.P1000,
 
     label: (T) -> String = { it.toString() }
 ) {
-    val labelSpacing = 4.dp
-    val headerSpacing = 4.dp
-    val minusPlusSpacing = 12.dp
+    val labelSpacing = LABELS_SPACING.scaled()
+    val headerSpacing = HEADER_SPACING.scaled()
+    val minusPlusSpacing = ICONS_SPACING.scaled()
 
-    val density = LocalDensity.current
+    val actualIndex = selectedIndex.coerceIn(0, values.lastIndex.coerceAtLeast(0))
 
-    var isActive by remember {
-        mutableStateOf(false)
-    }
-
-    val interactionScope = rememberCoroutineScope()
-
-    fun activateEffect() {
-        interactionScope.launch {
-            isActive = true
-            delay(250.milliseconds)
-            isActive = false
-        }
-    }
-
-    //val actualIndex = selectedIndex.coerceIn(0, values.lastIndex)
-
-    val sliderFraction = if (
+    val sliderValue = if (
         value != null &&
         minValue != null &&
         maxValue != null &&
         maxValue != minValue
     ) {
-        ((value - minValue).toFloat() / (maxValue - minValue))
-            .coerceIn(0f, 1f)
+        value.toFloat()
     } else {
-        selectedIndex
-            .coerceIn(0, values.lastIndex)
-            .toFloat() / values.lastIndex.coerceAtLeast(1)
+        actualIndex.toFloat()
+    }
+
+    val sliderMin = if (
+        value != null &&
+        minValue != null &&
+        maxValue != null &&
+        maxValue != minValue
+    ) {
+        minValue.toFloat()
+    } else {
+        0f
+    }
+
+    val sliderMax = if (
+        value != null &&
+        minValue != null &&
+        maxValue != null &&
+        maxValue != minValue
+    ) {
+        maxValue.toFloat()
+    } else {
+        values.lastIndex.coerceAtLeast(0).toFloat()
     }
 
     Column(
@@ -124,27 +113,37 @@ fun <T> TemplateSlider(
     ) {
         if (showHeader) {
             Row(
+                modifier = Modifier
+                    .then(
+                        if(showMinusPlus) {
+                            Modifier
+                                .padding(
+                                    start = minusPlusSpacing + 24.dp.scaled()
+                                )
+                        } else {
+                            Modifier
+                        }
+                    ),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                if (headerIcon != null && onHeaderIconClick != null
-                ) {
-                    TemplateClickableIcon(
-                        icon = headerIcon,
-                        contentDescription = headerIconContentDescription,
-                        onClick = onHeaderIconClick,
-                        modifier = Modifier.size(24.dp),
-                        defaultTint = InfoDefault,
-                        activeTint = InfoActive
+                if (showInfoIcon) {
+                    InfoIconButton(
+                        infoTitle = infoTitle,
+                        infoMessage = infoMessage,
+                        modifier = Modifier.size(ICONS_SIZE.scaled()),
+                        defaultTint = FriendlyLinesColors.InfoIcon.InfoDefault,
+                        activeTint = FriendlyLinesColors.InfoIcon.InfoActive,
+                        disabledTint = FriendlyLinesColors.Neutral.N300
                     )
+
+                    Spacer(modifier = Modifier.width(16.dp.scaled()))
                 }
 
                 if (headerText != null) {
-                    Spacer(modifier = Modifier.width(16.dp))
                     Text(
                         text = headerText,
                         color = headerTitleColor,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Normal
+                        style = FriendlyLinesTextStyles.bodyRegular
                     )
                 }
             }
@@ -154,173 +153,141 @@ fun <T> TemplateSlider(
 
         Row(
             modifier = Modifier.wrapContentWidth(),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.Top
         ) {
-            val currentActiveColor = if (enabled) activeColor else Primary300
-            val currentInactiveColor = if (enabled) inactiveColor else Neutral300
-
             if (showMinusPlus) {
                 TemplateClickableIcon(
-                    icon = Icons.Default.IndeterminateCheckBox,
-                    contentDescription = "Zmniejsz wartość",
+                    icon = Icons.Filled.IndeterminateCheckBox,
+                    contentDescription = null,
                     onClick = {
                         onMinusClick?.invoke()
-                        activateEffect()
                     },
                     enabled = enabled && when {
-                        value != null && minValue != null ->
-                            value > minValue
-
-                        else ->
-                            selectedIndex > 0
+                        value != null && minValue != null -> value > minValue
+                        else -> actualIndex > 0
                     },
-                    modifier = Modifier.size(24.dp),
-                    defaultTint = Primary700,
-                    activeTint = Primary900,
-                    disabledTint = Primary300
+                    modifier = Modifier.size(ICONS_SIZE.scaled()),
+                    defaultTint = FriendlyLinesColors.PrimaryFriendlyLines.P700,
+                    activeTint = FriendlyLinesColors.PrimaryFriendlyLines.P900,
+                    disabledTint = FriendlyLinesColors.PrimaryFriendlyLines.P300
                 )
 
                 Spacer(modifier = Modifier.width(minusPlusSpacing))
             }
 
-            Canvas(
+            Column(
                 modifier = Modifier
-                    .width(sliderWidth)
-                    .height(40.dp)
-                    .pointerInput(values, enabled) {
-                        if (!enabled) return@pointerInput
-                        detectTapGestures { offset ->
-                            val width = size.width.toFloat()
-                            val position = (offset.x / width).coerceIn(0f, 1f)
-                            val index =
-                                if (values.size == 1) {
-                                    0
-                                } else {
-                                    (position * values.lastIndex).roundToInt()
-                                }
-                            onValueSelected(index)
-                            activateEffect()
+                    .then(
+                        if(sliderWidth != null) {
+                            Modifier.width(sliderWidth.scaled())
+                        } else {
+                            Modifier.weight(1f)
                         }
-                    }
-                    .pointerInput(values, enabled) {
-                        if (!enabled) return@pointerInput
-                        detectHorizontalDragGestures(
-                            onDragStart = {
-                                isActive = true
-                            },
-                            onDragEnd = {
-                                isActive = false
-                            },
-                            onDragCancel = {
-                                isActive = false
-                            }
-                        ) { change, _ ->
-                            val width = size.width.toFloat()
-                            val position = (change.position.x / width).coerceIn(0f, 1f)
-                            val index =
-                                if (values.size == 1) {
-                                    0
-                                } else {
-                                    (position * values.lastIndex).roundToInt()
-                                }
-                            onValueSelected(index)
-                            change.consume()
-                        }
-                    }
+                    ),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(labelSpacing)
             ) {
-                if (values.size == 1) {
-                    return@Canvas
-                }
-                val trackY = size.height / 2f
-                val startX = 0f
-                val endX = size.width
-                //val selectedPosition = actualIndex.toFloat() / values.lastIndex
-                val thumbX = startX + (endX - startX) * sliderFraction
+                Slider(
+                    value = sliderValue,
+                    onValueChange = { newValue ->
+                        if (
+                            value != null &&
+                            minValue != null &&
+                            maxValue != null &&
+                            maxValue != minValue
+                        ) {
+                            val normalized = ((newValue - minValue).toFloat() / (maxValue - minValue)).coerceIn(0f, 1f)
 
-                // Drag effect
-                if (isActive) {
-                    drawCircle(
-                        color = activeEffectColor,
-                        radius = with(density) {
-                            (thumbRadius + 7.dp).toPx()
+                            val index = (normalized * values.lastIndex)
+                                .roundToInt()
+                                .coerceIn(0, values.lastIndex)
+
+                            onValueSelected(index)
+                        } else {
+                            val index = newValue
+                                .roundToInt()
+                                .coerceIn(0, values.lastIndex)
+
+                            onValueSelected(index)
+                        }
+                    },
+                    valueRange = sliderMin..sliderMax,
+                    steps = if (sliderMax > sliderMin) {
+                        (sliderMax - sliderMin)
+                            .roundToInt()
+                            .minus(1)
+                            .coerceAtLeast(0)
+                    } else { 0 },
+                    enabled = enabled && values.isNotEmpty(),
+                    colors = SliderDefaults.colors(
+                        thumbColor = if (enabled) {
+                            activeColor
+                        } else {
+                            FriendlyLinesColors.PrimaryFriendlyLines.P300
                         },
-                        center = Offset(thumbX, trackY)
-                    )
+                        activeTrackColor = if (enabled) {
+                            activeColor.copy(alpha = 0.35f)
+                        } else {
+                            FriendlyLinesColors.Neutral.N300
+                        },
+                        inactiveTrackColor = if (enabled) {
+                            inactiveColor
+                        } else {
+                            FriendlyLinesColors.Neutral.N300
+                        },
+                        disabledThumbColor = FriendlyLinesColors.PrimaryFriendlyLines.P300,
+                        disabledActiveTrackColor = FriendlyLinesColors.Neutral.N300,
+                        disabledInactiveTrackColor = FriendlyLinesColors.Neutral.N300
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(SLIDER_HEIGHT.scaled())
+                        .padding(horizontal = SLIDER_HORIZONTAL_PADDING.scaled())
+                )
+
+                if (values.isNotEmpty()) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(
+                                start = 8.dp,
+                                end = if (values.size >= 10) {
+                                    0.dp
+                                } else {
+                                    8.dp
+                                }
+                            ),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        values.forEach { item ->
+                            Text(
+                                text = label(item),
+                                color = labelColor,
+                                style = FriendlyLinesTextStyles.captionC1,
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    }
                 }
-
-                // Background
-                drawLine(
-                    color = currentInactiveColor,
-                    start = Offset(startX, trackY),
-                    end = Offset(endX, trackY),
-                    strokeWidth = with(density) {
-                        trackHeight.toPx()
-                    },
-                    cap = StrokeCap.Round
-                )
-
-                // Active bar
-                drawLine(
-                    color = currentActiveColor,
-                    start = Offset(startX, trackY),
-                    end = Offset(thumbX, trackY),
-                    strokeWidth = with(density) {
-                        trackHeight.toPx()
-                    },
-                    cap = StrokeCap.Round
-                )
-
-                // Dot
-                drawCircle(
-                    color = currentActiveColor,
-                    radius = with(density) {
-                        thumbRadius.toPx()
-                    },
-                    center = Offset(thumbX, trackY)
-                )
             }
 
             if (showMinusPlus) {
                 Spacer(modifier = Modifier.width(minusPlusSpacing))
 
                 TemplateClickableIcon(
-                    icon = Icons.Default.AddBox,
-                    contentDescription = "Zwiększ wartość",
+                    icon = Icons.Filled.AddBox,
+                    contentDescription = null,
                     onClick = {
                         onPlusClick?.invoke()
-                        activateEffect()
                     },
                     enabled = enabled && when {
-                        value != null && maxValue != null ->
-                            value < maxValue
-
-                        else ->
-                            selectedIndex < values.lastIndex
+                        value != null && maxValue != null -> value < maxValue
+                        else -> actualIndex < values.lastIndex
                     },
-                    modifier = Modifier.size(24.dp),
-                    defaultTint = Primary700,
-                    activeTint = Primary900,
-                    disabledTint = Primary300
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(labelSpacing))
-
-        // Labels
-        Row(
-            modifier = Modifier
-                .width(sliderWidth)
-                .align(Alignment.CenterHorizontally),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            values.forEach { value ->
-                Text(
-                    text = label(value),
-                    color = labelColor,
-                    fontSize = 16.7.sp,
-                    fontWeight = FontWeight.Normal,
-                    textAlign = TextAlign.Center
+                    modifier = Modifier.size(ICONS_SIZE.scaled()),
+                    defaultTint = FriendlyLinesColors.PrimaryFriendlyLines.P700,
+                    activeTint = FriendlyLinesColors.PrimaryFriendlyLines.P900,
+                    disabledTint = FriendlyLinesColors.PrimaryFriendlyLines.P300
                 )
             }
         }

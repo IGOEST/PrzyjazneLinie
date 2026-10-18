@@ -1,7 +1,7 @@
 package com.example.friendlylines.therapist_app.ui.configuration.settings
 
-import com.example.friendlylines.therapist_app.ui.main.ExitDestination
-import com.example.friendlylines.therapist_app.ui.materials.models.NameError
+import com.example.friendlylines.therapist_app.components.NameError
+import com.example.friendlylines.therapist_app.navigation.ExitDestination
 import com.example.shared.data.drafts.LearningStepsLearningDraft
 import com.example.shared.data.drafts.LearningStepsPatternsDraft
 import com.example.shared.data.drafts.LearningStepsTestDraft
@@ -15,5 +15,6 @@ data class LearningStepsSettingsState (
     val exitDestination: ExitDestination? = null,
     val savedLearningStepId: Long? = null,
     val stepNameError: NameError? = null,
-    val showSaveDialog: Boolean = false
+    val showSaveDialog: Boolean = false,
+    val isLoading: Boolean = false
 )

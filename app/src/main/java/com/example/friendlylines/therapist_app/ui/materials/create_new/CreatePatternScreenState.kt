@@ -1,7 +1,7 @@
 package com.example.friendlylines.therapist_app.ui.materials.create_new
 
-import com.example.friendlylines.therapist_app.ui.materials.models.NameError
-import com.example.friendlylines.therapist_app.ui.main.ExitDestination
+import com.example.friendlylines.therapist_app.components.NameError
+import com.example.friendlylines.therapist_app.navigation.ExitDestination
 
 data class CreatePatternScreenState(
     val smoothingEnabled: Boolean = false,
