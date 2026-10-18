@@ -21,12 +21,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import androidx.compose.ui.geometry.Offset
-<<<<<<< HEAD
-=======
 import com.example.shared.data.entities.LearningStepEntity
-//import com.example.shared.data.entities.LearningStepMode
-//import com.example.shared.data.entities.LearningStepMode
->>>>>>> origin/ola
 import com.example.shared.data.repositories.LearningStepsRepository
 import com.example.friendlylines.child_app.assessment.ShapeCorrectness
 
@@ -75,7 +70,6 @@ class ChildViewModel  @Inject constructor(
     }
 
     // Finger actions functions
-
     private fun handlePointerDown(position: Offset) {
         finishTimerJob?.cancel()
         _state.update { currentState ->
@@ -101,7 +95,6 @@ class ChildViewModel  @Inject constructor(
     }
 
     // TIMER functions (time limit)
-
     private fun startFinishTimer() {
         finishTimerJob?.cancel()
         finishTimerJob = viewModelScope.launch {
@@ -266,12 +259,7 @@ class ChildViewModel  @Inject constructor(
         }
     }
 
-<<<<<<< HEAD
-    private fun loadActiveStepData() {
-=======
-
     private fun loadActiveStepData(step: LearningStepEntity) {
->>>>>>> origin/ola
         viewModelScope.launch {
             try {
                 val activePatterns = learningStepRepository.getPatternConfigurations(step.id)
@@ -283,7 +271,6 @@ class ChildViewModel  @Inject constructor(
                 if (activePatterns.isEmpty()) return@launch
 
                 var patternResults = mutableListOf<PatternResult>()
-//                val testMode = (step.mode == LearningStepMode.TEST.name)
                 val testMode = step.isTest
                 val repetitions = if (testMode) step.testRepetitions else step.learningRepetitions
                 val learningStepResult = LearningStepResult(

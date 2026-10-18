@@ -157,9 +157,7 @@
     <string name="example_pattern_square">Square</string>
     <string name="example_pattern_triangle">Triangle</string>
     <string name="example_pattern_circle">Circle</string>
-<<<<<<< HEAD
     <string name="straight_line_info">The \"Straight line\" option allows drawing straight lines.</string>
-=======
     <string name="example_pattern_vertical_line">Vertical line</string>
     <string name="example_pattern_horizontal_line">Horizontal line</string>
     <string name="example_pattern_diagonal_line_down">Diagonal line down</string>
@@ -172,8 +170,6 @@
     <string name="example_learning_step_medium">Medium (example step)</string>
     <string name="example_learning_step_hard">Hard (example step)</string>
 
-    <string name="straight_line_info">The \"Straight line\" option will allow for drawing straight lines.</string>
->>>>>>> origin/ola
     <string name="repetitions">Repetitions</string>
     <string name="attempts">Attempts</string>
     <string name="accuracy">Accuracy</string>

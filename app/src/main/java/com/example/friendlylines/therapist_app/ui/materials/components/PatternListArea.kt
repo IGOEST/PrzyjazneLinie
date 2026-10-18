@@ -47,7 +47,7 @@ fun PatternListArea(
     onPatternClick: (PatternItem) -> Unit = {},
     showAddPatternItem: Boolean = true,
     showBorder: Boolean = false,
-    showDeleteBotton: Boolean = true,
+    showDeleteButton: Boolean = true,
     isPatternSelected: (PatternItem) -> Boolean = { false },
     modifier: Modifier = Modifier
 ) {
@@ -102,7 +102,7 @@ fun PatternListArea(
                             items = patterns,
                             key = { it.pattern.id }
                         ) { pattern ->
-                            if (showDeleteBotton) {
+                            if (showDeleteButton) {
                                 PatternItem(
                                     pattern = pattern,
                                     onDeleteClick = {

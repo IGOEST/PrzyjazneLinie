@@ -48,7 +48,7 @@ fun <T> TemplateDropdown(
     modifier: Modifier = Modifier,
     label: String,
     dropdownWidth: Dp? = null,
-    optionLabel: (T?) -> String = { it.toString() },
+    optionLabel: @Composable (T?) -> String = { it.toString() },
     enabled: Boolean = true,
     showHeader: Boolean = false,
     showInfoIcon: Boolean = false,
@@ -64,7 +64,11 @@ fun <T> TemplateDropdown(
         mutableStateOf(false)
     }
 
-    val selectedText = value?.let(optionLabel) ?: label
+    val selectedText = if (value != null) {
+        optionLabel(value)
+    } else {
+        label
+    }
 
     val headerSpacing = HEADER_SPACING.scaled()
 

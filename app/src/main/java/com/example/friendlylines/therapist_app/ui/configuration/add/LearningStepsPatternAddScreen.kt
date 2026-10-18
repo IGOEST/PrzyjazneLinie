@@ -137,7 +137,7 @@ fun LearningStepsPatternAddScreen(
                     },
                     showAddPatternItem = false,
                     showBorder = true,
-                    showDeleteBotton = false,
+                    showDeleteButton = false,
                     isPatternSelected = { pattern ->
                         selectedPattern?.pattern?.id == pattern.pattern.id
                     },
