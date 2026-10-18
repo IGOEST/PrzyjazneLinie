@@ -54,7 +54,10 @@ class LearningStepsListScreenViewModel @Inject constructor(
 
             is LearningStepsListEvent.CopyClicked -> {
                 viewModelScope.launch {
-                    val newLearningStepId = learningStepsRepository.copyLearningStep(event.id)
+                    val newLearningStepId = learningStepsRepository.copyLearningStep(
+                        id = event.id,
+                        copySuffix = event.copySuffix
+                    )
 
                     _state.update {
                         it.copy(

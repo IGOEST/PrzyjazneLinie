@@ -67,6 +67,8 @@ fun LearningStepsListScreen(
 
     val state by viewModel.state.collectAsStateWithLifecycle()
 
+    val copySuffix = stringResource(R.string.copy_text)
+
     LaunchedEffect(Unit) {
         val newLearningStepId =
             navController.currentBackStackEntry
@@ -115,19 +117,6 @@ fun LearningStepsListScreen(
         }
     }
 
-    val filteredLearningSteps = remember(state.learningSteps, state.searchQuery) {
-        if (state.searchQuery.isBlank()) {
-            state.learningSteps
-        } else {
-            state.learningSteps.filter {
-                it.name.contains(
-                    state.searchQuery.trim(),
-                    ignoreCase = true
-                )
-            }
-        }
-    }
-
     var hideExampleSteps by remember {
         mutableStateOf(false)
     }
@@ -150,10 +139,22 @@ fun LearningStepsListScreen(
         mutableStateOf(false)
     }
 
-    val visibleLearningSteps = if (hideExampleSteps) {
-        state.learningSteps.filter { !it.isExample }
-    } else {
-        state.learningSteps
+    val filteredLearningSteps = remember(state.learningSteps, state.searchQuery, hideExampleSteps) {
+        val steps = if (state.searchQuery.isBlank()) {
+            state.learningSteps
+        } else {
+            state.learningSteps.filter {
+                it.name.contains(
+                    state.searchQuery.trim(),
+                    ignoreCase = true
+                )
+            }
+        }
+
+        if (hideExampleSteps) {
+            steps.filter { !it.isExample }
+        } else { steps
+        }
     }
 
     BackHandler {
@@ -326,7 +327,9 @@ fun LearningStepsListScreen(
                 onConfirm = {
                     learningStepToCopy?.let { learningStep ->
                         viewModel.onEvent(
-                            LearningStepsListEvent.CopyClicked(learningStep.id)
+                            LearningStepsListEvent.CopyClicked(
+                                id = learningStep.id,
+                                copySuffix = copySuffix)
                         )
                     }
                     learningStepToCopy = null

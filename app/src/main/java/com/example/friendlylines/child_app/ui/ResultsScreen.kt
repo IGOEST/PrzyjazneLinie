@@ -32,6 +32,7 @@ import com.example.friendlylines.R
 import com.example.friendlylines.child_app.backgrounds.ChildGameEmptyBackground
 import com.example.friendlylines.child_app.ui.components.IconType
 import com.example.friendlylines.child_app.ui.components.TemplateChildButton
+import com.example.friendlylines.name_mapping.ExamplePatternNames
 import com.example.friendlylines.theme.FriendlyLinesColors
 import com.example.friendlylines.theme.FriendlyLinesTextStyles
 import com.example.friendlylines.theme.scaled
@@ -107,8 +108,16 @@ fun ResultsScreen(
                         selectedPattern = picked ?: patterns.first()
                     },
                     label = "",
-                    optionLabel = { it?.patternName ?: "" },
-                    dropdownWidth = 350.dp.scaled()
+                    dropdownWidth = 350.dp.scaled(),
+                    optionLabel = { pattern ->
+                        pattern?.let {
+                            val name = it.exampleKey?.let { key ->
+                                ExamplePatternNames.examplePatternNameFor(key)
+                            } ?: it.originalName
+
+                            "$name ${it.displayNumber}"
+                        } ?: ""
+                    }
                 )
             }
             Row(

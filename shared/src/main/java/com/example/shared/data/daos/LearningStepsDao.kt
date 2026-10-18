@@ -9,6 +9,7 @@ import androidx.room3.Update
 import com.example.shared.data.entities.LearningStepEntity
 import com.example.shared.data.entities.LearningStepPatternEntity
 import com.example.shared.data.entities.LearningStepWithPatterns
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface LearningStepsDao {
@@ -45,6 +46,9 @@ interface LearningStepsDao {
 
     @Query("DELETE FROM learning_steps WHERE id = :stepId")
     suspend fun deleteLearningStep(stepId: Long)
+
+    @Query("DELETE FROM learning_step_patterns WHERE learningStepId = :learningStepId")
+    suspend fun deleteLearningStepPatterns(learningStepId: Long)
 
     @Query("SELECT * FROM learning_steps ORDER BY id ASC")
     suspend fun getAll(): List<LearningStepEntity>
@@ -89,9 +93,6 @@ interface LearningStepsDao {
     @Update
     suspend fun updateLearningStep(learningStep: LearningStepEntity)
 
-    @Query("DELETE FROM learning_step_patterns WHERE learningStepId = :learningStepId")
-    suspend fun deleteLearningStepPatterns(learningStepId: Long)
-
     @Transaction
     suspend fun updateLearningStepWithPatterns(
         learningStep: LearningStepEntity,
@@ -114,4 +115,13 @@ interface LearningStepsDao {
             )
         }
     }
+
+    @Transaction
+    suspend fun deleteLearningStepWithPatterns(stepId: Long) {
+        deleteLearningStepPatterns(stepId)
+        deleteLearningStep(stepId)
+    }
+
+    @Query("SELECT * FROM learning_steps WHERE isActive = 1 LIMIT 1")
+    fun observeActiveStep(): Flow<LearningStepEntity?>
 }

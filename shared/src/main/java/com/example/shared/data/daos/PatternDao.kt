@@ -45,6 +45,9 @@ interface PatternDao {
     @Query("SELECT * FROM patterns WHERE id = :patternId")
     suspend fun getPattern(patternId: Long): PatternWithStrokes?
 
+    @Query("SELECT * FROM patterns WHERE exampleKey = :key LIMIT 1")
+    suspend fun getExamplePatternByKey(key: String): PatternEntity?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPattern(pattern: PatternEntity): Long
 

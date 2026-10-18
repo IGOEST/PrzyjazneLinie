@@ -1,5 +1,6 @@
 package com.example.shared.data.repositories
 
+import androidx.compose.ui.res.stringResource
 import com.example.shared.data.daos.LearningStepsDao
 import com.example.shared.data.drafts.AccuracyLevel
 import com.example.shared.data.drafts.LearningStepsDraft
@@ -11,14 +12,22 @@ import com.example.shared.data.drafts.PatternConfigOptions
 import com.example.shared.data.drafts.PatternWidth
 import com.example.shared.data.entities.LearningStepEntity
 import com.example.shared.data.entities.LearningStepPatternEntity
+import com.example.shared.data.examples.ExampleLearningSteps
+import com.example.shared.data.examples.ExamplePatternConfiguration
 import com.example.shared.data.models.PatternItem
 import com.example.shared.data.models.toPatternDrawing
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class LearningStepsRepository @Inject constructor(
     private val learningStepsDao: LearningStepsDao,
     private val patternRepository: PatternRepository
 ) {
+
+    fun observeActiveStep(): Flow<LearningStepEntity?> {
+        return learningStepsDao.observeActiveStep()
+    }
+
     suspend fun saveLearningStep(draft: LearningStepsDraft): Long {
 
         val learningStepEntity = LearningStepEntity(
@@ -153,6 +162,13 @@ class LearningStepsRepository @Inject constructor(
         return learningStepsDao.getForLearningStep(learningStepId)
     }
 
+    suspend fun existsLearningStepByName(name: String, excludedId: Long): Boolean {
+        return learningStepsDao.existsLearningStepByName(
+            name = name,
+            excludedId = excludedId
+        )
+    }
+
     suspend fun updateLearningStepActive(id: Long, isActive: Boolean) {
         learningStepsDao.updateActiveStep(
             id = id,
@@ -221,22 +237,15 @@ class LearningStepsRepository @Inject constructor(
     }
 
     suspend fun deleteLearningStep(id: Long) {
-        learningStepsDao.deleteLearningStep(id)
+        learningStepsDao.deleteLearningStepWithPatterns(id)
     }
 
-    suspend fun existsLearningStepByName(name: String, excludedId: Long): Boolean {
-        return learningStepsDao.existsLearningStepByName(
-            name = name,
-            excludedId = excludedId
-        )
-    }
-
-    suspend fun copyLearningStep(id: Long): Long {
+    suspend fun copyLearningStep(id: Long, copySuffix: String): Long {
         val source = learningStepsDao.getLearningStepWithPatterns(id) ?: return 0L
 
         val newLearningStep = source.learningStep.copy(
             id = 0L,
-            name = "${source.learningStep.name} - kopia",
+            name = "${source.learningStep.name} - $copySuffix",
             isActive = false,
             isExample = false
         )
@@ -255,5 +264,27 @@ class LearningStepsRepository @Inject constructor(
         }
 
         return newLearningStepId
+    }
+
+    suspend fun insertExampleLearningSteps() {
+        if (getAllLearningSteps().isNotEmpty()) return
+
+        for (exampleStep in ExampleLearningSteps.create()) {
+            val patterns = exampleStep.patternKeys.mapIndexed { index, key ->
+                val pattern = requireNotNull(
+                    patternRepository.getExamplePatternByKey(key)
+                )
+
+                ExamplePatternConfiguration.create(
+                    patternId = pattern.id,
+                    order = index
+                )
+            }
+
+            learningStepsDao.insertLearningStepWithPatterns(
+                learningStep = exampleStep.step,
+                patterns = patterns
+            )
+        }
     }
 }

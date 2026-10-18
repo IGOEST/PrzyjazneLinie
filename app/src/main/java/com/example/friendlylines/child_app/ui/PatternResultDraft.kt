@@ -22,7 +22,8 @@ data class LearningStepResult(
     val testMode: Boolean,
     val timeLimit: Int,
     val attempts: Int,
-    val randomPatternOrder: Boolean
+    val randomPatternOrder: Boolean,
+    val exampleKey: String? = null
 )
 
 data class PatternResult(
@@ -33,5 +34,10 @@ data class PatternResult(
     val correctCoverage: Int = 0,
     val lineOutOfBounds: Int = 0,
     val shapeMatch: Int = 0,
-    val correctStartingPoint: Boolean = true
+    val correctStartingPoint: Boolean = true,
+    var lastAttemptTime: Double = 0.0,
+    var totalTime: Double = 0.0,
+    var attempts: Int,
+    val exampleKey: String? = null,
+    var displayNumber: Int = 1
 )

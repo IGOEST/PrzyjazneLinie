@@ -1,5 +1,6 @@
 package com.example.friendlylines.child_app.main
 
+import android.os.SystemClock
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.friendlylines.child_app.ui.LearningStepResult
@@ -20,7 +21,14 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import androidx.compose.ui.geometry.Offset
+<<<<<<< HEAD
+=======
+import com.example.shared.data.entities.LearningStepEntity
+//import com.example.shared.data.entities.LearningStepMode
+//import com.example.shared.data.entities.LearningStepMode
+>>>>>>> origin/ola
 import com.example.shared.data.repositories.LearningStepsRepository
+import com.example.friendlylines.child_app.assessment.ShapeCorrectness
 
 @HiltViewModel
 class ChildViewModel  @Inject constructor(
@@ -31,6 +39,11 @@ class ChildViewModel  @Inject constructor(
     private val _state = MutableStateFlow(GameState())
     val state: StateFlow<GameState> = _state.asStateFlow()
 
+    private val shapeCorrectness = ShapeCorrectness(
+        sampleCount = 32,
+        correctThreshold = 0.80f
+    )
+
     private var gameTimerJob: Job? = null
     private var finishTimerJob: Job? = null
 
@@ -39,8 +52,14 @@ class ChildViewModel  @Inject constructor(
     private var isFinishTimerActive = false
 
     init {
-        loadActiveStepData()
+    viewModelScope.launch {
+        learningStepRepository.observeActiveStep().collect { step ->
+            if (step != null) {
+                loadActiveStepData(step)
+            }
+        }
     }
+}
 
     fun onEvent(event: ChildMainEvent) {
         when (event) {
@@ -54,6 +73,8 @@ class ChildViewModel  @Inject constructor(
             }
         }
     }
+
+    // Finger actions functions
 
     private fun handlePointerDown(position: Offset) {
         finishTimerJob?.cancel()
@@ -79,6 +100,8 @@ class ChildViewModel  @Inject constructor(
         startFinishTimer()  // timer after trace is finished, in case user continues drawing
     }
 
+    // TIMER functions (time limit)
+
     private fun startFinishTimer() {
         finishTimerJob?.cancel()
         finishTimerJob = viewModelScope.launch {
@@ -103,6 +126,28 @@ class ChildViewModel  @Inject constructor(
             delay(millis)
             goToNextPattern()
         }
+    }
+
+    // Time is counted for whole pattern and last (or successful) attempt
+    private fun finishAttempt() {
+        val limitMillis = (_state.value.learningStepResult?.timeLimit ?: return) * 1000L
+        val remaining = (timeLimitRemainingMillis ?: return) -
+                (System.currentTimeMillis() - timerStartedAt)
+        val s = (limitMillis - remaining).coerceIn(0L, limitMillis) / 1000.0
+
+        val result = _state.value.patternResults
+            .getOrNull(_state.value.currentPattern) ?: return
+        result.totalTime += s - 1.5   // substract finish timer
+        result.lastAttemptTime = s - 1.5
+    }
+
+    // TODO: Restarts if pattern is wrong and there are attempts left
+    private fun restartAttempt() {
+        finishAttempt()
+        finishTimerJob?.cancel()
+        _state.update { it.copy(userStrokes = emptyList()) }
+        //new time limit
+        startTimeLimitTimer(_state.value.learningStepResult?.timeLimit ?: 0)
     }
 
     private fun handleToggleMenu() {
@@ -149,6 +194,7 @@ class ChildViewModel  @Inject constructor(
     }
 
     private fun goToNextPattern() {
+        finishAttempt()
         gameTimerJob?.cancel()
         finishTimerJob?.cancel()
         timeLimitRemainingMillis = null
@@ -207,7 +253,7 @@ class ChildViewModel  @Inject constructor(
 
     private fun loadPatternDrawing(index: Int, state: GameState) {
         val patternResult = state.patternResults.getOrNull(index) ?: return
-        
+
         // Start time limit for the new pattern
         startTimeLimitTimer(state.learningStepResult?.timeLimit ?: 0)
 
@@ -220,10 +266,14 @@ class ChildViewModel  @Inject constructor(
         }
     }
 
+<<<<<<< HEAD
     private fun loadActiveStepData() {
+=======
+
+    private fun loadActiveStepData(step: LearningStepEntity) {
+>>>>>>> origin/ola
         viewModelScope.launch {
             try {
-                val step = learningStepRepository.getActiveStep()
                 val activePatterns = learningStepRepository.getPatternConfigurations(step.id)
                     .filter {
                         it.isEnabled && if(step.isTest) it.isTest else it.isLearning
@@ -271,7 +321,9 @@ class ChildViewModel  @Inject constructor(
                                     patternId = p.patternId,
                                     patternName = patternEntity.name,
                                     originalName = patternEntity.name,
-                                    config = config
+                                    config = config,
+                                    attempts = 1,
+                                    exampleKey = patternEntity.exampleKey
                                 )
                             )
                         }
@@ -282,7 +334,7 @@ class ChildViewModel  @Inject constructor(
 
                 _state.update { it.copy(
                     patternResults = preparedResults,
-                    learningStepResult = learningStepResult
+                    learningStepResult = learningStepResult,
                 ) }
             } catch (_: Exception) {}
         }
@@ -300,10 +352,15 @@ class ChildViewModel  @Inject constructor(
         }
 
         // assigning numbers
-        var count = 1
+        val countsByPatternId = mutableMapOf<Long, Int>()
+
         for (p in prepared) {
-            p.patternName = p.originalName + " " + count
-            count++
+            val number = (countsByPatternId[p.patternId] ?: 0) + 1
+            countsByPatternId[p.patternId] = number
+
+            p.displayNumber = number
+            p.patternName = "${p.originalName} $number"
+            p.totalTime = 0.0
         }
 
         return prepared

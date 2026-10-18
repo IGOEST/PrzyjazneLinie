@@ -80,7 +80,6 @@ class GalleryScreenViewModel @Inject constructor(
 
     private fun initializePatterns() {
         viewModelScope.launch {
-            patternRepository.insertExamplePatterns()
             loadPatterns()
         }
     }

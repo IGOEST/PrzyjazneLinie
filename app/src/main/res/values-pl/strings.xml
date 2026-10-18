@@ -19,6 +19,7 @@
     <string name="add_pattern_text">Dodaj własny wzór</string>
     <string name="delete_dialog_title">Usunąć?</string>
     <string name="delete_pattern_dialog_message">Czy na pewno chcesz usunąć ten wzór? Tej akcji nie można cofnąć.</string>
+    <string name="delete_step_dialog_message">Czy na pewno chcesz usunąć ten krok uczenia? Tej akcji nie można cofnąć.</string>
     <string name="delete_confirm_button_text">USUŃ</string>
     <string name="dismiss_button_text">ANULUJ</string>
     <string name="saved_pop_up_message">Wzór został zapisany.</string>
@@ -82,6 +83,7 @@
     <string name="copy_dialog_title">Utworzyć kopię?</string>
     <string name="copy_dialog_message">Czy na pewno chcesz utworzyć kopię tej konfiguracji wzoru?</string>
     <string name="copy_button_text">KOPIUJ</string>
+    <string name="copy_text">kopia</string>
 
     <string name="edit_dialog_title">Edytować?</string>
     <string name="edit_dialog_message">Czy na pewno chcesz edytować tę konfigurację wzoru?</string>
@@ -170,6 +172,18 @@
     <string name="example_pattern_square">Kwadrat</string>
     <string name="example_pattern_triangle">Trójkąt</string>
     <string name="example_pattern_circle">Koło</string>
+    <string name="example_pattern_vertical_line">Linia pionowa</string>
+    <string name="example_pattern_horizontal_line">Linia pozioma</string>
+    <string name="example_pattern_diagonal_line_down">Linia ukośna w dół</string>
+    <string name="example_pattern_diagonal_line_up">Linia ukośna w górę</string>
+    <string name="example_pattern_curve_line">Linia krzywa</string>
+    <string name="example_pattern_rectangle">Prostokąt</string>
+    <string name="example_pattern_ellipse">Elipsa</string>
+
+    <string name="example_learning_step_easy">Łatwy (przykładowy krok)</string>
+    <string name="example_learning_step_medium">Średni (przykładowy krok)</string>
+    <string name="example_learning_step_hard">Trudny (przykładowy krok)</string>
+
     <string name="repetitions">Powtórzenia</string>
     <string name="attempts">Próby</string>
     <string name="accuracy">Dokładność</string>
