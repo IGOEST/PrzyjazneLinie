@@ -33,7 +33,7 @@ data class PatternResult(
     val config: PatternConfig,
     val correctCoverage: Int = 0,
     val lineOutOfBounds: Int = 0,
-    val shapeMatch: Int = 0,
+    var shapeMatch: Int = 0,
     val correctStartingPoint: Boolean = true,
     var lastAttemptTime: Double = 0.0,
     var totalTime: Double = 0.0,

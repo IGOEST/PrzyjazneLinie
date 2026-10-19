@@ -161,12 +161,16 @@ class ShapeCorrectness (
         }
 
         // total size of entire drawing after centering
-        val sizeSquared = centeredStrokes.flatten().sumOf { point ->
+        val centeredPoints = centeredStrokes.flatten()
+        if (centeredPoints.isEmpty()) return null
+
+        val sizeSquared = centeredPoints.sumOf { point ->
             point.x.toDouble() * point.x +
                 point.y.toDouble() * point.y
         }
 
-        val size = sqrt(sizeSquared)
+        val meanSquaredSize = sizeSquared/centeredPoints.size
+        val size = sqrt(meanSquaredSize)
         if (size < 1e-9) return null
 
         return centeredStrokes.map { stroke ->

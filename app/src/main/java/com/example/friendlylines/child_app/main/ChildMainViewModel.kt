@@ -24,6 +24,7 @@ import androidx.compose.ui.geometry.Offset
 import com.example.shared.data.entities.LearningStepEntity
 import com.example.shared.data.repositories.LearningStepsRepository
 import com.example.friendlylines.child_app.assessment.ShapeCorrectness
+import com.example.shared.data.models.Point
 
 @HiltViewModel
 class ChildViewModel  @Inject constructor(
@@ -91,6 +92,39 @@ class ChildViewModel  @Inject constructor(
     }
 
     private fun handlePointerUp() {
+        val currentState = _state.value
+        val referenceDrawing = currentState.currentPatternDrawing
+
+        val result = if (referenceDrawing != null) {
+            val userPoints = currentState.userStrokes.map { stroke ->
+                stroke.map { point ->
+                    Point(
+                        x = point.x,
+                        y = point.y
+                    )
+                }
+            }
+
+            shapeCorrectness.evaluate(
+                userStrokes = userPoints,
+                referenceStrokes = referenceDrawing.strokes,
+                allowRotation = false
+            )
+        } else {
+            null
+        }
+        _state.update {
+            it.copy(shapeAssessmentResult = result)
+        }
+
+        if (result != null) {
+            _state.value.patternResults
+                .getOrNull(_state.value.currentPattern)
+                ?.let { patternResult ->
+                    patternResult.shapeMatch = (result.score * 100).toInt()
+                }
+        }
+
         startFinishTimer()  // timer after trace is finished, in case user continues drawing
     }
 
@@ -200,7 +234,8 @@ class ChildViewModel  @Inject constructor(
                 val newState = currentState.copy(
                     currentPattern = nextIndex,
                     userStrokes = emptyList(),
-                    currentPatternDrawing = null
+                    currentPatternDrawing = null,
+                    shapeAssessmentResult = null
                 )
                 loadPatternDrawing(nextIndex, newState)
                 newState
