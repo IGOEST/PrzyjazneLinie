@@ -24,6 +24,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.friendlylines.R
+import com.example.friendlylines.name_mapping.ExampleStepsNames
 import com.example.friendlylines.theme.FriendlyLinesColors
 import com.example.friendlylines.theme.FriendlyLinesModalShape
 import com.example.friendlylines.theme.FriendlyLinesTextStyles
@@ -82,7 +83,11 @@ fun LearningStepsListItem(
             modifier = Modifier.size(18.dp.scaled())
         )
         Text(
-            text = learningStep.name,
+            text = if (learningStep.isExample) {
+                ExampleStepsNames.exampleLearningStepNameFor(learningStep.name)
+            } else {
+                learningStep.name
+            },
             color = FriendlyLinesColors.PrimaryFriendlyLines.P1000,
             style = FriendlyLinesTextStyles.headingH5Regular,
             modifier = Modifier.weight(1f),

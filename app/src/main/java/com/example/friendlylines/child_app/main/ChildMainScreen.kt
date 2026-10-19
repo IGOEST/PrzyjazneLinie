@@ -11,6 +11,7 @@ import com.example.friendlylines.child_app.ui.GameDrawingScreen
 import com.example.friendlylines.child_app.ui.InformationScreen
 import com.example.friendlylines.child_app.ui.MainMenuScreen
 import com.example.friendlylines.child_app.ui.ResultsScreen
+import com.example.friendlylines.name_mapping.ExampleStepsNames
 import kotlinx.coroutines.delay
 
 @Composable
@@ -27,7 +28,13 @@ fun ChildMainScreen(viewModel: ChildViewModel = hiltViewModel()) {
         }
         "main" -> {
             MainMenuScreen(
-                activeStep = state.learningStepResult?.name ?: "",
+                activeStep = state.learningStepResult?.let { step ->
+                    if (step.isExample) {
+                        ExampleStepsNames.exampleLearningStepNameFor(step.name)
+                    } else {
+                        step.name
+                    }
+                } ?: "",
                 mode = when (state.learningStepResult?.testMode) {
                     true -> stringResource(R.string.test_mode)
                     false -> stringResource(R.string.learning_mode)

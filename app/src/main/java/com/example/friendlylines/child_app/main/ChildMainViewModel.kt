@@ -275,6 +275,7 @@ class ChildViewModel  @Inject constructor(
                 val repetitions = if (testMode) step.testRepetitions else step.learningRepetitions
                 val learningStepResult = LearningStepResult(
                     name = step.name,
+                    isExample = step.isExample,
                     testMode = testMode,
                     showStartingPoint = if (testMode) false else step.learningStartingPointEnabled,
                     timeLimit = if (testMode) step.testTimeLimit else step.learningTimeLimit,
