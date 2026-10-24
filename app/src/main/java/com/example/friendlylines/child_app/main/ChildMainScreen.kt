@@ -6,7 +6,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.friendlylines.child_app.ui.GameDrawingScreen
-import com.example.friendlylines.child_app.ui.InformationScreen
+import com.example.friendlylines.child_app.ui.InfoSplashScreen
 import com.example.friendlylines.child_app.ui.MainMenuScreen
 import com.example.friendlylines.child_app.ui.ResultsScreen
 import kotlinx.coroutines.delay
@@ -21,7 +21,11 @@ fun ChildMainScreen(viewModel: ChildViewModel = hiltViewModel()) {
                 delay(5000L)
                 viewModel.onEvent(ChildMainEvent.GoToNextScreen)
             }
-            InformationScreen()
+            InfoSplashScreen(
+                appTitle = stringResource(R.string.app_name),
+                appIconRes = R.drawable.app_icon,
+                onContinue = { viewModel.onEvent(ChildMainEvent.GoToNextScreen) }
+            )
         }
         "main" -> {
             MainMenuScreen(
