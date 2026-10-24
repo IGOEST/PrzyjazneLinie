@@ -8,7 +8,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.friendlylines.R
 import com.example.friendlylines.child_app.ui.GameDrawingScreen
-import com.example.friendlylines.child_app.ui.InfoSplashScreen
+import com.example.friendlylines.components.InfoSplashScreen
 import com.example.friendlylines.child_app.ui.MainMenuScreen
 import com.example.friendlylines.child_app.ui.ResultsScreen
 import com.example.friendlylines.name_mapping.ExampleStepsNames

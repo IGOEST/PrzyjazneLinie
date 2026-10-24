@@ -1,4 +1,4 @@
-package com.example.friendlylines.child_app.ui
+package com.example.friendlylines.components
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image

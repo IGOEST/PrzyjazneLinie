@@ -1,5 +1,6 @@
 package com.example.friendlylines.therapist_app.ui.home
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -44,6 +45,8 @@ fun HomeScreen(
     onHomeClick: () -> Unit,
 ) {
     val activeLearningStep by viewModel.activeLearningStep.collectAsStateWithLifecycle()
+
+    BackHandler { onBackClick() }
 
     val navController = rememberNavController()
 
