@@ -1,15 +1,14 @@
 package com.example.friendlylines.therapist_app.ui.materials.gallery
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
@@ -21,29 +20,29 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.composables.core.rememberScrollAreaState
 import com.example.friendlylines.R
-import com.example.friendlylines.therapist_app.ui.components.PatternListArea
+import com.example.friendlylines.components.LoadingScreen
+import com.example.friendlylines.theme.FriendlyLinesColors
+import com.example.friendlylines.theme.FriendlyLinesTextStyles
+import com.example.friendlylines.theme.scaled
+import com.example.friendlylines.therapist_app.backgrounds.PlainBackground
+import com.example.friendlylines.therapist_app.navigation.TemplateTopAppBar
+import com.example.friendlylines.therapist_app.ui.components.InfoIconButton
 import com.example.friendlylines.therapist_app.ui.components.TemplateAlertDialog
 import com.example.friendlylines.therapist_app.ui.components.TemplateCheckbox
 import com.example.friendlylines.therapist_app.ui.components.TemplateNotification
-import com.example.friendlylines.therapist_app.ui.components.TemplateTopAppBar
-//import com.example.friendlylines.therapist_app.ui.materials.models.PatternItem
-import com.example.friendlylines.therapist_app.ui.theme.Primary50
-import com.example.friendlylines.therapist_app.ui.theme.Primary900
-import com.example.shared.data.models.PatternItem
+import com.example.friendlylines.therapist_app.ui.materials.components.PatternListArea
+
+private val CONTENT_PADDING = 20.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,22 +55,6 @@ fun GalleryScreen(
     val viewModel: GalleryScreenViewModel = hiltViewModel()
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-//    LaunchedEffect(Unit) {
-//        viewModel.onEvent(GalleryScreenEvent.Initialize)
-//    }
-
-//    val viewModel: GalleryScreenViewModel = hiltViewModel()
-//
-//    LaunchedEffect(Unit) {
-//        viewModel.initializePatterns()
-//    }
-//
-//    var hideExamplePatterns by remember {
-//        mutableStateOf(false)
-//    }
-//
-//    val patternItems by viewModel.patterns.collectAsStateWithLifecycle()
-
     val gridState = rememberLazyGridState()
     val scrollAreaState = rememberScrollAreaState(gridState)
 
@@ -81,26 +64,11 @@ fun GalleryScreen(
         state.patterns
     }
 
-//    val visiblePatterns = if (hideExamplePatterns) {
-//        patternItems.filter {!it.pattern.isExample}
-//    } else {
-//        patternItems
-//    }
-//
-//    var patternToDelete by remember {
-//        mutableStateOf<PatternItem?>(null)
-//    }
-
-//    var scrollToPatternId by remember {
-//        mutableStateOf<Long?>(null)
-//    }
-
     val snackbarHostState = remember {
         SnackbarHostState()
     }
 
-    val savedStateHandle = navController.currentBackStackEntry
-        ?.savedStateHandle
+    val savedStateHandle = navController.currentBackStackEntry?.savedStateHandle
 
     val newPatternId = savedStateHandle
         ?.getStateFlow<Long?>(
@@ -116,7 +84,6 @@ fun GalleryScreen(
             viewModel.onEvent(
                 GalleryScreenEvent.NewPatternReceived(newPatternId)
             )
-//            scrollToPatternId = newPatternId
 
             snackbarHostState.showSnackbar(
                 message = savedPopUpMessage,
@@ -140,7 +107,6 @@ fun GalleryScreen(
             gridState.animateScrollToItem(
                 index = gridIndex
             )
-//            scrollToPatternId = null
         }
 
         viewModel.onEvent(
@@ -148,8 +114,12 @@ fun GalleryScreen(
         )
     }
 
+    BackHandler {
+        onBackClick()
+    }
+
     Scaffold(
-        containerColor = Primary50,
+        containerColor = FriendlyLinesColors.PrimaryFriendlyLines.P50,
         snackbarHost = {
             SnackbarHost(
                 hostState = snackbarHostState
@@ -163,67 +133,80 @@ fun GalleryScreen(
             TemplateTopAppBar(
                 text = stringResource(R.string.pattern_gallery_header),
                 onBackClick = onBackClick,
-                onHomeClick = onHomeClick
+                onHomeClick = onHomeClick,
+                infoTitle = stringResource(R.string.info_dialog_title),
+                infoMessage = stringResource(R.string.pattern_gallery_screen_info_message)
             )
         }
     ) { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Primary50)
-                .padding(padding)
-        ) {
-            Row(
+        val content: @Composable () -> Unit = {
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(
-                        horizontal = 16.dp,
-                        vertical = 16.dp
-                    ),
-                verticalAlignment = Alignment.CenterVertically
+                    .fillMaxSize()
+                    .background(FriendlyLinesColors.PrimaryFriendlyLines.P50)
+                    .padding(CONTENT_PADDING.scaled()),
+                verticalArrangement = Arrangement.spacedBy(4.dp.scaled())
             ) {
-                Text(
-                    text = stringResource(R.string.hide_exemplary_patterns),
-                    fontSize = 16.7.sp,
-                    color = Primary900,
-                    modifier = Modifier.padding(start = 20.dp),
-                    fontWeight = FontWeight.Normal
-                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp.scaled()),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp.scaled())
+                ) {
+                    TemplateCheckbox(
+                        checked = state.hideExamplePatterns,
+                        onCheckedChange = {
+                            viewModel.onEvent(
+                                GalleryScreenEvent.HideExamplePatternsChanged(it)
+                            )
+                        },
+                        modifier = Modifier.size(24.dp.scaled())
+                    )
+                    Text(
+                        text = stringResource(R.string.hide_exemplary_patterns),
+                        color = FriendlyLinesColors.PrimaryFriendlyLines.P900,
+                        style = FriendlyLinesTextStyles.captionC1
+                    )
+                    InfoIconButton(
+                        infoTitle = stringResource(R.string.info_dialog_title),
+                        infoMessage = stringResource(R.string.hide_exemplary_patterns_info_message),
+                        defaultTint = FriendlyLinesColors.InfoIcon.InfoDefault,
+                        activeTint = FriendlyLinesColors.InfoIcon.InfoActive,
+                        disabledTint = FriendlyLinesColors.Neutral.N300
+                    )
+                }
 
-                Spacer(modifier = Modifier.width(8.dp))
-
-                TemplateCheckbox(
-                    checked = state.hideExamplePatterns,
-                    onCheckedChange = {
-                        //hideExamplePatterns = it
+                PatternListArea(
+                    patterns = visiblePatterns,
+                    gridState = gridState,
+                    scrollAreaState = scrollAreaState,
+                    onCreateClick = onCreateClick,
+                    onDeleteClick = {
                         viewModel.onEvent(
-                            GalleryScreenEvent.HideExamplePatternsChanged(it)
+                            GalleryScreenEvent.DeletePatternClicked(it)
                         )
                     },
-                    modifier = Modifier.size(18.dp)
+                    showAddPatternItem = true,
+                    showBorder = false,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .align(Alignment.CenterHorizontally)
                 )
             }
+        }
 
-            Spacer(modifier = Modifier.height(4.dp))
-
-            PatternListArea(
-                patterns = visiblePatterns,
-                gridState = gridState,
-                scrollAreaState = scrollAreaState,
-                onCreateClick = onCreateClick,
-                onDeleteClick = {
-                    //patternToDelete = it
-                    viewModel.onEvent(
-                        GalleryScreenEvent.DeletePatternClicked(it)
-                    )
-                },
-                showAddPatternItem = true,
-                showBorder = false,
-                modifier = Modifier
-                    .fillMaxWidth(0.9f)
-                    .weight(1f)
-                    .align(Alignment.CenterHorizontally)
-            )
+        if (state.isLoading) {
+            PlainBackground(modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+            ) { LoadingScreen() }
+        } else {
+            PlainBackground(modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+            ) { content() }
         }
     }
 
@@ -237,16 +220,11 @@ fun GalleryScreen(
                 viewModel.onEvent(
                     GalleryScreenEvent.DeletePatternConfirmed
                 )
-//                patternToDelete?.let { pattern ->
-//                    viewModel.deletePattern(pattern.pattern.id)
-//                }
-//                patternToDelete = null
             },
             onDismiss = {
                 viewModel.onEvent(
                     GalleryScreenEvent.DeletePatternDismissed
                 )
-//                patternToDelete = null
             }
         )
     }

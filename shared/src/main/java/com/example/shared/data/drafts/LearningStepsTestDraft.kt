@@ -1,7 +1,7 @@
 package com.example.shared.data.drafts
 
 data class LearningStepsTestDraft(
-    val id: Long,
+    val overridesLearning: Boolean = false,
     val repetitions: Int = 3,
     val attempts: Int = 1,
     val timeLimit: Int = 30,

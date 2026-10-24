@@ -1,10 +1,7 @@
 package com.example.friendlylines.therapist_app.ui.materials.create_new
 
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.unit.IntSize
-import com.example.friendlylines.therapist_app.ui.components.NameError
-import com.example.friendlylines.therapist_app.ui.main.ExitDestination
-import com.example.friendlylines.therapist_app.ui.materials.models.DrawingStroke
+import com.example.friendlylines.therapist_app.components.NameError
+import com.example.friendlylines.therapist_app.navigation.ExitDestination
 
 data class CreatePatternScreenState(
     val smoothingEnabled: Boolean = false,

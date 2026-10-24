@@ -11,20 +11,26 @@ data class LearningStepEntity(
     val id: Long = 0,
 
     val name: String,
-    val activeStep: Boolean = false,
-    val mode: String = LearningStepMode.LEARNING.name,
-    val isExample: Boolean = false,
 
-    // learning settings
-    val repetitions: Int,
-    val attempts: Int,
-    val timeLimit: Int,
-    val accuracyLevel: String,
-    val startingPointEnabled: Boolean,
-    val randomPatternOrder: Boolean,
+    val isActive: Boolean,
+    val isLearning: Boolean = true,
+    val isTest: Boolean = false,
+    val isExample: Boolean,
 
-    // test settings
+    // Learning settings
+    val learningRepetitions: Int,
+    val learningAttempts: Int,
+    val learningTimeLimit: Int,
+    val learningAccuracyLevel: String,
+    val learningStartingPointEnabled: Boolean,
+    val learningRandomPatternOrder: Boolean,
+
+    // Test settings
+    val overridesLearning: Boolean,
     val testRepetitions: Int,
+    val testAttempts: Int,
     val testTimeLimit: Int,
-    val testAccuracyLevel: String
+    val testAccuracyLevel: String,
+    val testStartingPointEnabled: Boolean,
+    val testRandomPatternOrder: Boolean
 )

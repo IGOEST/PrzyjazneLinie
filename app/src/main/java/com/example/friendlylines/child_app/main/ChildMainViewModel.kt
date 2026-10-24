@@ -10,7 +10,6 @@ import com.example.shared.data.drafts.PatternWidth
 import com.example.shared.data.drafts.toDp
 import com.example.shared.data.models.toPatternDrawing
 import com.example.shared.data.drafts.PatternConfigOptions
-import com.example.shared.data.repositories.LearningStepRepository
 import com.example.shared.data.repositories.PatternRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -22,16 +21,24 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import androidx.compose.ui.geometry.Offset
-import com.example.shared.data.entities.LearningStepMode
+import com.example.shared.data.entities.LearningStepEntity
+import com.example.shared.data.repositories.LearningStepsRepository
+import com.example.friendlylines.child_app.assessment.ShapeCorrectness
+import com.example.shared.data.models.Point
 
 @HiltViewModel
 class ChildViewModel  @Inject constructor(
-    private val learningStepRepository: LearningStepRepository,
+    private val learningStepRepository: LearningStepsRepository,
     private val patternRepository: PatternRepository
 )  : ViewModel() {
 
     private val _state = MutableStateFlow(GameState())
     val state: StateFlow<GameState> = _state.asStateFlow()
+
+    private val shapeCorrectness = ShapeCorrectness(
+        sampleCount = 32,
+        correctThreshold = 0.80f
+    )
 
     private var gameTimerJob: Job? = null
     private var finishTimerJob: Job? = null
@@ -41,8 +48,14 @@ class ChildViewModel  @Inject constructor(
     private var isFinishTimerActive = false
 
     init {
-        loadActiveStepData()
+    viewModelScope.launch {
+        learningStepRepository.observeActiveStep().collect { step ->
+            if (step != null) {
+                loadActiveStepData(step)
+            }
+        }
     }
+}
 
     fun onEvent(event: ChildMainEvent) {
         when (event) {
@@ -58,7 +71,6 @@ class ChildViewModel  @Inject constructor(
     }
 
     // Finger actions functions
-
     private fun handlePointerDown(position: Offset) {
         finishTimerJob?.cancel()
         _state.update { currentState ->
@@ -80,11 +92,43 @@ class ChildViewModel  @Inject constructor(
     }
 
     private fun handlePointerUp() {
+        val currentState = _state.value
+        val referenceDrawing = currentState.currentPatternDrawing
+
+        val result = if (referenceDrawing != null) {
+            val userPoints = currentState.userStrokes.map { stroke ->
+                stroke.map { point ->
+                    Point(
+                        x = point.x,
+                        y = point.y
+                    )
+                }
+            }
+
+            shapeCorrectness.evaluate(
+                userStrokes = userPoints,
+                referenceStrokes = referenceDrawing.strokes,
+                allowRotation = false
+            )
+        } else {
+            null
+        }
+        _state.update {
+            it.copy(shapeAssessmentResult = result)
+        }
+
+        if (result != null) {
+            _state.value.patternResults
+                .getOrNull(_state.value.currentPattern)
+                ?.let { patternResult ->
+                    patternResult.shapeMatch = (result.score * 100).toInt()
+                }
+        }
+
         startFinishTimer()  // timer after trace is finished, in case user continues drawing
     }
 
     // TIMER functions (time limit)
-
     private fun startFinishTimer() {
         finishTimerJob?.cancel()
         finishTimerJob = viewModelScope.launch {
@@ -190,7 +234,8 @@ class ChildViewModel  @Inject constructor(
                 val newState = currentState.copy(
                     currentPattern = nextIndex,
                     userStrokes = emptyList(),
-                    currentPatternDrawing = null
+                    currentPatternDrawing = null,
+                    shapeAssessmentResult = null
                 )
                 loadPatternDrawing(nextIndex, newState)
                 newState
@@ -249,26 +294,28 @@ class ChildViewModel  @Inject constructor(
         }
     }
 
-
-    private fun loadActiveStepData() {
+    private fun loadActiveStepData(step: LearningStepEntity) {
         viewModelScope.launch {
             try {
-                val step = learningStepRepository.getActiveStep()
                 val activePatterns = learningStepRepository.getPatternConfigurations(step.id)
-                    .filter { it.isEnabled }
+                    .filter {
+                        it.isEnabled && if(step.isTest) it.isTest else it.isLearning
+                    }
                     .sortedBy { it.order }
 
                 if (activePatterns.isEmpty()) return@launch
 
                 var patternResults = mutableListOf<PatternResult>()
-                val testMode = (step.mode == LearningStepMode.TEST.name)
-                val repetitions = if (testMode) step.testRepetitions else step.repetitions
+                val testMode = step.isTest
+                val repetitions = if (testMode) step.testRepetitions else step.learningRepetitions
                 val learningStepResult = LearningStepResult(
                     name = step.name,
+                    isExample = step.isExample,
                     testMode = testMode,
-                    showStartingPoint = if (testMode) false else step.startingPointEnabled,
-                    timeLimit = if (testMode) step.testTimeLimit else step.timeLimit,
-                    attempts = if (testMode) 1 else step.attempts
+                    showStartingPoint = if (testMode) false else step.learningStartingPointEnabled,
+                    timeLimit = if (testMode) step.testTimeLimit else step.learningTimeLimit,
+                    attempts = if (testMode) 1 else step.learningAttempts,
+                    randomPatternOrder = if (testMode) false else step.learningRandomPatternOrder
                 )
                 for (p in activePatterns) {
                     for (i in 0 until repetitions) {
@@ -289,6 +336,7 @@ class ChildViewModel  @Inject constructor(
                                 patternThickness = p.width,
                                 patternThicknessDp = widthEnum.toDp(),
                                 smoothingEnabled = patternEntity.smoothingEnabled,
+                                patternVariety = p.patternVariety
                             )
 
                             patternResults.add(
@@ -297,14 +345,15 @@ class ChildViewModel  @Inject constructor(
                                     patternName = patternEntity.name,
                                     originalName = patternEntity.name,
                                     config = config,
-                                    attempts = 1
+                                    attempts = 1,
+                                    exampleKey = patternEntity.exampleKey
                                 )
                             )
                         }
                     }
                 }
 
-                val preparedResults = preparePatterns(patternResults, step.randomPatternOrder, testMode)
+                val preparedResults = preparePatterns(patternResults, step.learningRandomPatternOrder, testMode)
 
                 _state.update { it.copy(
                     patternResults = preparedResults,
@@ -326,11 +375,15 @@ class ChildViewModel  @Inject constructor(
         }
 
         // assigning numbers
-        var count = 1
+        val countsByPatternId = mutableMapOf<Long, Int>()
+
         for (p in prepared) {
-            p.patternName = p.originalName + " " + count
+            val number = (countsByPatternId[p.patternId] ?: 0) + 1
+            countsByPatternId[p.patternId] = number
+
+            p.displayNumber = number
+            p.patternName = "${p.originalName} $number"
             p.totalTime = 0.0
-            count++
         }
 
         return prepared

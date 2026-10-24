@@ -10,6 +10,7 @@ import com.example.shared.data.entities.PatternEntity
 import com.example.shared.data.entities.PatternWithStrokes
 import com.example.shared.data.entities.PointEntity
 import com.example.shared.data.entities.StrokeEntity
+import com.example.shared.data.entities.StrokeWithPoints
 
 @Dao
 interface PatternDao {
@@ -34,48 +35,42 @@ interface PatternDao {
 
     @Transaction
     @Query("SELECT * FROM patterns WHERE id = :patternId")
-    suspend fun getPatternWithStrokes(
-        patternId: Long
-    ): PatternWithStrokes?
+    suspend fun getPatternWithStrokes(patternId: Long): PatternWithStrokes?
+
+    @Transaction
+    @Query("SELECT * FROM strokes WHERE id = :strokeId")
+    suspend fun getStrokeWithPoints(strokeId: Long): StrokeWithPoints?
+
+    @Transaction
+    @Query("SELECT * FROM patterns WHERE id = :patternId")
+    suspend fun getPattern(patternId: Long): PatternWithStrokes?
+
+    @Query("SELECT * FROM patterns WHERE exampleKey = :key LIMIT 1")
+    suspend fun getExamplePatternByKey(key: String): PatternEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertPattern(
-        pattern: PatternEntity
-    ): Long
+    suspend fun insertPattern(pattern: PatternEntity): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertStroke(
-        stroke: StrokeEntity
-    ): Long
+    suspend fun insertStroke(stroke: StrokeEntity): Long
 
     @Insert
-    suspend fun insertStrokes(
-        strokes: List<StrokeEntity>
-    ): List<Long>
+    suspend fun insertStrokes(strokes: List<StrokeEntity>): List<Long>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertPoint(
-        point: PointEntity
-    )
+    suspend fun insertPoint(point: PointEntity)
 
     @Insert
-    suspend fun insertPoints(
-        points: List<PointEntity>
-    ): List<Long>
+    suspend fun insertPoints(points: List<PointEntity>): List<Long>
 
     @Delete
-    suspend fun deletePattern(
-        pattern: PatternEntity
-    )
+    suspend fun deletePattern(pattern: PatternEntity)
 
     @Query("DELETE FROM patterns WHERE id = :patternId")
     suspend fun deletePatternById(patternId: Long)
 
     @Transaction
-    suspend fun insertPatternWithStrokes(
-        pattern: PatternEntity,
-        strokes: List<StrokeEntity>,
-        pointsByStroke: List<List<PointEntity>>
+    suspend fun insertPatternWithStrokes(pattern: PatternEntity, strokes: List<StrokeEntity>, pointsByStroke: List<List<PointEntity>>
     ): Long {
         val patternId = insertPattern(pattern)
 
@@ -87,7 +82,7 @@ interface PatternDao {
 
         val strokeIds = insertStrokes(strokesWithPatternId)
 
-        val pointsWithStrokeIds = pointsByStroke.mapIndexed { strokeIndex, points ->
+        val pointsWithStrokeIds = pointsByStroke.flatMapIndexed { strokeIndex, points ->
             val strokeId = strokeIds[strokeIndex]
 
             points.map { point ->
@@ -95,7 +90,7 @@ interface PatternDao {
                     strokeId = strokeId
                 )
             }
-        }.flatten()
+        }
 
         insertPoints(pointsWithStrokeIds)
 

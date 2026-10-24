@@ -1,9 +1,7 @@
 package com.example.friendlylines.therapist_app.ui.configuration.patterns
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -11,56 +9,46 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddCircle
-import androidx.compose.material.icons.outlined.ArrowForwardIos
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.composables.core.ScrollArea
 import com.composables.core.Thumb
 import com.composables.core.VerticalScrollbar
 import com.composables.core.rememberScrollAreaState
 import com.example.friendlylines.R
-import com.example.friendlylines.therapist_app.ui.components.LearningStepsPatternItem
+import com.example.friendlylines.theme.FriendlyLinesColors
+import com.example.friendlylines.theme.scaled
+import com.example.friendlylines.therapist_app.navigation.TherapistNavRoutes
 import com.example.friendlylines.therapist_app.ui.components.TemplateAlertDialog
-import com.example.friendlylines.therapist_app.ui.components.TemplateButton
-import com.example.friendlylines.therapist_app.ui.components.TemplateSearchBox
-//import com.example.friendlylines.therapist_app.ui.configuration.config.LearningStepsPatternConfigDraft
-import com.example.friendlylines.therapist_app.ui.configuration.settings.LearningStepTab
-import com.example.friendlylines.therapist_app.ui.configuration.settings.LearningStepsSettingsViewModel
-import com.example.friendlylines.therapist_app.ui.main.NavRoutes
-import com.example.friendlylines.therapist_app.ui.theme.Primary50
-import com.example.friendlylines.therapist_app.ui.theme.Primary700
-import com.example.friendlylines.therapist_app.ui.theme.Primary900
+import com.example.friendlylines.therapist_app.ui.configuration.patterns.components.LearningStepsPatternListItem
+import com.example.friendlylines.therapist_app.ui.configuration.patterns.components.LearningStepsPatternsListHeader
+import com.example.friendlylines.therapist_app.ui.configuration.patterns.components.LearningStepsPatternsToolbar
+import com.example.friendlylines.therapist_app.ui.materials.components.SCROLLBAR_SHAPE
+import com.example.friendlylines.therapist_app.ui.materials.components.SCROLLBAR_WIDTH
 import com.example.shared.data.drafts.LearningStepsPatternConfigDraft
+import com.example.shared.data.drafts.LearningStepsPatternsDraft
 
 enum class MoveDirection {
     UP,
     DOWN
 }
+
+private val CONTENT_PADDING = 20.dp
 
 @Composable
 fun LearningStepsPatternsScreen(
@@ -70,27 +58,14 @@ fun LearningStepsPatternsScreen(
     onHomeClick: () -> Unit,
     onAddPatternClick: (Int) -> Unit,
     onNextClick: () -> Unit,
-    settingsViewModel: LearningStepsSettingsViewModel
+    onEvent: (LearningStepsPatternsEvent)    -> Unit,
+    draft: LearningStepsPatternsDraft
 ) {
+    val patterns = draft.patterns
+    val scrollToConfigId = draft.scrollToConfigId
+
     val listState = rememberLazyListState()
     val scrollAreaState = rememberScrollAreaState(listState)
-
-    var scrollToConfigId by remember {
-        mutableStateOf<Long?>(null)
-    }
-
-    val parentEntry = remember(navController.currentBackStackEntry) {
-        navController.getBackStackEntry(
-            NavRoutes.LEARNING_STEPS_CREATE
-        )
-    }
-
-    val newConfigId by parentEntry
-        .savedStateHandle
-        .getStateFlow<Long?>("newConfigId", null)
-        .collectAsStateWithLifecycle()
-
-    val patterns by settingsViewModel.patterns.collectAsStateWithLifecycle()
 
     var searchQuery by remember {
         mutableStateOf("")
@@ -121,22 +96,6 @@ fun LearningStepsPatternsScreen(
         mutableStateOf<LearningStepsPatternConfigDraft?>(null)
     }
 
-    LaunchedEffect(patterns, newConfigId) {
-        val configId = newConfigId ?: return@LaunchedEffect
-
-        val index = patterns.indexOfFirst {
-            it.id == configId
-        }
-
-        if (index >= 0) {
-            listState.animateScrollToItem(index)
-
-            parentEntry
-                .savedStateHandle
-                .set<Long?>("newConfigId", null)
-        }
-    }
-
     LaunchedEffect(scrollToConfigId, patterns) {
         val configId = scrollToConfigId ?: return@LaunchedEffect
 
@@ -146,15 +105,17 @@ fun LearningStepsPatternsScreen(
 
         if (index >= 0) {
             listState.animateScrollToItem(index)
-            scrollToConfigId = null
+            onEvent(
+                LearningStepsPatternsEvent.ScrollToConfigHandled
+            )
         }
     }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            //.padding(padding)
-            .background(Primary50)
+            .padding(CONTENT_PADDING.scaled()),
+        verticalArrangement = Arrangement.spacedBy(22.dp.scaled()),
     ) {
         LearningStepsPatternsToolbar(
             searchQuery = searchQuery,
@@ -169,18 +130,14 @@ fun LearningStepsPatternsScreen(
         )
 
         HorizontalDivider(
-            thickness = 1.dp,
-            color = Primary700
+            thickness = 3.dp.scaled(),
+            color = FriendlyLinesColors.PrimaryFriendlyLines.P700
         )
 
         LearningStepsPatternsListHeader()
 
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(
-                    horizontal = 32.dp
-                )
+            modifier = Modifier.fillMaxWidth()
         ) {
             ScrollArea(
                 state = scrollAreaState,
@@ -193,7 +150,6 @@ fun LearningStepsPatternsScreen(
                         state = listState,
                         modifier = Modifier.weight(1f),
                         contentPadding = PaddingValues(
-                            horizontal = 32.dp,
                             vertical = 16.dp
                         ),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -202,27 +158,49 @@ fun LearningStepsPatternsScreen(
                             items = filteredPatterns,
                             key = { _, pattern -> pattern.id }
                         ) { index, pattern ->
-                            LearningStepsPatternItem(
+                            LearningStepsPatternListItem(
                                 index = index,
                                 pattern = pattern,
                                 canMoveUp = index > 0,
                                 canMoveDown = index < patterns.lastIndex,
                                 onEnabledChange = { enabled ->
-                                    settingsViewModel.setPatternEnabled(
-                                        configId = pattern.id,
-                                        enabled = enabled
+                                    onEvent(
+                                        LearningStepsPatternsEvent.SetPatternEnabled(
+                                            configId = pattern.id,
+                                            enabled = enabled
+                                        )
+                                    )
+                                },
+                                onLearningToggled = { isLearning ->
+                                    onEvent(
+                                        LearningStepsPatternsEvent.SetPatternLearning(
+                                            configId = pattern.id,
+                                            isLearning = isLearning
+                                        )
+                                    )
+                                },
+                                onTestToggled = { isTest ->
+                                    onEvent(
+                                        LearningStepsPatternsEvent.SetPatternTest(
+                                            configId = pattern.id,
+                                            isTest = isTest
+                                        )
                                     )
                                 },
                                 onMoveUpClick = {
-                                    settingsViewModel.movePattern(
-                                        configId = pattern.id,
-                                        direction = MoveDirection.UP
+                                    onEvent(
+                                        LearningStepsPatternsEvent.MovePattern(
+                                            configId = pattern.id,
+                                            direction = MoveDirection.UP
+                                        )
                                     )
                                 },
                                 onMoveDownClick = {
-                                    settingsViewModel.movePattern(
-                                        configId = pattern.id,
-                                        direction = MoveDirection.DOWN
+                                    onEvent(
+                                        LearningStepsPatternsEvent.MovePattern(
+                                            configId = pattern.id,
+                                            direction = MoveDirection.DOWN
+                                        )
                                     )
                                 },
                                 onEditClick = {
@@ -243,12 +221,12 @@ fun LearningStepsPatternsScreen(
                     VerticalScrollbar(
                         modifier = Modifier
                             .fillMaxHeight()
-                            .width(4.dp)
+                            .width(SCROLLBAR_WIDTH.scaled())
                     ) {
                         Thumb(
                             Modifier.background(
-                                color = Primary700,
-                                shape = RoundedCornerShape(2.dp)
+                                color = FriendlyLinesColors.PrimaryFriendlyLines.P700,
+                                shape = RoundedCornerShape(SCROLLBAR_SHAPE.scaled())
                             )
                         )
                     }
@@ -266,7 +244,8 @@ fun LearningStepsPatternsScreen(
             onConfirm = {
                 patternConfigToEdit?.let { pattern ->
                     navController.navigate(
-                        NavRoutes.learningStepsPatternAdd(
+                        TherapistNavRoutes.LearningStepsPatternAdd(
+                            stepId = stepId,
                             configId = pattern.id,
                             patternId = pattern.pattern.pattern.id,
                             order = pattern.order
@@ -289,10 +268,11 @@ fun LearningStepsPatternsScreen(
             dismissText = stringResource(R.string.dismiss_button_text),
             onConfirm = {
                 patternConfigToCopy?.let { pattern ->
-                    val newConfigId = settingsViewModel.copyPattern(pattern.id)
-                    if (newConfigId != null) {
-                        scrollToConfigId = newConfigId
-                    }
+                    onEvent(
+                        LearningStepsPatternsEvent.CopyPattern(
+                            configId = pattern.id
+                        )
+                    )
                 }
                 patternConfigToCopy = null
             },
@@ -310,7 +290,11 @@ fun LearningStepsPatternsScreen(
             dismissText = stringResource(R.string.dismiss_button_text),
             onConfirm = {
                 patternConfigToDelete?.let { pattern ->
-                    settingsViewModel.deletePattern(pattern.id)
+                    onEvent(
+                        LearningStepsPatternsEvent.DeletePattern(
+                            configId = pattern.id
+                        )
+                    )
                 }
                 patternConfigToDelete = null
             },
@@ -318,96 +302,5 @@ fun LearningStepsPatternsScreen(
                 patternConfigToDelete = null
             }
         )
-    }
-}
-
-@Composable
-fun LearningStepsPatternsToolbar(
-    searchQuery: String,
-    onSearchQueryChange: (String) -> Unit,
-    onAddPatternClick: () -> Unit,
-    onNextClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(
-                horizontal = 24.dp,
-                vertical = 16.dp
-            ),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        TemplateSearchBox (
-            value = searchQuery,
-            onValueChange = onSearchQueryChange,
-            placeholder = stringResource(R.string.search_box_text),
-            modifier = Modifier.weight(1f)
-        )
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        TemplateButton(
-            modifier = Modifier
-                .wrapContentWidth()
-                .height(54.dp),
-            enabled = true,
-            onClick = onAddPatternClick,
-            text = stringResource(R.string.add_pattern_button_text),
-            icon = Icons.Default.AddCircle
-        )
-
-        Spacer(modifier = Modifier.width(32.dp))
-
-        TemplateButton(
-            modifier = Modifier
-                .wrapContentWidth()
-                .height(54.dp),
-            enabled = true,
-            onClick = onNextClick,
-            text = stringResource(R.string.next_button_text),
-            icon = Icons.Outlined.ArrowForwardIos
-        )
-    }
-}
-
-@Composable
-fun LearningStepsPatternsListHeader(
-    modifier: Modifier = Modifier
-) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(
-                start = 64.dp,
-                end = 96.dp,
-                top = 16.dp,
-                bottom = 16.dp
-            ),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Box(
-            modifier = Modifier.weight(1f),
-            contentAlignment = Alignment.CenterStart
-        ) {
-            Text(
-                text = stringResource(R.string.pattern_list_header_name),
-                fontSize = 16.7.sp,
-                fontWeight = FontWeight.Normal,
-                color = Primary900
-            )
-        }
-
-        Box(
-            modifier = Modifier.weight(1f),
-            contentAlignment = Alignment.CenterEnd
-        ) {
-            Text(
-                text = stringResource(R.string.list_header_actions),
-                fontSize = 16.7.sp,
-                fontWeight = FontWeight.Normal,
-                color = Primary900
-            )
-        }
     }
 }

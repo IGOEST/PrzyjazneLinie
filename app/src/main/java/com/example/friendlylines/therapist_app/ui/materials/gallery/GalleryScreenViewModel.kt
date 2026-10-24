@@ -1,10 +1,7 @@
 package com.example.friendlylines.therapist_app.ui.materials.gallery
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-//import com.example.friendlylines.therapist_app.ui.materials.models.PatternItem
-//import com.example.friendlylines.therapist_app.ui.materials.models.toPatternDrawing
 import com.example.shared.data.repositories.PatternRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -83,29 +80,60 @@ class GalleryScreenViewModel @Inject constructor(
 
     private fun initializePatterns() {
         viewModelScope.launch {
-            patternRepository.insertExamplePatterns()
             loadPatterns()
         }
     }
 
-    private suspend fun loadPatterns() {
-        val patterns = patternRepository.getAllPatterns()
+    private suspend fun refreshGallery() {
+        try {
+            val patterns = patternRepository.getAllPatterns()
 
-        val patternItems = patterns.mapNotNull { pattern ->
-            val patternWithStrokes = patternRepository.getPattern(pattern.id)
+            val patternItems = patterns.mapNotNull { pattern ->
+                val patternWithStrokes = patternRepository.getPattern(pattern.id)
 
-            patternWithStrokes?.let {
-                PatternItem(
-                    pattern = pattern,
-                    drawing = it.toPatternDrawing()
+                patternWithStrokes?.let {
+                    PatternItem(
+                        pattern = pattern,
+                        drawing = it.toPatternDrawing()
+                    )
+                }
+            }
+
+            _state.update {
+                it.copy(
+                    patterns = patternItems,
                 )
             }
+        } catch (e: Exception) {
+            throw e
         }
+    }
 
-        _state.update {
-            it.copy(
-                patterns = patternItems
-            )
+    private fun loadPatterns() {
+        viewModelScope.launch {
+            _state.update {
+                it.copy(
+                    isLoading = true
+                )
+            }
+
+            try {
+                refreshGallery()
+
+                _state.update {
+                    it.copy(
+                        isLoading = false
+                    )
+                }
+            } catch (e: Exception) {
+                _state.update {
+                    it.copy(
+                        isLoading = false
+                    )
+                }
+
+                throw e
+            }
         }
     }
 
@@ -114,7 +142,7 @@ class GalleryScreenViewModel @Inject constructor(
 
         viewModelScope.launch {
             patternRepository.deletePattern(pattern.pattern.id)
-            loadPatterns()
+            refreshGallery()
 
             _state.update {
                 it.copy(
@@ -123,63 +151,4 @@ class GalleryScreenViewModel @Inject constructor(
             }
         }
     }
-
-    fun printPatterns() {
-        viewModelScope.launch {
-            val patterns = patternRepository.getAllPatterns()
-
-            patterns.forEach { pattern ->
-                Log.d("PATTERN_DB", pattern.toString())
-            }
-        }
-    }
 }
-
-//@HiltViewModel
-//class GalleryScreenViewModel @Inject constructor(
-//    private val patternRepository: PatternRepository
-//) : ViewModel() {
-//
-//    private val _patterns = MutableStateFlow<List<PatternItem>>(emptyList())
-//
-//    val patterns: StateFlow<List<PatternItem>> = _patterns.asStateFlow()
-//
-//    fun initializePatterns() {
-//        viewModelScope.launch {
-//            patternRepository.insertExamplePatterns()
-//            loadPatterns()
-//        }
-//    }
-//
-//    private suspend fun loadPatterns() {
-//        val patterns = patternRepository.getAllPatterns()
-//
-//        _patterns.value = patterns.mapNotNull { pattern ->
-//            val patternWithStrokes = patternRepository.getPattern(pattern.id)
-//
-//            patternWithStrokes?.let {
-//                PatternItem(
-//                    pattern = pattern,
-//                    drawing = it.toPatternDrawing()
-//                )
-//            }
-//        }
-//    }
-//
-//    fun deletePattern(patternId: Long) {
-//        viewModelScope.launch {
-//            patternRepository.deletePattern(patternId)
-//            loadPatterns()
-//        }
-//    }
-//
-//    fun printPatterns() {
-//        viewModelScope.launch {
-//            val patterns = patternRepository.getAllPatterns()
-//
-//            patterns.forEach { pattern ->
-//                Log.d("PATTERN_DB", pattern.toString())
-//            }
-//        }
-//    }
-//}

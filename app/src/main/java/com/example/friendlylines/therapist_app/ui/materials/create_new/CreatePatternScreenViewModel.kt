@@ -2,22 +2,17 @@ package com.example.friendlylines.therapist_app.ui.materials.create_new
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.friendlylines.therapist_app.ui.components.NameError
-import com.example.friendlylines.therapist_app.ui.materials.models.toNormalizedStroke
 import com.example.shared.data.entities.PatternWithStrokes
 import com.example.shared.data.models.Point
 import com.example.shared.data.repositories.PatternRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.lang.System.currentTimeMillis
 import javax.inject.Inject
-import com.example.friendlylines.therapist_app.ui.main.ExitDestination
+import com.example.friendlylines.therapist_app.components.NameError
 
 @HiltViewModel
 class CreatePatternScreenViewModel @Inject constructor(
@@ -46,10 +41,7 @@ class CreatePatternScreenViewModel @Inject constructor(
                 }
             }
 
-            CreatePatternScreenEvent.ClearDrawingClicked -> {
-                // Obsługa czyszczenia rysunku pozostaje w Compose,
-                // ponieważ strokes/currentStroke są lokalnym stanem canvasu.
-            }
+            CreatePatternScreenEvent.ClearDrawingClicked -> {}
 
             CreatePatternScreenEvent.SaveClicked -> {
                 _state.update {
@@ -110,16 +102,7 @@ class CreatePatternScreenViewModel @Inject constructor(
                 }
             }
 
-            CreatePatternScreenEvent.ExitRequested -> {
-                _state.update {
-                    it.copy(
-                        showExitDialog = true,
-                        exitDestination = ExitDestination.PREVIOUS
-                    )
-                }
-            }
-
-            is CreatePatternScreenEvent.ExitToDestination -> {
+            is CreatePatternScreenEvent.ExitRequested -> {
                 _state.update {
                     it.copy(
                         showExitDialog = true,
@@ -201,11 +184,7 @@ class CreatePatternScreenViewModel @Inject constructor(
                         savedPatternId = patternId
                     )
                 }
-            } catch (e: Exception) {
-                // Zachowujemy obecne zachowanie:
-                // onError było puste, więc tutaj również
-                // nie pokazujemy żadnego błędu użytkownikowi.
-            }
+            } catch (e: Exception) { }
         }
     }
 
@@ -265,64 +244,3 @@ class CreatePatternScreenViewModel @Inject constructor(
         }
     }
 }
-
-//@HiltViewModel
-//class CreatePatternScreenViewModel @Inject constructor(
-//    private val patternRepository: PatternRepository
-//) : ViewModel() {
-//
-//    fun savePattern(
-//        name: String,
-//        isExample: Boolean,
-//        isComplex: Boolean,
-//        createdAt: Long,
-//        strokes: List<List<Point>>,
-//        smoothingEnabled: Boolean,
-//        onSuccess: (Long) -> Unit ={},
-//        onError: (Throwable) -> Unit = {}
-//    ) {
-//        viewModelScope.launch {
-//            try {
-//                val patternId = patternRepository.savePattern(
-//                    name = name,
-//                    isExample = isExample,
-//                    isComplex = isComplex,
-//                    createdAt = createdAt,
-//                    strokes = strokes,
-//                    smoothingEnabled = smoothingEnabled
-//                )
-//                onSuccess(patternId)
-//            } catch (e: Exception) {
-//                onError(e)
-//            }
-//        }
-//    }
-//
-//    fun getPattern(
-//        patternId: Long,
-//        onResult: (PatternWithStrokes?) -> Unit
-//    ) {
-//        viewModelScope.launch {
-//            try {
-//                val pattern = patternRepository.getPattern(patternId)
-//                onResult(pattern)
-//            } catch (e: Exception) {
-//                onResult(null)
-//            }
-//        }
-//    }
-//
-//    fun checkPatternName(
-//        name: String,
-//        onResult: (Boolean) -> Unit
-//    ) {
-//        viewModelScope.launch {
-//            try {
-//                val exists = patternRepository.patternExistsByName(name)
-//                onResult(exists)
-//            } catch (e: Exception) {
-//                onResult(false)
-//            }
-//        }
-//    }
-//}
