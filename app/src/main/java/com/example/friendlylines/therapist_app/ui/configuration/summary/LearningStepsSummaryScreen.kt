@@ -27,8 +27,11 @@ import com.example.friendlylines.theme.scaled
 import com.example.friendlylines.therapist_app.backgrounds.PlainBackground
 import com.example.friendlylines.therapist_app.components.NameError
 import com.example.friendlylines.therapist_app.ui.components.TemplateButton
+import com.example.friendlylines.therapist_app.ui.configuration.reinforcement.animationThemeLabelRes
+import com.example.friendlylines.therapist_app.ui.configuration.reinforcement.praiseWordLabelRes
 import com.example.friendlylines.therapist_app.ui.configuration.settings.LearningStepsSettingsState
 import com.example.friendlylines.therapist_app.ui.configuration.summary.components.LearningStepSummaryBox
+import com.example.shared.data.drafts.LearningStepsReinforcementsDraft
 
 private val CONTENT_PADDING = 20.dp
 private val SAVE_CONTENT_WIDTH = 350.dp
@@ -51,7 +54,14 @@ fun LearningStepsSummaryScreen(
         randomPatternOrderEnabled = stringResource(R.string.random_pattern_order),
         yes = stringResource(R.string.yes),
         no = stringResource(R.string.no),
-        none = stringResource(R.string.none)
+        none = stringResource(R.string.none),
+        notApplicable = stringResource(R.string.not_applicable),
+        praiseWordsLabel = stringResource(R.string.praise_words_label),
+        praiseWords = LearningStepsReinforcementsDraft.PRAISE_WORDS.associateWith { stringResource(it.praiseWordLabelRes()) },
+        animationLabel = stringResource(R.string.animations_label),
+        animationThemes = LearningStepsReinforcementsDraft.ANIMATION_THEMES.associateWith { stringResource(it.animationThemeLabelRes()) },
+        endAnimation = stringResource(R.string.reinforcements_end_animation_label),
+        endFanfare = stringResource(R.string.reinforcements_end_fanfare_label)
     )
 
     val summaryTable = viewModel.buildSummary(state, strings)

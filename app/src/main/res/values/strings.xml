@@ -229,6 +229,24 @@
     <string name="learning_steps_test_random_order_banner_info">In TEST mode random pattern order is turned off. During the game, patterns will be shown in order determined by their position on the list in PATTERNS tab.</string>
     <string name="learning_steps_test_no_hints_banner_info">In test mode, hints (starting point) and reinforcements are not used and the therapist does not help or talk to the child until the test is finished.</string>
     <string name="child_home_cannot_play_message">No materials configured for this step</string>
+    <string name="reinforcements_help_text">Select the reinforcements that will help the child retain the knowledge.</string>
+    <string name="reinforcements_theme_flowers">Flowers</string>
+    <string name="reinforcements_theme_butterflies">Butterflies</string>
+    <string name="reinforcements_theme_balloons">Baloons</string>
+    <string name="reinforcements_theme_cars">Cars</string>
+    <string name="reinforcements_theme_balls">Balls</string>
+    <string name="reinforcements_praise_good">Good</string>
+    <string name="reinforcements_praise_super">Super</string>
+    <string name="reinforcements_praise_great">Great</string>
+    <string name="reinforcements_praise_bravo">Bravo</string>
+    <string name="reinforcements_praise_header">Choose verbal reinforcements</string>
+    <string name="reinforcements_animation_header">Choose visual reinforcements</string>
+    <string name="reinforcements_end_header">Choose end-of-session reinforcements</string>
+    <string name="reinforcements_end_animation_label">Additional animation at the end of learning</string>
+    <string name="reinforcements_end_fanfare_label">Fanfare sound at the end of learning</string>
+    <string name="not_applicable">X</string>
+    <string name="praise_words_label">Verbal praises</string>
+    <string name="animations_label">Animations</string>
 
 
 </resources>

@@ -5,11 +5,14 @@ import com.example.friendlylines.therapist_app.ui.configuration.patterns.Learnin
 import com.example.friendlylines.therapist_app.ui.configuration.summary.LearningStepsSummaryEvent
 import com.example.friendlylines.therapist_app.ui.configuration.test.LearningStepsTestEvent
 import com.example.friendlylines.therapist_app.navigation.ExitDestination
+import com.example.friendlylines.therapist_app.ui.configuration.reinforcement.LearningStepsReinforcementsEvent
+import com.example.shared.data.drafts.LearningStepsReinforcementsDraft
 
 sealed class LearningStepsSettingsEvent {
     data class Patterns(val event: LearningStepsPatternsEvent): LearningStepsSettingsEvent()
     data class Learning(val event: LearningStepsLearningEvent): LearningStepsSettingsEvent()
     data class Test(val event: LearningStepsTestEvent): LearningStepsSettingsEvent()
+    data class Reinforcements(val event: LearningStepsReinforcementsEvent): LearningStepsSettingsEvent()
     data class Summary(val event: LearningStepsSummaryEvent) : LearningStepsSettingsEvent()
     data object SaveSuccessHandled : LearningStepsSettingsEvent()
     data class NameChanged(val name: String) : LearningStepsSettingsEvent()

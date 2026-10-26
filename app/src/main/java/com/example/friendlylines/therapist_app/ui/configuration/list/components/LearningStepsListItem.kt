@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -35,9 +36,9 @@ import com.example.shared.data.entities.LearningStepEntity
 
 val ROW_HORIZONTAL_PADDING = 20.dp
 val ROW_ITEM_SPACING = 18.dp
-val ROW_CHECKBOX_SLOT_WIDTH = 48.dp
 val ROW_MODE_SECTION_WIDTH = 220.dp
 
+private val ROW_HEIGHT = 48.dp
 private val ROW_VERTICAL_PADDING = 10.dp
 private val ROW_SHADOW_ELEVATION = 2.dp
 private val ROW_MODE_TEXT_SPACING = 8.dp
@@ -71,7 +72,8 @@ fun LearningStepsListItem(
             .padding(
                 horizontal = ROW_HORIZONTAL_PADDING.scaled(),
                 vertical = ROW_VERTICAL_PADDING.scaled()
-            ),
+            )
+            .height(ROW_HEIGHT.scaled()),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(ROW_ITEM_SPACING.scaled())
 
@@ -126,13 +128,15 @@ fun LearningStepsListItem(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(ROW_ACTION_ICON_SPACING.scaled())
             ) {
-                TemplateClickableIcon(
-                    icon = Icons.Filled.Edit,
-                    contentDescription = stringResource(R.string.edit_icon_description),
-                    onClick = onEditClick,
-                    modifier = Modifier.size(ROW_ACTION_ICON_SIZE.scaled()),
-                    enabled = !learningStep.isExample
-                )
+                if (!learningStep.isExample) {
+                    TemplateClickableIcon(
+                        icon = Icons.Filled.Edit,
+                        contentDescription = stringResource(R.string.edit_icon_description),
+                        onClick = onEditClick,
+                        modifier = Modifier.size(ROW_ACTION_ICON_SIZE.scaled()),
+                        enabled = !learningStep.isExample
+                    )
+                }
 
                 TemplateClickableIcon(
                     icon = Icons.Filled.ContentCopy,
@@ -141,13 +145,15 @@ fun LearningStepsListItem(
                     modifier = Modifier.size(ROW_ACTION_ICON_SIZE.scaled())
                 )
 
-                TemplateClickableIcon(
-                    icon = Icons.Filled.Delete,
-                    contentDescription = stringResource(R.string.delete_icon_description),
-                    onClick = onDeleteClick,
-                    modifier = Modifier.size(ROW_ACTION_ICON_SIZE.scaled()),
-                    enabled = !learningStep.isExample
-                )
+                if (!learningStep.isExample) {
+                    TemplateClickableIcon(
+                        icon = Icons.Filled.Delete,
+                        contentDescription = stringResource(R.string.delete_icon_description),
+                        onClick = onDeleteClick,
+                        modifier = Modifier.size(ROW_ACTION_ICON_SIZE.scaled()),
+                        enabled = !learningStep.isExample
+                    )
+                }
             }
         }
     }
@@ -181,7 +187,8 @@ fun LearningStepsListItemAdd(
                 interactionSource = interactionSource,
                 indication = null,
                 onClick = onClick
-            ),
+            )
+            .height(ROW_HEIGHT.scaled()),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(ROW_ITEM_SPACING.scaled())
     ) {

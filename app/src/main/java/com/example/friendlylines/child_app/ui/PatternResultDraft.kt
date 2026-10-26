@@ -23,7 +23,13 @@ data class LearningStepResult(
     val timeLimit: Int,
     val attempts: Int,
     val randomPatternOrder: Boolean,
-    val exampleKey: String? = null
+    val exampleKey: String? = null,
+    val praiseWords: Set<String>,
+    val praiseWordsEnabled: Boolean,
+    val animations: Set<String>,
+    val animationsEnabled: Boolean,
+    val endFanfare: Boolean,
+    val endAnimation: Boolean
 )
 
 data class PatternResult(

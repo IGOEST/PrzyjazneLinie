@@ -1,29 +1,32 @@
 package com.example.friendlylines.child_app.main
 
-import android.os.SystemClock
+import android.util.Log
+import androidx.compose.ui.geometry.Offset
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.friendlylines.child_app.assessment.ShapeCorrectness
+import com.example.friendlylines.child_app.reinforcements.ReinforcementEvent
 import com.example.friendlylines.child_app.ui.LearningStepResult
 import com.example.friendlylines.child_app.ui.PatternConfig
 import com.example.friendlylines.child_app.ui.PatternResult
+import com.example.shared.data.drafts.PatternConfigOptions
 import com.example.shared.data.drafts.PatternWidth
 import com.example.shared.data.drafts.toDp
+import com.example.shared.data.entities.LearningStepEntity
 import com.example.shared.data.models.toPatternDrawing
-import com.example.shared.data.drafts.PatternConfigOptions
+import com.example.shared.data.repositories.LearningStepsRepository
 import com.example.shared.data.repositories.PatternRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import androidx.compose.ui.geometry.Offset
-import com.example.shared.data.entities.LearningStepEntity
-import com.example.shared.data.repositories.LearningStepsRepository
-import com.example.friendlylines.child_app.assessment.ShapeCorrectness
 
 @HiltViewModel
 class ChildViewModel  @Inject constructor(
@@ -33,6 +36,9 @@ class ChildViewModel  @Inject constructor(
 
     private val _state = MutableStateFlow(GameState())
     val state: StateFlow<GameState> = _state.asStateFlow()
+
+    private val _effects = Channel<ReinforcementEvent>(Channel.BUFFERED)
+    val effects = _effects.receiveAsFlow()
 
     private val shapeCorrectness = ShapeCorrectness(
         sampleCount = 32,
@@ -99,7 +105,7 @@ class ChildViewModel  @Inject constructor(
         finishTimerJob?.cancel()
         finishTimerJob = viewModelScope.launch {
             delay(1500L)
-            goToNextPattern()
+            continueAfterDrawing()
         }
     }
 
@@ -272,18 +278,26 @@ class ChildViewModel  @Inject constructor(
 
                 var patternResults = mutableListOf<PatternResult>()
                 val testMode = step.isTest
-                val repetitions = if (testMode) step.testRepetitions else step.learningRepetitions
+                val repetitions = if (testMode) step.test.repetitions else step.learning.repetitions
                 val learningStepResult = LearningStepResult(
                     name = step.name,
                     testMode = testMode,
-                    showStartingPoint = if (testMode) false else step.learningStartingPointEnabled,
-                    timeLimit = if (testMode) step.testTimeLimit else step.learningTimeLimit,
-                    attempts = if (testMode) 1 else step.learningAttempts,
-                    randomPatternOrder = if (testMode) false else step.learningRandomPatternOrder
+                    showStartingPoint = if (testMode) false else step.learning.startingPointEnabled,
+                    timeLimit = if (testMode) step.test.timeLimit else step.learning.timeLimit,
+                    attempts = if (testMode) 1 else step.learning.attempts,
+                    randomPatternOrder = if (testMode) false else step.learning.randomPatternOrder,
+                    praiseWordsEnabled = step.reinforcements.praiseWordsEnabled,
+                    praiseWords = step.reinforcements.enabledPraiseWords,
+                    animationsEnabled = step.reinforcements.animationsEnabled,
+                    animations = step.reinforcements.enabledAnimationThemes,
+                    endFanfare = step.reinforcements.endSessionFanfareEnabled,
+                    endAnimation = step.reinforcements.endSessionAnimationEnabled
                 )
                 for (p in activePatterns) {
                     for (i in 0 until repetitions) {
                         val patternEntity = patternRepository.getPattern(p.patternId)?.pattern
+
+                        Log.e("PatternConfig", "${p.patternColor}, ${p.writingColor}, ${p.backgroundColor}")
 
                         if (patternEntity != null) {
                             val widthEnum = try {
@@ -293,8 +307,7 @@ class ChildViewModel  @Inject constructor(
                             }
 
                             val config = PatternConfig(
-                                patternColor =
-                                    PatternConfigOptions.getPatternAndWritingColor(p.patternColor),
+                                patternColor = PatternConfigOptions.getPatternAndWritingColor(p.patternColor),
                                 traceColor = PatternConfigOptions.getPatternAndWritingColor(p.writingColor),
                                 backgroundColor = PatternConfigOptions.getBackgroundColor(p.backgroundColor),
                                 patternThickness = p.width,
@@ -302,6 +315,8 @@ class ChildViewModel  @Inject constructor(
                                 smoothingEnabled = patternEntity.smoothingEnabled,
                                 patternVariety = p.patternVariety
                             )
+
+                            Log.e("PatternConfig", "${config.patternColor}, ${config.traceColor}, ${config.backgroundColor}")
 
                             patternResults.add(
                                 PatternResult(
@@ -317,7 +332,7 @@ class ChildViewModel  @Inject constructor(
                     }
                 }
 
-                val preparedResults = preparePatterns(patternResults, step.learningRandomPatternOrder, testMode)
+                val preparedResults = preparePatterns(patternResults, step.learning.randomPatternOrder, testMode)
 
                 _state.update { it.copy(
                     patternResults = preparedResults,
@@ -351,6 +366,55 @@ class ChildViewModel  @Inject constructor(
         }
 
         return prepared
+    }
+
+    private fun playPraise(): Boolean {
+        val state = _state.value
+
+        if (state.learningStepResult?.testMode != false) return false
+
+        val praisesEnabled = state.learningStepResult.praiseWordsEnabled
+        val enabledPraiseWords = state.learningStepResult.praiseWords
+
+        if (enabledPraiseWords.isEmpty() || !praisesEnabled) return false
+
+        val praiseWord = enabledPraiseWords.random()
+
+        val result = _effects.trySend(ReinforcementEvent.PlayPraise(praiseWord))
+        return result.isSuccess
+    }
+
+    fun onPraisePlaybackFinished() {
+        if (!playAnimation()) goToNextPattern()
+    }
+
+    private fun playAnimation(): Boolean {
+        val state = _state.value
+
+        if (state.learningStepResult?.testMode != false) return false
+
+        val animationsEnabled = state.learningStepResult.animationsEnabled
+        val animationsThemes = state.learningStepResult.animations
+
+        if (animationsThemes.isEmpty() || !animationsEnabled) return false
+
+        val theme = animationsThemes.random()
+        val result = _effects.trySend(ReinforcementEvent.PlayAnimation(theme))
+        return result.isSuccess
+    }
+
+    fun onAnimationFinished() {
+        goToNextPattern()
+    }
+
+    private fun continueAfterDrawing() {
+        if (playPraise()) {
+            return
+        }
+        if (playAnimation()) {
+            return
+        }
+        goToNextPattern()
     }
 }
 

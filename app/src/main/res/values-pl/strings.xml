@@ -243,5 +243,23 @@
     <string name="learning_steps_test_random_order_banner_info">W trybie TESTU losowa kolejność wzorów jest wyłączona. Podczas gry wzory będą pokazywane w kolejności ustalonej przez ich pozycję na liście w zakładce WZORY.</string>
     <string name="learning_steps_test_no_hints_banner_info">W trybie testu nie używa się podpowiedzi (punktu startowego) i wzmocnień, a terapeuta nie pomaga i nie rozmawia z dzieckiem, aż do zakończenia testu.</string>
     <string name="child_home_cannot_play_message">" Brak materiałów skonfigurowanych dla tego kroku"</string>
+    <string name="reinforcements_help_text">Zaznacz wybrane wzmocnienia, które pomogą dziecku utrwalić wiedzę.</string>
+    <string name="reinforcements_theme_flowers">Kwiatki</string>
+    <string name="reinforcements_theme_butterflies">Motylki</string>
+    <string name="reinforcements_theme_balloons">Balony</string>
+    <string name="reinforcements_theme_cars">Samochodziki</string>
+    <string name="reinforcements_theme_balls">Piłeczki</string>
+    <string name="reinforcements_praise_good">Dobrze</string>
+    <string name="reinforcements_praise_super">Super</string>
+    <string name="reinforcements_praise_great">Świetnie</string>
+    <string name="reinforcements_praise_bravo">Brawo</string>
+    <string name="reinforcements_praise_header">" Wybierz wzmocnienia słowne"</string>
+    <string name="reinforcements_animation_header">Wybierz wzmocnienia wizualne</string>
+    <string name="reinforcements_end_header">Wybierz wzmocnienia końcowe</string>
+    <string name="reinforcements_end_animation_label">Dodatkowa animacja na koniec uczenia</string>
+    <string name="reinforcements_end_fanfare_label">Dźwięk fanfarów na koniec uczenia</string>
+    <string name="not_applicable">X</string>
+    <string name="praise_words_label">Pochwały słowne</string>
+    <string name="animations_label">Animacje</string>
 
 </resources>

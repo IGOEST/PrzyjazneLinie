@@ -7,6 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.DrawStyle
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -35,7 +36,7 @@ fun PatternPreview(
     strokeColor: Color = FriendlyLinesColors.Shades.Black,
     singlePointRadius: Dp = SINGLE_POINT_RADIUS.scaled(),
     showStartingPoint: Boolean = false,
-    startingPointColor: Color = FriendlyLinesColors.Shades.White,
+    startingPointColor: Color = Color(0xFF00D97E),//FriendlyLinesColors.Shades.White,
     patternVariety: Boolean = false,
     varietyKey: Int = 0
 ) {
@@ -60,7 +61,7 @@ fun PatternPreview(
             strokes = drawing.strokes
         ) ?: return@Canvas
 
-        if (bounds.width <= 0f || bounds.height <= 0f) {
+        if (bounds.width < 0f || bounds.height < 0f) {
             return@Canvas
         }
 
@@ -127,9 +128,29 @@ fun PatternPreview(
                         y = (firstPoint.y - bounds.minY) * scale + offset.y
                     )
 
+                    val startRadius = (strokeWidth * 1.1f).toPx()
+
+                    drawCircle(
+                        color = Color(0xFF263238),
+                        radius = startRadius * 0.9f,
+                        center = startPosition
+                    )
+
+                    drawCircle(
+                        color = Color.White,
+                        radius = startRadius * 0.7f,
+                        center = startPosition
+                    )
+
                     drawCircle(
                         color = startingPointColor,
-                        radius = ((strokeWidth / 2) * 1.5f).toPx(),
+                        radius = startRadius * 0.5f,
+                        center = startPosition
+                    )
+
+                    drawCircle(
+                        color = Color.White,
+                        radius = startRadius * 0.2f,
                         center = startPosition
                     )
                 }

@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.friendlylines.therapist_app.components.NameError
 import com.example.friendlylines.therapist_app.ui.configuration.learning.LearningStepsLearningEvent
 import com.example.friendlylines.therapist_app.ui.configuration.patterns.LearningStepsPatternsScreenViewModel
+import com.example.friendlylines.therapist_app.ui.configuration.reinforcement.LearningStepsReinforcementsScreenViewModel
 import com.example.friendlylines.therapist_app.ui.configuration.summary.LearningStepsSummaryEvent
 import com.example.friendlylines.therapist_app.ui.configuration.test.LearningStepsTestEvent
 import com.example.shared.data.drafts.LearningStepsDraft
@@ -56,6 +57,17 @@ class LearningStepsSettingsViewModel @Inject constructor(
                 onTestEvent(event)
             }
 
+            is LearningStepsSettingsEvent.Reinforcements -> {
+                _state.update {
+                    it.copy(
+                        reinforcementsState = LearningStepsReinforcementsScreenViewModel.reduce(
+                            state = it.reinforcementsState,
+                            event = event.event
+                        )
+                    )
+                }
+            }
+
             is LearningStepsSettingsEvent.Summary -> {
                 when (event.event) {
                     LearningStepsSummaryEvent.SaveClicked -> {
@@ -103,7 +115,8 @@ class LearningStepsSettingsViewModel @Inject constructor(
                                     name = name,
                                     patterns = currentState.patternState,
                                     learning = currentState.learningState,
-                                    test = currentState.testState
+                                    test = currentState.testState,
+                                    reinforcements = currentState.reinforcementsState
                                 )
 
                                 val savedLearningStepId = if (stepId == null) {
@@ -179,7 +192,8 @@ class LearningStepsSettingsViewModel @Inject constructor(
                             stepName = draft.name,
                             patternState = draft.patterns,
                             learningState = draft.learning,
-                            testState = draft.test
+                            testState = draft.test,
+                            reinforcementsState = draft.reinforcements
                         )
                     }
                     _state.update {

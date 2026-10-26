@@ -1,13 +1,9 @@
 package com.example.shared.data.repositories
 
-import androidx.compose.ui.res.stringResource
 import com.example.shared.data.daos.LearningStepsDao
-import com.example.shared.data.drafts.AccuracyLevel
 import com.example.shared.data.drafts.LearningStepsDraft
-import com.example.shared.data.drafts.LearningStepsLearningDraft
 import com.example.shared.data.drafts.LearningStepsPatternConfigDraft
 import com.example.shared.data.drafts.LearningStepsPatternsDraft
-import com.example.shared.data.drafts.LearningStepsTestDraft
 import com.example.shared.data.drafts.PatternConfigOptions
 import com.example.shared.data.drafts.PatternWidth
 import com.example.shared.data.entities.LearningStepEntity
@@ -34,27 +30,14 @@ class LearningStepsRepository @Inject constructor(
             id = 0L,
             name = draft.name,
 
-            isActive = false,
-            isLearning = true,
-            isTest = false,
-            isExample = false,
+            isActive = draft.isActive,
+            isLearning = draft.isLearning,
+            isTest = draft.isTest,
+            isExample = draft.isExample,
 
-            // Learning
-            learningRepetitions = draft.learning.repetitions,
-            learningAttempts = draft.learning.attempts,
-            learningTimeLimit = draft.learning.timeLimit,
-            learningAccuracyLevel = draft.learning.accuracyLevel.name,
-            learningStartingPointEnabled = draft.learning.startingPointEnabled,
-            learningRandomPatternOrder = draft.learning.randomPatternOrder,
-
-            // Test
-            overridesLearning = draft.test.overridesLearning,
-            testRepetitions = draft.test.repetitions,
-            testAttempts = draft.test.attempts,
-            testTimeLimit = draft.test.timeLimit,
-            testAccuracyLevel = draft.test.accuracyLevel.name,
-            testStartingPointEnabled = draft.test.startingPointEnabled,
-            testRandomPatternOrder = draft.test.randomPatternOrder
+            learning = draft.learning,
+            test = draft.test,
+            reinforcements = draft.reinforcements
         )
 
         val patternEntities = draft.patterns.patterns.map { patternDraft ->
@@ -117,30 +100,16 @@ class LearningStepsRepository @Inject constructor(
         return LearningStepsDraft(
             id = learningStep.id,
             name = learningStep.name,
+            isActive = learningStep.isActive,
+            isLearning = learningStep.isLearning,
+            isTest = learningStep.isTest,
+            isExample = learningStep.isExample,
             patterns = LearningStepsPatternsDraft(
                 patterns = patternDrafts
             ),
-            learning = LearningStepsLearningDraft(
-                repetitions = learningStep.learningRepetitions,
-                attempts = learningStep.learningAttempts,
-                timeLimit = learningStep.learningTimeLimit,
-                accuracyLevel = AccuracyLevel.valueOf(
-                    learningStep.learningAccuracyLevel
-                ),
-                startingPointEnabled = learningStep.learningStartingPointEnabled,
-                randomPatternOrder = learningStep.learningRandomPatternOrder
-            ),
-            test = LearningStepsTestDraft(
-                overridesLearning = learningStep.overridesLearning,
-                repetitions = learningStep.testRepetitions,
-                attempts = learningStep.testAttempts,
-                timeLimit = learningStep.testTimeLimit,
-                accuracyLevel = AccuracyLevel.valueOf(
-                    learningStep.testAccuracyLevel
-                ),
-                startingPointEnabled = learningStep.testStartingPointEnabled,
-                randomPatternOrder = learningStep.testRandomPatternOrder
-            )
+            learning = learningStep.learning,
+            test = learningStep.test,
+            reinforcements = learningStep.reinforcements
         )
     }
 
@@ -197,20 +166,9 @@ class LearningStepsRepository @Inject constructor(
             isTest = current.isTest,
             isExample = current.isExample,
 
-            learningRepetitions = draft.learning.repetitions,
-            learningAttempts = draft.learning.attempts,
-            learningTimeLimit = draft.learning.timeLimit,
-            learningAccuracyLevel = draft.learning.accuracyLevel.name,
-            learningStartingPointEnabled = draft.learning.startingPointEnabled,
-            learningRandomPatternOrder = draft.learning.randomPatternOrder,
-
-            overridesLearning = draft.test.overridesLearning,
-            testRepetitions = draft.test.repetitions,
-            testAttempts = draft.test.attempts,
-            testTimeLimit = draft.test.timeLimit,
-            testAccuracyLevel = draft.test.accuracyLevel.name,
-            testStartingPointEnabled = draft.test.startingPointEnabled,
-            testRandomPatternOrder = draft.test.randomPatternOrder
+            learning = draft.learning,
+            test = draft.test,
+            reinforcements = draft.reinforcements
         )
 
         val patternEntities = draft.patterns.patterns.map { patternDraft ->

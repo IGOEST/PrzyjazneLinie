@@ -1,7 +1,9 @@
 package com.example.shared.data.database
 
+import androidx.room3.ColumnTypeConverters
 import androidx.room3.Database
 import androidx.room3.RoomDatabase
+import com.example.shared.data.converters.SetStringConverter
 import com.example.shared.data.daos.LearningStepsDao
 import com.example.shared.data.daos.PatternDao
 import com.example.shared.data.entities.LearningStepEntity
@@ -18,8 +20,11 @@ import com.example.shared.data.entities.PointEntity
         LearningStepEntity::class,
         LearningStepPatternEntity::class
     ],
-    version = 10,
+    version = 11,
     exportSchema = false
+)
+@ColumnTypeConverters(
+    SetStringConverter::class
 )
 abstract class FriendlyLinesDatabase : RoomDatabase() {
     abstract fun patternDao(): PatternDao

@@ -22,6 +22,7 @@ import androidx.navigation.NavController
 import com.example.friendlylines.R
 import com.example.friendlylines.components.LoadingScreen
 import com.example.friendlylines.theme.FriendlyLinesColors
+import com.example.friendlylines.therapist_app.backgrounds.MascotNarrowHelpBackground
 import com.example.friendlylines.therapist_app.backgrounds.MascotWideHelpBackground
 import com.example.friendlylines.therapist_app.backgrounds.PlainBackground
 import com.example.friendlylines.therapist_app.navigation.ExitDestination
@@ -169,7 +170,9 @@ fun LearningStepsSettingsScreen(
                     LearningStepsReinforcementScreen(
                         onNextClick = {
                             selectedTab = LearningStepTab.TEST
-                        }
+                        },
+                        onEvent = { viewModel.onEvent(LearningStepsSettingsEvent.Reinforcements(it))},
+                        draft = state.reinforcementsState
                     )
                 }
 
