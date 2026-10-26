@@ -21,10 +21,11 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.unit.IntSize
 import com.example.shared.data.entities.LearningStepEntity
 import com.example.shared.data.repositories.LearningStepsRepository
 import com.example.friendlylines.child_app.assessment.ShapeCorrectness
-import com.example.shared.data.models.Point
+import com.example.friendlylines.therapist_app.ui.materials.geometry.toNormalized
 
 @HiltViewModel
 class ChildViewModel  @Inject constructor(
@@ -46,6 +47,7 @@ class ChildViewModel  @Inject constructor(
     private var timeLimitRemainingMillis: Long? = null
     private var timerStartedAt: Long = 0L
     private var isFinishTimerActive = false
+    private var canvasSize: IntSize = IntSize.Zero
 
     init {
     viewModelScope.launch {
@@ -62,6 +64,7 @@ class ChildViewModel  @Inject constructor(
             is ChildMainEvent.OnPointerDown -> handlePointerDown(event.position)
             is ChildMainEvent.OnPointerMove -> handlePointerMove(event.position)
             is ChildMainEvent.OnPointerUp -> handlePointerUp()
+            is ChildMainEvent.OnCanvasSizeChanged -> {canvasSize = event.size}
             is ChildMainEvent.ToggleMenu -> handleToggleMenu()
             is ChildMainEvent.BackToMainMenu -> handleBackToMainMenu()
             else -> _state.update { currentState ->
@@ -98,17 +101,14 @@ class ChildViewModel  @Inject constructor(
         val result = if (referenceDrawing != null) {
             val userPoints = currentState.userStrokes.map { stroke ->
                 stroke.map { point ->
-                    Point(
-                        x = point.x,
-                        y = point.y
-                    )
+                    Offset(point.x, point.y).toNormalized(canvasSize)
                 }
             }
 
             shapeCorrectness.evaluate(
                 userStrokes = userPoints,
                 referenceStrokes = referenceDrawing.strokes,
-                allowRotation = false
+                canvasSize = canvasSize
             )
         } else {
             null
