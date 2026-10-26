@@ -5,6 +5,9 @@ import kotlinx.serialization.Serializable
 sealed class TherapistNavRoutes {
 
     @Serializable
+    data class InfoSplash(val autoAdvance: Boolean = true) : TherapistNavRoutes()
+
+    @Serializable
     data object Home : TherapistNavRoutes()
 
     @Serializable
