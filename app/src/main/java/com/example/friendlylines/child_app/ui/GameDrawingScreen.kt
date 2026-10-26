@@ -32,7 +32,9 @@ import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.friendlylines.R
@@ -141,6 +143,13 @@ fun GameDrawingScreen(
                             onDragCancel = {
                                 viewModel.onEvent(ChildMainEvent.OnPointerUp)
                             }
+                        )
+                    }
+                    .onSizeChanged{ size ->
+                        viewModel.onEvent(
+                            ChildMainEvent.OnCanvasSizeChanged(
+                                IntSize(size.width, size.height)
+                            )
                         )
                     }
             ) {

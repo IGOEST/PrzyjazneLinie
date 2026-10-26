@@ -27,6 +27,8 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import androidx.compose.ui.unit.IntSize
+import com.example.friendlylines.therapist_app.ui.materials.geometry.toNormalized
 
 @HiltViewModel
 class ChildViewModel  @Inject constructor(
@@ -51,6 +53,7 @@ class ChildViewModel  @Inject constructor(
     private var timeLimitRemainingMillis: Long? = null
     private var timerStartedAt: Long = 0L
     private var isFinishTimerActive = false
+    private var canvasSize: IntSize = IntSize.Zero
 
     init {
     viewModelScope.launch {
@@ -67,6 +70,7 @@ class ChildViewModel  @Inject constructor(
             is ChildMainEvent.OnPointerDown -> handlePointerDown(event.position)
             is ChildMainEvent.OnPointerMove -> handlePointerMove(event.position)
             is ChildMainEvent.OnPointerUp -> handlePointerUp()
+            is ChildMainEvent.OnCanvasSizeChanged -> {canvasSize = event.size}
             is ChildMainEvent.ToggleMenu -> handleToggleMenu()
             is ChildMainEvent.BackToMainMenu -> handleBackToMainMenu()
             else -> _state.update { currentState ->
@@ -97,6 +101,36 @@ class ChildViewModel  @Inject constructor(
     }
 
     private fun handlePointerUp() {
+        val currentState = _state.value
+        val referenceDrawing = currentState.currentPatternDrawing
+
+        val result = if (referenceDrawing != null) {
+            val userPoints = currentState.userStrokes.map { stroke ->
+                stroke.map { point ->
+                    Offset(point.x, point.y).toNormalized(canvasSize)
+                }
+            }
+
+            shapeCorrectness.evaluate(
+                userStrokes = userPoints,
+                referenceStrokes = referenceDrawing.strokes,
+                canvasSize = canvasSize
+            )
+        } else {
+            null
+        }
+        _state.update {
+            it.copy(shapeAssessmentResult = result)
+        }
+
+        if (result != null) {
+            _state.value.patternResults
+                .getOrNull(_state.value.currentPattern)
+                ?.let { patternResult ->
+                    patternResult.shapeMatch = (result.score * 100).toInt()
+                }
+        }
+
         startFinishTimer()  // timer after trace is finished, in case user continues drawing
     }
 
@@ -206,7 +240,8 @@ class ChildViewModel  @Inject constructor(
                 val newState = currentState.copy(
                     currentPattern = nextIndex,
                     userStrokes = emptyList(),
-                    currentPatternDrawing = null
+                    currentPatternDrawing = null,
+                    shapeAssessmentResult = null
                 )
                 loadPatternDrawing(nextIndex, newState)
                 newState
@@ -281,6 +316,7 @@ class ChildViewModel  @Inject constructor(
                 val repetitions = if (testMode) step.test.repetitions else step.learning.repetitions
                 val learningStepResult = LearningStepResult(
                     name = step.name,
+                    isExample = step.isExample,
                     testMode = testMode,
                     showStartingPoint = if (testMode) false else step.learning.startingPointEnabled,
                     timeLimit = if (testMode) step.test.timeLimit else step.learning.timeLimit,

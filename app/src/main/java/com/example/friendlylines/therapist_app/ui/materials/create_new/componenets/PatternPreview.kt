@@ -67,8 +67,8 @@ fun PatternPreview(
 
         val padding = 10.dp.toPx()
 
-        val availableWidth = size.width - 2f * padding
-        val availableHeight = size.height - 2f * padding
+        val availableWidth = (size.width - 2f * padding).coerceAtLeast(1f)
+        val availableHeight = (size.height - 2f * padding).coerceAtLeast(1f)
 
         val radians = Math.toRadians(
             transform.rotation.toDouble()
@@ -77,20 +77,22 @@ fun PatternPreview(
         val cos = kotlin.math.abs(kotlin.math.cos(radians)).toFloat()
         val sin = kotlin.math.abs(kotlin.math.sin(radians)).toFloat()
 
-        val rotatedWidth = bounds.width * cos + bounds.height * sin
-        val rotatedHeight = bounds.width * sin + bounds.height * cos
+        val effectiveWidth = bounds.width.coerceAtLeast(0.001f)
+        val effectiveHeight = bounds.height.coerceAtLeast(0.001f)
+
+        val rotatedWidth = effectiveWidth * cos + effectiveHeight * sin
+        val rotatedHeight = effectiveWidth * sin + effectiveHeight * cos
+
+        val safeRotatedWidth = rotatedWidth.coerceAtLeast(0.001f)
+        val safeRotatedHeight = rotatedHeight.coerceAtLeast(0.001f)
 
         val baseScale = minOf(
-            availableWidth / rotatedWidth,
-            availableHeight / rotatedHeight
+            availableWidth / safeRotatedWidth,
+            availableHeight / safeRotatedHeight
         )
 
-//        val scale = minOf(
-//            availableWidth / bounds.width,
-//            availableHeight / bounds.height
-//        )
-
         val scale = baseScale * transform.scale
+
 
         val drawingWidth = bounds.width * scale
         val drawingHeight = bounds.height * scale

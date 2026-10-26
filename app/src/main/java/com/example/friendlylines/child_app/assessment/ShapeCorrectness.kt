@@ -1,9 +1,7 @@
 package com.example.friendlylines.child_app.assessment
 
+import androidx.compose.ui.unit.IntSize
 import com.example.shared.data.models.Point
-import kotlin.math.atan2
-import kotlin.math.cos
-import kotlin.math.sin
 import kotlin.math.sqrt
 
 data class ShapeAssessmentResult(
@@ -35,7 +33,7 @@ class ShapeCorrectness (
     fun evaluate(
         userStrokes: List<List<Point>>,
         referenceStrokes: List<List<Point>>,
-        allowRotation: Boolean = false
+        canvasSize: IntSize
     ): ShapeAssessmentResult {
 
         if (userStrokes.isEmpty() || referenceStrokes.isEmpty()) {
@@ -65,16 +63,32 @@ class ShapeCorrectness (
         val normalizedReference = normalize(referencePoints)
             ?: return invalidResult()
 
+        android.util.Log.d(
+            "ShapeCorrectness",
+            "user first point=${normalizedUser.first().first()}, " +
+                    "reference first point=${normalizedReference.first().first()}"
+        )
+
         // find the best pairing of user strokes to reference strokes
         val bestDistance = findBestAssignment(
             user = normalizedUser,
-            reference = normalizedReference,
-            allowRotation = allowRotation
+            reference = normalizedReference
         )
 
-        val score = (1.0 - bestDistance / 2.0)
+        if (!bestDistance.isFinite()) return invalidResult()
+
+        val referenceScale = calculateScale(normalizedReference)
+
+        android.util.Log.d(
+            "ShapeCorrectness",
+            "bestDistance=$bestDistance, referenceScale=$referenceScale"
+        )
+
+        val score = (1.0 - bestDistance / referenceScale)
             .coerceIn(0.0, 1.0)
             .toFloat()
+
+        android.util.Log.d("ShapeCorrectness", "score=$score")
 
         return ShapeAssessmentResult(
             score = score,
@@ -83,6 +97,25 @@ class ShapeCorrectness (
             isValid = true
         )
     }
+
+    private fun calculateScale(strokes: List<List<Point>>): Double {
+    val points = strokes.flatten()
+
+    val minX = points.minOf { it.x.toDouble() }
+    val maxX = points.maxOf { it.x.toDouble() }
+    val minY = points.minOf { it.y.toDouble() }
+    val maxY = points.maxOf { it.y.toDouble() }
+
+    android.util.Log.d(
+        "ShapeCorrectness",
+        "minX=$minX maxX=$maxX minY=$minY maxY=$maxY"
+    )
+
+    return sqrt(
+        (maxX - minX) * (maxX - minX) +
+        (maxY - minY) * (maxY - minY)
+    ).coerceAtLeast(1e-6)
+}
 
     // resampling one stroke, so that they consist of the same number of points within same distance
     private fun resample(
@@ -141,7 +174,7 @@ class ShapeCorrectness (
         return result
     }
 
-    // centering and scaling all strokes together (= drawing in different part of the screen is allowed, difference in size is allowed)
+    // centering and all strokes together (= drawing in different part of the screen is allowed, difference in size is not allowed)
     private fun normalize(
         strokes: List<List<Point>>
     ): List<List<Point>>? {
@@ -160,30 +193,13 @@ class ShapeCorrectness (
             }
         }
 
-        // total size of entire drawing after centering
-        val sizeSquared = centeredStrokes.flatten().sumOf { point ->
-            point.x.toDouble() * point.x +
-                point.y.toDouble() * point.y
-        }
-
-        val size = sqrt(sizeSquared)
-        if (size < 1e-9) return null
-
-        return centeredStrokes.map { stroke ->
-            stroke.map { point ->
-                Point(
-                    x = (point.x / size).toFloat(),
-                    y = (point.y / size).toFloat()
-                )
-            }
-        }
+        return centeredStrokes
     }
 
     // trying every possible assignment of strokes
     private fun findBestAssignment(
         user: List<List<Point>>,
-        reference: List<List<Point>>,
-        allowRotation: Boolean
+        reference: List<List<Point>>
     ): Double {
 
         val usedReference = BooleanArray(reference.size)
@@ -199,8 +215,7 @@ class ShapeCorrectness (
 
                 val distance = compareDrawings(
                     user = user,
-                    reference = orderedReference,
-                    allowRotation = allowRotation
+                    reference = orderedReference
                 )
 
                 if (distance < bestDistance) {
@@ -226,65 +241,112 @@ class ShapeCorrectness (
         return bestDistance
     }
 
+    private fun calculateStrokeError(
+        userStroke: List<Point>,
+        referenceStroke: List<Point>
+    ): Double {
+        val n = userStroke.size
+
+        if (n != referenceStroke.size || n == 0) {
+            return Double.POSITIVE_INFINITY
+        }
+
+        fun isClosed(stroke: List<Point>): Boolean {
+            val first = stroke.first()
+            val last = stroke.last()
+
+            val minX = stroke.minOf { it.x }
+            val maxX = stroke.maxOf { it.x }
+            val minY = stroke.minOf { it.y }
+            val maxY = stroke.maxOf { it.y }
+
+            val dx = (maxX - minX).toDouble()
+            val dy = (maxY - minY).toDouble()
+            val diagonal = sqrt(dx * dx + dy * dy)
+
+            val endDx = (first.x - last.x).toDouble()
+            val endDy = (first.y - last.y).toDouble()
+            val endDistance = sqrt(endDx * endDx + endDy * endDy)
+
+            return endDistance <= (diagonal * 0.1).coerceAtLeast(1e-4)
+        }
+
+        fun errorForShift(shift: Int, reversed: Boolean): Double {
+            var error = 0.0
+
+            for (i in 0 until n) {
+                val referenceIndex = if (reversed) {
+                    (shift - i + n) % n
+                } else {
+                    (i + shift) % n
+                }
+
+                val user = userStroke[i]
+                val reference = referenceStroke[referenceIndex]
+
+                val dx = user.x.toDouble() - reference.x
+                val dy = user.y.toDouble() - reference.y
+
+                error += dx * dx + dy * dy
+            }
+
+            return error
+        }
+
+        // for "open" patterns we assume starting points on the edge of patterns
+        if (!isClosed(userStroke) || !isClosed(referenceStroke)) {
+            return minOf(
+                errorForShift(0, reversed = false),
+                errorForShift(n - 1, reversed = true)
+            )
+        }
+
+        // for close patterns we have to test all possible starting points
+        var bestError = Double.POSITIVE_INFINITY
+
+        for (shift in 0 until n) {
+            bestError = minOf(
+                bestError,
+                errorForShift(shift, reversed = false),
+                errorForShift(shift, reversed = true)
+            )
+        }
+
+        return bestError
+    }
+
     // comparing 2 drawings whose strokes are already paired
     private fun compareDrawings(
         user: List<List<Point>>,
-        reference: List<List<Point>>,
-        allowRotation: Boolean
+        reference: List<List<Point>>
     ): Double {
 
-        val flatUser = user.flatten()
-        val flatReference = reference.flatten()
+        var totalSquaredError = 0.0
+        var totalPoints = 0
 
-        val angle = if (allowRotation) {
-            bestRotationAngle(flatUser, flatReference)
-        } else {
-            0.0
+        for (strokeIndex in user.indices) {
+            val userStroke = user[strokeIndex]
+            val referenceStroke= reference[strokeIndex]
+
+            if (userStroke.size != referenceStroke.size) {
+                return Double.POSITIVE_INFINITY
+            }
+
+            var strokeError = calculateStrokeError(
+                userStroke = userStroke,
+                referenceStroke = referenceStroke
+            )
+
+            if (!strokeError.isFinite()) {
+                return Double.POSITIVE_INFINITY
+            }
+
+            totalSquaredError += strokeError
+            totalPoints += userStroke.size
         }
 
-        val c = cos(angle)
-        val s = sin(angle)
-        var squaredError = 0.0
-
-        for (i in flatUser.indices) {
-            val point = flatUser[i]
-            val target = flatReference[i]
-
-            // applying the same rotation to every point in the user drawing
-            val rotatedX = point.x * c - point.y * s
-            val rotatedY = point.x * s + point.y * c
-
-            val dx = rotatedX - target.x
-            val dy = rotatedY - target.y
-
-            squaredError += dx * dx + dy * dy
-        }
-
-        // root mean square error
-        return sqrt(squaredError / flatUser.size)
-    }
-
-    // calculating angle that minimizes squared errors between points
-    private fun bestRotationAngle(
-        user: List<Point>,
-        reference: List<Point>
-    ): Double {
-
-        var dot = 0.0
-        var cross = 0.0
-
-        for (i in user.indices) {
-            val ux = user[i].x.toDouble()
-            val uy = user[i].y.toDouble()
-            val rx = reference[i].x.toDouble()
-            val ry = reference[i].y.toDouble()
-
-            // determining the rotation that best aligns the points
-            dot += ux * rx + uy * ry
-            cross += ux * ry - uy * rx
-        }
-
-        return atan2(cross, dot)
+        if (totalPoints == 0) return Double.POSITIVE_INFINITY
+        return sqrt(totalSquaredError / totalPoints)
     }
 
     // invalid = not enough usable input to compare

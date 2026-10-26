@@ -29,7 +29,8 @@ data class LearningStepResult(
     val animations: Set<String>,
     val animationsEnabled: Boolean,
     val endFanfare: Boolean,
-    val endAnimation: Boolean
+    val endAnimation: Boolean,
+    val isExample: Boolean = false,
 )
 
 data class PatternResult(
@@ -39,7 +40,7 @@ data class PatternResult(
     val config: PatternConfig,
     val correctCoverage: Int = 0,
     val lineOutOfBounds: Int = 0,
-    val shapeMatch: Int = 0,
+    var shapeMatch: Int = 0,
     val correctStartingPoint: Boolean = true,
     var lastAttemptTime: Double = 0.0,
     var totalTime: Double = 0.0,

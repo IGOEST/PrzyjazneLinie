@@ -1,5 +1,6 @@
 package com.example.friendlylines.therapist_app.ui.home
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,6 +27,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.friendlylines.R
+import com.example.friendlylines.name_mapping.ExampleStepsNames
 import com.example.friendlylines.theme.FriendlyLinesColors
 import com.example.friendlylines.theme.FriendlyLinesTextStyles
 import com.example.friendlylines.theme.scaled
@@ -43,6 +45,8 @@ fun HomeScreen(
     onHomeClick: () -> Unit,
 ) {
     val activeLearningStep by viewModel.activeLearningStep.collectAsStateWithLifecycle()
+
+    BackHandler { onBackClick() }
 
     val navController = rememberNavController()
 
@@ -84,8 +88,14 @@ fun HomeScreen(
                         horizontalArrangement = Arrangement.Start,
                     ) {
                         Text(
-                            text = activeLearningStep?.let {
-                                stringResource(R.string.active_learning_step) + " ${it.name}" + " (${if (it.isTest) stringResource(R.string.test_mode) else stringResource(R.string.learning_mode)})"
+                            text = activeLearningStep?.let { step ->
+                                val stepName = if (step.isExample) {
+                                    ExampleStepsNames.exampleLearningStepNameFor(step.name)
+                                } else {
+                                    step.name
+                                }
+
+                                stringResource(R.string.active_learning_step) + " $stepName" + " (${if (step.isTest) stringResource(R.string.test_mode) else stringResource(R.string.learning_mode)})"
                             } ?: stringResource(R.string.no_active_step),
                             style = FriendlyLinesTextStyles.headingH5Regular,
                             color = FriendlyLinesColors.PrimaryFriendlyLines.P1000,

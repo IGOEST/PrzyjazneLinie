@@ -1,11 +1,15 @@
 package com.example.friendlylines.therapist_app.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.example.friendlylines.R
+import com.example.friendlylines.components.InfoSplashScreen
 import com.example.friendlylines.therapist_app.ui.configuration.add.LearningStepsPatternAddScreen
 import com.example.friendlylines.therapist_app.ui.configuration.config.LearningStepPatternConfigScreen
 import com.example.friendlylines.therapist_app.ui.configuration.list.LearningStepsListScreen
@@ -13,6 +17,7 @@ import com.example.friendlylines.therapist_app.ui.configuration.settings.Learnin
 import com.example.friendlylines.therapist_app.ui.home.HomeScreen
 import com.example.friendlylines.therapist_app.ui.materials.create_new.CreatePatternScreen
 import com.example.friendlylines.therapist_app.ui.materials.gallery.GalleryScreen
+import kotlinx.coroutines.delay
 
 @Composable
 fun TherapistNavGraph(
@@ -31,12 +36,39 @@ fun TherapistNavGraph(
         }
     }
 
-    NavHost(navController = navController, startDestination = TherapistNavRoutes.Home) {
+    NavHost(navController = navController, startDestination = TherapistNavRoutes.InfoSplash()) {
+        composable<TherapistNavRoutes.InfoSplash> { backStackEntry ->
+            val route = backStackEntry.toRoute<TherapistNavRoutes.InfoSplash>()
+
+            val navigateToHome: () -> Unit = {
+                if (navController.previousBackStackEntry != null) {
+                    navController.popBackStack()
+                } else {
+                    navController.navigate(TherapistNavRoutes.Home) {
+                        popUpTo<TherapistNavRoutes.InfoSplash> { inclusive = true }
+                    }
+                }
+            }
+
+            if (route.autoAdvance) {
+                LaunchedEffect(Unit) {
+                    delay(5000L)
+                    navigateToHome()
+                }
+            }
+
+            InfoSplashScreen(
+                appTitle = stringResource(R.string.app_name),
+                appIconRes = R.drawable.app_icon,
+                onContinue = navigateToHome
+            )
+        }
+
         composable<TherapistNavRoutes.Home> {
             HomeScreen(
-                onGalleryClick = {navController.navigate(TherapistNavRoutes.Gallery)},
-                onLearningStepsClick = {navController.navigate(TherapistNavRoutes.LearningStepsList)},
-                onBackClick = onBackClick,
+                onGalleryClick = { navController.navigate(TherapistNavRoutes.Gallery) },
+                onLearningStepsClick = { navController.navigate(TherapistNavRoutes.LearningStepsList) },
+                onBackClick = { navController.navigate(TherapistNavRoutes.InfoSplash(autoAdvance = false)) },
                 onHomeClick = onHomeClick
             )
         }
