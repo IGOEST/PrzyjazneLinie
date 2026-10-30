@@ -170,11 +170,11 @@ fun ResultsScreen(
                         )
                         ResultInfoRow(
                             label = stringResource(id = R.string.results_correct_covering) + ": ",
-                            value = "${selectedPattern.correctCoverage}%"
+                            value = "${selectedPattern.insideArea}%"
                         )
                         ResultInfoRow(
                             label = stringResource(id = R.string.results_line_out_of_bounds) + ": ",
-                            value = "${selectedPattern.lineOutOfBounds}%"
+                            value = "${selectedPattern.outsideArea}%"
                         )
                         ResultInfoRow(
                             label = stringResource(id = R.string.results_correct_shape) + ": ",

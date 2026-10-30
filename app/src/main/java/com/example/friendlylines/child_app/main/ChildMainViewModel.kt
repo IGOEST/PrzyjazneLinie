@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.ui.geometry.Offset
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.friendlylines.child_app.assessment.AreaComparison
 import com.example.friendlylines.child_app.assessment.ShapeCorrectness
 import com.example.friendlylines.child_app.reinforcements.ReinforcementEvent
 import com.example.friendlylines.child_app.ui.LearningStepResult
@@ -54,6 +55,10 @@ class ChildViewModel  @Inject constructor(
     private var timerStartedAt: Long = 0L
     private var isFinishTimerActive = false
     private var canvasSize: IntSize = IntSize.Zero
+
+    private var density: Float = 1f
+
+    fun setDensity(value: Float) { density = value }
 
     init {
     viewModelScope.launch {
@@ -119,16 +124,41 @@ class ChildViewModel  @Inject constructor(
         } else {
             null
         }
+
+        val patternResult = currentState.patternResults.getOrNull(currentState.currentPattern)
+
+        val areaResult = if (referenceDrawing != null && patternResult != null) {
+            val thicknessPx = patternResult.config.patternThicknessDp.value * density
+            AreaComparison.evaluatePatternDrawing(
+                userStrokes = currentState.userStrokes,
+                patternDrawing = referenceDrawing,
+                canvasSize = canvasSize,
+                patternThicknessPx = thicknessPx,
+                userThicknessPx = thicknessPx,
+                toleranceMarginPx = (thicknessPx / 2).toInt(),
+                density = density,
+                scaleMultiplier = currentState.patternScale,
+                rotationDegrees = currentState.patternRotation,
+                smoothing = patternResult.config.smoothingEnabled
+            )
+        } else null
+
         _state.update {
             it.copy(shapeAssessmentResult = result)
         }
 
-        if (result != null) {
-            _state.value.patternResults
-                .getOrNull(_state.value.currentPattern)
-                ?.let { patternResult ->
-                    patternResult.shapeMatch = (result.score * 100).toInt()
-                }
+        val currentPatternResult = _state.value.patternResults.getOrNull(_state.value.currentPattern)
+        if (currentPatternResult != null) {
+            if (result != null) {
+                currentPatternResult.shapeMatch = (result.score * 100).toInt()
+            }
+            if (areaResult != null) {
+                val coverage = areaResult.patternCoveragePercent.toDouble()
+                val outside = areaResult.drawingOutsidePercent.toDouble()
+
+                currentPatternResult.insideArea = coverage.toInt()
+                currentPatternResult.outsideArea = outside.toInt()
+            }
         }
 
         startFinishTimer()  // timer after trace is finished, in case user continues drawing
@@ -246,6 +276,14 @@ class ChildViewModel  @Inject constructor(
                 loadPatternDrawing(nextIndex, newState)
                 newState
             } else {
+                val results = currentState.patternResults
+                if (results.isNotEmpty()) {
+                    val avgShape = results.map { it.shapeMatch }.average().toInt()
+
+                    currentState.learningStepResult?.apply {
+                        shapeMatch = avgShape
+                    }
+                }
                 currentState.copy(screenState = "end")
             }
         }
@@ -295,7 +333,14 @@ class ChildViewModel  @Inject constructor(
             try {
                 val patternWithStrokes = patternRepository.getPattern(patternResult.patternId)
                 val drawing = patternWithStrokes?.toPatternDrawing()
-                _state.update { it.copy(currentPatternDrawing = drawing) }
+                val variety = patternResult.config.patternVariety
+                _state.update {
+                    it.copy(
+                        currentPatternDrawing = drawing,
+                        patternScale = if (variety) kotlin.random.Random.nextFloat() * 0.4f + 0.8f else 1f,
+                        patternRotation = if (variety) kotlin.random.Random.nextFloat() * 40f - 20f else 0f
+                    )
+                }
             } catch (_: Exception) {}
         }
     }
