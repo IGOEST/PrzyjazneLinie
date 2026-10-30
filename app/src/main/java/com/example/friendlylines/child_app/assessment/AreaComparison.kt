@@ -10,10 +10,7 @@ import androidx.compose.ui.unit.IntSize
 import com.example.friendlylines.therapist_app.ui.materials.geometry.calculateNormalizedBounds
 import com.example.friendlylines.therapist_app.ui.materials.create_new.componenets.chaikinSmooth
 import com.example.shared.data.models.PatternDrawing
-import java.util.Arrays
 import kotlin.math.max
-import kotlin.math.min
-import kotlin.math.sqrt
 
 /**
  * Result of drawing and pattern area comparison.
@@ -32,7 +29,6 @@ data class AreaComparisonResult(
 )
 
 object AreaComparison {
-    enum class AlignmentMode { NONE, TRANSLATE, TRANSLATE_AND_SCALE }
 
     private const val ALPHA_THRESHOLD = 10
 
@@ -46,8 +42,7 @@ object AreaComparison {
         density: Float = 1f,
         scaleMultiplier: Float = 1f,
         rotationDegrees: Float = 0f,
-        smoothing: Boolean = false,
-        alignmentMode: AlignmentMode = AlignmentMode.NONE
+        smoothing: Boolean = false
     ): AreaComparisonResult {
         val patternStrokes = patternDrawing.toCanvasPixelStrokes(
             canvasSize = canvasSize,
@@ -62,8 +57,7 @@ object AreaComparison {
             canvasSize = canvasSize,
             patternThicknessPx = patternThicknessPx,
             userThicknessPx = userThicknessPx,
-            toleranceMarginPx = toleranceMarginPx,
-            alignmentMode = alignmentMode
+            toleranceMarginPx = toleranceMarginPx
         )
     }
 
@@ -75,14 +69,11 @@ object AreaComparison {
         patternThicknessPx: Float = 20f,
         userThicknessPx: Float = 20f,
         toleranceMarginPx: Int = 10,
-        maxEvaluationDimension: Int = 500,
-        alignmentMode: AlignmentMode = AlignmentMode.NONE
+        maxEvaluationDimension: Int = 500
     ): AreaComparisonResult {
         if (canvasSize.width <= 0 || canvasSize.height <= 0 || userStrokes.isEmpty() || patternStrokes.isEmpty()) {
             return emptyResult()
         }
-
-        val alignedPattern = alignPattern(patternStrokes, userStrokes, alignmentMode)
 
         val maxDim = max(canvasSize.width, canvasSize.height)
         val scale = if (maxDim > maxEvaluationDimension) maxEvaluationDimension.toFloat() / maxDim else 1.0f
@@ -94,9 +85,9 @@ object AreaComparison {
         val userThickness = (userThicknessPx * scale).coerceAtLeast(1f)
         val tolerance = (toleranceMarginPx * scale).coerceAtLeast(0f)
 
-        val patternMask = renderMask(alignedPattern, scale, evalWidth, evalHeight, patternThickness)
+        val patternMask = renderMask(patternStrokes, scale, evalWidth, evalHeight, patternThickness)
         val patternTolMask = if (tolerance > 0f)
-            renderMask(alignedPattern, scale, evalWidth, evalHeight, patternThickness + 2f * tolerance)
+            renderMask(patternStrokes, scale, evalWidth, evalHeight, patternThickness + 2f * tolerance)
         else patternMask
 
         val userMask = renderMask(userStrokes, scale, evalWidth, evalHeight, userThickness)
@@ -105,27 +96,6 @@ object AreaComparison {
         else userMask
 
         return compareMasks(patternMask, patternTolMask, userMask, userTolMask)
-    }
-
-    fun evaluateBitmaps(
-        patternBitmap: Bitmap,
-        userDrawingBitmap: Bitmap,
-        toleranceMarginPx: Int = 10
-    ): AreaComparisonResult {
-        val width = patternBitmap.width
-        val height = patternBitmap.height
-
-        if (width <= 0 || height <= 0 || userDrawingBitmap.width != width || userDrawingBitmap.height != height) {
-            return emptyResult()
-        }
-
-        val patternMask = maskFromBitmap(patternBitmap)
-        val userMask = maskFromBitmap(userDrawingBitmap)
-
-        val patternTol = if (toleranceMarginPx > 0) dilateMask(patternMask, width, height, toleranceMarginPx) else patternMask
-        val userTol = if (toleranceMarginPx > 0) dilateMask(userMask, width, height, toleranceMarginPx) else userMask
-
-        return compareMasks(patternMask, patternTol, userMask, userTol)
     }
 
     private fun compareMasks(
@@ -236,77 +206,6 @@ object AreaComparison {
                     path.lineTo(stroke[i].x * scale, stroke[i].y * scale)
                 }
                 canvas.drawPath(path, paint)
-            }
-        }
-    }
-
-    private fun dilateMask(mask: BooleanArray, width: Int, height: Int, radius: Int): BooleanArray {
-        val dilated = BooleanArray(mask.size)
-        val spans = IntArray(2 * radius + 1) { i ->
-            val dy = i - radius
-            sqrt((radius * radius - dy * dy).toFloat()).toInt()
-        }
-        for (y in 0 until height) {
-            for (x in 0 until width) {
-                if (!mask[y * width + x]) continue
-                for (dy in -radius..radius) {
-                    val ny = y + dy
-                    if (ny < 0 || ny >= height) continue
-                    val dx = spans[dy + radius]
-                    val from = ny * width + (x - dx).coerceAtLeast(0)
-                    val to = ny * width + (x + dx).coerceAtMost(width - 1) + 1
-                    Arrays.fill(dilated, from, to, true)
-                }
-            }
-        }
-        return dilated
-    }
-
-    // ---------- optional alignment ----------
-
-    private class Box(val minX: Float, val minY: Float, val maxX: Float, val maxY: Float) {
-        val w get() = maxX - minX
-        val h get() = maxY - minY
-        val cx get() = (minX + maxX) / 2f
-        val cy get() = (minY + maxY) / 2f
-    }
-
-    private fun boundsOf(strokes: List<List<Offset>>): Box? {
-        var minX = Float.MAX_VALUE; var minY = Float.MAX_VALUE
-        var maxX = -Float.MAX_VALUE; var maxY = -Float.MAX_VALUE
-        var any = false
-        strokes.forEach { s -> s.forEach { p ->
-            any = true
-            minX = min(minX, p.x); minY = min(minY, p.y)
-            maxX = max(maxX, p.x); maxY = max(maxY, p.y)
-        } }
-        return if (any) Box(minX, minY, maxX, maxY) else null
-    }
-
-    private fun alignPattern(
-        pattern: List<List<Offset>>,
-        user: List<List<Offset>>,
-        mode: AlignmentMode
-    ): List<List<Offset>> {
-        if (mode == AlignmentMode.NONE) return pattern
-        val pb = boundsOf(pattern) ?: return pattern
-        val ub = boundsOf(user) ?: return pattern
-
-        val eps = 1e-3f
-        val s = if (mode == AlignmentMode.TRANSLATE_AND_SCALE) {
-            val sx = if (pb.w > eps && ub.w > eps) ub.w / pb.w else null
-            val sy = if (pb.h > eps && ub.h > eps) ub.h / pb.h else null
-            when {
-                sx != null && sy != null -> min(sx, sy)
-                sx != null -> sx
-                sy != null -> sy
-                else -> 1f
-            }
-        } else 1f
-
-        return pattern.map { stroke ->
-            stroke.map { p ->
-                Offset((p.x - pb.cx) * s + ub.cx, (p.y - pb.cy) * s + ub.cy)
             }
         }
     }
