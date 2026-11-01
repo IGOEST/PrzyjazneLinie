@@ -9,6 +9,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.IntSize
 import com.example.friendlylines.therapist_app.ui.materials.geometry.calculateNormalizedBounds
 import com.example.friendlylines.therapist_app.ui.materials.create_new.componenets.chaikinSmooth
+import com.example.shared.data.drafts.AccuracyLevel
 import com.example.shared.data.models.PatternDrawing
 import kotlin.math.max
 
@@ -36,9 +37,9 @@ object AreaComparison {
         userStrokes: List<List<Offset>>,
         patternDrawing: PatternDrawing,
         canvasSize: IntSize,
+        accuracyLevel: AccuracyLevel,
         patternThicknessPx: Float = 20f,
         userThicknessPx: Float = 20f,
-        toleranceMarginPx: Int = 10,
         density: Float = 1f,
         scaleMultiplier: Float = 1f,
         rotationDegrees: Float = 0f,
@@ -55,20 +56,20 @@ object AreaComparison {
             userStrokes = userStrokes,
             patternStrokes = patternStrokes,
             canvasSize = canvasSize,
+            accuracyLevel = accuracyLevel,
             patternThicknessPx = patternThicknessPx,
-            userThicknessPx = userThicknessPx,
-            toleranceMarginPx = toleranceMarginPx
+            userThicknessPx = userThicknessPx
         )
     }
 
-    // toleranceMarginPx is the distance that is still counted as "inside" the pattern.
+    // accuracyLevel represents the distance that is still counted as "inside" the pattern.
     fun evaluateStrokes(
         userStrokes: List<List<Offset>>,
         patternStrokes: List<List<Offset>>,
         canvasSize: IntSize,
+        accuracyLevel: AccuracyLevel = AccuracyLevel.MEDIUM,
         patternThicknessPx: Float = 20f,
         userThicknessPx: Float = 20f,
-        toleranceMarginPx: Int = 10,
         maxEvaluationDimension: Int = 500
     ): AreaComparisonResult {
         if (canvasSize.width <= 0 || canvasSize.height <= 0 || userStrokes.isEmpty() || patternStrokes.isEmpty()) {
@@ -83,7 +84,8 @@ object AreaComparison {
 
         val patternThickness = (patternThicknessPx * scale).coerceAtLeast(1f)
         val userThickness = (userThicknessPx * scale).coerceAtLeast(1f)
-        val tolerance = (toleranceMarginPx * scale).coerceAtLeast(0f)
+
+        val tolerance = (accuracyLevel.toleranceMarginPx * scale).coerceAtLeast(0f)
 
         val patternMask = renderMask(patternStrokes, scale, evalWidth, evalHeight, patternThickness)
         val patternTolMask = if (tolerance > 0f)
