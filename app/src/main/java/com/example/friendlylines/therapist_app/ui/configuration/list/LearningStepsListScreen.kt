@@ -36,6 +36,7 @@ import com.composables.core.VerticalScrollbar
 import com.composables.core.rememberScrollAreaState
 import com.example.friendlylines.R
 import com.example.friendlylines.components.LoadingScreen
+import com.example.friendlylines.name_mapping.ExampleStepsNames
 import com.example.friendlylines.theme.FriendlyLinesColors
 import com.example.friendlylines.theme.scaled
 import com.example.friendlylines.therapist_app.backgrounds.PlainBackground
@@ -318,6 +319,7 @@ fun LearningStepsListScreen(
             )
         }
 
+        val translatedName = learningStepToCopy?.let {learningStep -> ExampleStepsNames.exampleLearningStepNameFor(learningStep.name) }
         if (learningStepToCopy != null) {
             TemplateAlertDialog(
                 title = stringResource(R.string.copy_dialog_title),
@@ -326,11 +328,14 @@ fun LearningStepsListScreen(
                 dismissText = stringResource(R.string.dismiss_button_text),
                 onConfirm = {
                     learningStepToCopy?.let { learningStep ->
-                        viewModel.onEvent(
-                            LearningStepsListEvent.CopyClicked(
-                                id = learningStep.id,
-                                copySuffix = copySuffix)
-                        )
+                        translatedName?.let { name ->
+                            viewModel.onEvent(
+                                LearningStepsListEvent.CopyClicked(
+                                    id = learningStep.id,
+                                    originalName = translatedName,
+                                    copySuffix = copySuffix)
+                            )
+                        }
                     }
                     learningStepToCopy = null
                 },

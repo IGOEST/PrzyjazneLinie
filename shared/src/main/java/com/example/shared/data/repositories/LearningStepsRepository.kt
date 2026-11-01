@@ -198,12 +198,17 @@ class LearningStepsRepository @Inject constructor(
         learningStepsDao.deleteLearningStepWithPatterns(id)
     }
 
-    suspend fun copyLearningStep(id: Long, copySuffix: String): Long {
+    suspend fun copyLearningStep(id: Long, originalName: String, copySuffix: String): Long {
         val source = learningStepsDao.getLearningStepWithPatterns(id) ?: return 0L
+
+        val newName = uniqueCopyName(
+            originalName = originalName,
+            copySuffix = copySuffix
+        )
 
         val newLearningStep = source.learningStep.copy(
             id = 0L,
-            name = "${source.learningStep.name} - $copySuffix",
+            name = newName,
             isActive = false,
             isExample = false
         )
@@ -222,6 +227,31 @@ class LearningStepsRepository @Inject constructor(
         }
 
         return newLearningStepId
+    }
+
+    private suspend fun uniqueCopyName(
+        originalName: String,
+        copySuffix: String
+    ): String {
+        val existingNames = learningStepsDao.getAll()
+            .map { it.name }
+            .toSet()
+
+        val baseName = "$originalName - $copySuffix"
+
+        if (baseName !in existingNames) {
+            return baseName
+        }
+
+        var n = 2
+        var nextCopyName: String
+
+        do {
+            nextCopyName = "$baseName $n"
+            n++
+        } while (nextCopyName in existingNames)
+
+        return nextCopyName
     }
 
     suspend fun insertExampleLearningSteps() {

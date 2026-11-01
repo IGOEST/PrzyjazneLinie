@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Friendly Lines</string>
-    <string name="title_therapist">Therapist</string>
-    <string name="title_child">Child</string>
+    <string name="title_therapist">Friendly Lines Settings</string>
+    <string name="title_child">Friendly Lines</string>
     <string name="active_learning_step">Active learning step:</string>
     <string name="example">Example</string>
     <string name="play_button_description">Play</string>
@@ -229,6 +229,7 @@
     <string name="reinforcements_theme_balloons">Baloons</string>
     <string name="reinforcements_theme_cars">Cars</string>
     <string name="reinforcements_theme_balls">Balls</string>
+    <string name="reinforcements_theme_sea">Sea creatures</string>
     <string name="reinforcements_praise_good">Good</string>
     <string name="reinforcements_praise_super">Super</string>
     <string name="reinforcements_praise_great">Great</string>

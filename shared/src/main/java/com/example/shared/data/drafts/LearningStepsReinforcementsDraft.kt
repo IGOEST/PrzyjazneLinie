@@ -23,6 +23,7 @@ data class LearningStepsReinforcementsDraft(
                 "balloons",
                 "cars",
                 "balls",
+                "sea_creatures"
             )
     }
 }

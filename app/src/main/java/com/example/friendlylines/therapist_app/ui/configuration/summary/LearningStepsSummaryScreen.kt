@@ -141,7 +141,7 @@ fun LearningStepsSummaryScreen(
 
                     TemplateButton(
                         modifier = Modifier.fillMaxWidth(),
-                        enabled = state.stepName.isNotBlank(),
+                        enabled = state.stepName.isNotBlank() && state.patternState.patterns.isNotEmpty(),
                         onClick = onSaveClick,
                         text = stringResource(R.string.save_button_text),
                         icon = Icons.Filled.Save
