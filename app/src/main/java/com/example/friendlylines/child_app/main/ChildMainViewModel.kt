@@ -1,6 +1,5 @@
 package com.example.friendlylines.child_app.main
 
-import android.util.Log
 import androidx.compose.ui.geometry.Offset
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -29,6 +28,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import androidx.compose.ui.unit.IntSize
+import com.example.friendlylines.child_app.assessment.toCanvasPixelStrokes
 import com.example.friendlylines.therapist_app.ui.materials.geometry.toNormalized
 import com.example.shared.data.drafts.AccuracyLevel
 
@@ -47,9 +47,7 @@ class ChildViewModel  @Inject constructor(
     private val _effects = Channel<ReinforcementEvent>(Channel.BUFFERED)
     val effects = _effects.receiveAsFlow()
 
-    private val shapeCorrectness = ShapeCorrectness(
-        correctThreshold = 0.80f
-    )
+    private val shapeCorrectness = ShapeCorrectness()
 
     private var gameTimerJob: Job? = null
     private var finishTimerJob: Job? = null
@@ -132,8 +130,21 @@ class ChildViewModel  @Inject constructor(
         val referenceDrawing = currentState.currentPatternDrawing
 
         // shape assessment
-        val shapeResult = if (referenceDrawing != null) {
+        val patternResult = currentState.patternResults.getOrNull(currentState.currentPattern)
+        val shapeResult = if (referenceDrawing != null && patternResult != null) {
             val userPoints = currentState.userStrokes.map { stroke ->
+                stroke.map { point ->
+                    Offset(point.x, point.y).toNormalized(canvasSize)
+                }
+            }
+
+            val referencePoints = referenceDrawing.toCanvasPixelStrokes(
+                canvasSize = canvasSize,
+                density = density,
+                scaleMultiplier = currentState.patternScale,
+                rotationDegrees = currentState.patternRotation,
+                smoothing = patternResult.config.smoothingEnabled
+            ).map { stroke ->
                 stroke.map { point ->
                     Offset(point.x, point.y).toNormalized(canvasSize)
                 }
@@ -141,16 +152,13 @@ class ChildViewModel  @Inject constructor(
 
             shapeCorrectness.evaluateShape(
                 userStrokes = userPoints,
-                referenceStrokes = referenceDrawing.strokes,
-                canvasSize = canvasSize
+                referenceStrokes = referencePoints
             )
         } else {
             null
         }
 
         // area assessment
-        val patternResult = currentState.patternResults.getOrNull(currentState.currentPattern)
-
         val areaResult = if (referenceDrawing != null && patternResult != null) {
             val thicknessPx = patternResult.config.patternThicknessDp.value * density
             AreaComparison.evaluatePatternDrawing(
@@ -428,8 +436,6 @@ class ChildViewModel  @Inject constructor(
                     for (i in 0 until repetitions) {
                         val patternEntity = patternRepository.getPattern(p.patternId)?.pattern
 
-                        Log.e("PatternConfig", "${p.patternColor}, ${p.writingColor}, ${p.backgroundColor}")
-
                         if (patternEntity != null) {
                             val widthEnum = try {
                                 PatternWidth.valueOf(p.width)
@@ -446,8 +452,6 @@ class ChildViewModel  @Inject constructor(
                                 smoothingEnabled = patternEntity.smoothingEnabled,
                                 patternVariety = p.patternVariety
                             )
-
-                            Log.e("PatternConfig", "${config.patternColor}, ${config.traceColor}, ${config.backgroundColor}")
 
                             patternResults.add(
                                 PatternResult(

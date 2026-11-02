@@ -1,6 +1,5 @@
 package com.example.friendlylines.child_app.assessment
 
-import androidx.compose.ui.unit.IntSize
 import com.example.shared.data.models.Point
 import kotlin.math.acos
 import kotlin.math.sqrt
@@ -8,7 +7,6 @@ import kotlin.math.sqrt
 data class ShapeAssessmentResult(
     val score: Float,   // 0.0 = very different, 1.0 = identical
     val distance: Float,    // lower = better match
-    val isCorrect: Boolean,
     val isValid: Boolean
 )
 
@@ -22,14 +20,12 @@ data class ShapeAssessmentResult(
  */
 class ShapeCorrectness (
     private val minSampleCount: Int = 32,
-    private val maxSampleCount: Int = 256,
-    private val pointsDistanceToSample: Double = 0.01,
-    private val correctThreshold: Float = 0.80f,
+    private val maxSampleCount: Int = 1024,
+    private val sampleCountMultiplier: Double = 100.0,
     private val maxStrokesToMatch: Int = 8,
     private val turnImportance: Double = 0.5
 ) {
     init {
-        require(correctThreshold in 0f..1f)
         require(maxStrokesToMatch >= 1)
     }
     /**
@@ -37,8 +33,7 @@ class ShapeCorrectness (
      */
     fun evaluateShape(
         userStrokes: List<List<Point>>,
-        referenceStrokes: List<List<Point>>,
-        canvasSize: IntSize
+        referenceStrokes: List<List<Point>>
     ): ShapeAssessmentResult {
 
         if (userStrokes.isEmpty() || referenceStrokes.isEmpty()) {
@@ -100,7 +95,6 @@ class ShapeCorrectness (
         return ShapeAssessmentResult(
             score = score,
             distance = bestDistance.toFloat(),
-            isCorrect = score >= correctThreshold,
             isValid = true
         )
     }
@@ -112,24 +106,35 @@ class ShapeCorrectness (
         val strokeLength = calculateStrokeLength(stroke)
         val complexity = calculateStrokeComplexity(stroke)
 
-        return (strokeLength * complexity * pointsDistanceToSample)
+        val rawSampleCount = strokeLength * sampleCountMultiplier * complexity
+
+        val sampleCount = rawSampleCount
             .toInt()
             .coerceIn(minSampleCount, maxSampleCount)
+
+        return sampleCount
     }
 
     private fun calculateStrokeComplexity(stroke: List<Point>): Double {
         if (stroke.size < 3) return 1.0
 
         var totalDirectionChanges = 0.0
+        val noise = Math.toRadians(10.0)
 
         for (i in 1 until stroke.lastIndex) {
-            totalDirectionChanges += calculateTurn(
+            val turn = calculateTurn(
                 stroke = stroke,
                 index = i,
                 closed = false
             )
+
+            if (turn > noise) {
+                totalDirectionChanges += turn
+            }
         }
-        return 1.0 + totalDirectionChanges/ Math.PI
+
+        val complexity = 1.0 + totalDirectionChanges/ Math.PI
+        return complexity
     }
 
     private fun calculateStrokeLength(stroke: List<Point>): Double {
@@ -304,7 +309,7 @@ class ShapeCorrectness (
                 return Double.POSITIVE_INFINITY
             }
 
-            var strokeError = compareStrokes(
+            val strokeError = compareStrokes(
                 userStroke = userStroke,
                 referenceStroke = referenceStroke
             )
@@ -472,7 +477,7 @@ class ShapeCorrectness (
 
         if (length1 < 1e-6 || length2 < 1e-6) return 0.0
 
-        // calculating dot product, dividing by lengths so lengths dont matter
+        // calculating dot product, dividing by lengths so lengths don't matter
         val scalar = (x1*x2 + y1*y2)/(length1*length2)
 
         // using acos to return angle
@@ -510,7 +515,6 @@ class ShapeCorrectness (
         return ShapeAssessmentResult(
             score = 0f,
             distance = Float.POSITIVE_INFINITY,
-            isCorrect = false,
             isValid = false
         )
     }
