@@ -62,6 +62,11 @@ private val themeDrawables: Map<String, List<Int>> = mapOf(
         R.drawable.animation_ball_1,
         R.drawable.animation_ball_2,
         R.drawable.animation_ball_3
+    ),
+    "sea_creatures" to listOf(
+        R.drawable.animation_sea_fish,
+        R.drawable.animation_sea_octopus,
+        R.drawable.animation_sea_seahorse,
     )
 )
 

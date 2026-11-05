@@ -38,10 +38,14 @@ fun PatternPreview(
     showStartingPoint: Boolean = false,
     startingPointColor: Color = Color(0xFF00D97E),//FriendlyLinesColors.Shades.White,
     patternVariety: Boolean = false,
-    varietyKey: Int = 0
+    varietyKey: Int = 0,
+    scaleMultiplier: Float? = null,
+    rotationDegrees: Float? = null
 ) {
-    val transform = remember(drawing, patternVariety, varietyKey) {
-        if (patternVariety) {
+    val transform = remember(drawing, patternVariety, varietyKey, scaleMultiplier, rotationDegrees) {
+        if (scaleMultiplier != null && rotationDegrees != null) {
+            PatternTransform(scale = scaleMultiplier, rotation = rotationDegrees)
+        } else if (patternVariety) {
             PatternTransform(
                 scale = Random.nextFloat() * 0.4f + 0.8f,
                 rotation = Random.nextFloat() * 40f - 20f

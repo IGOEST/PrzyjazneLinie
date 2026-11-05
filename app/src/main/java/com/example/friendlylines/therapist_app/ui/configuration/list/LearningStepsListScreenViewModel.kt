@@ -56,6 +56,7 @@ class LearningStepsListScreenViewModel @Inject constructor(
                 viewModelScope.launch {
                     val newLearningStepId = learningStepsRepository.copyLearningStep(
                         id = event.id,
+                        originalName = event.originalName,
                         copySuffix = event.copySuffix
                     )
 

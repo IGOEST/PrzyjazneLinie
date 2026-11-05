@@ -17,5 +17,7 @@ data class GameState(
     val isMenuOpen: Boolean = false,
     val activeStepName: String = "",
     val activeStepLearning: Boolean = false,
-    val activeStepTest: Boolean = false
+    val activeStepTest: Boolean = false,
+    val patternScale: Float = 1f,
+    val patternRotation: Float = 0f,
 )

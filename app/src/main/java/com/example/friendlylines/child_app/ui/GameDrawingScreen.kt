@@ -33,6 +33,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -56,6 +57,9 @@ fun GameDrawingScreen(
     viewModel: ChildViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
+
+    val density = LocalDensity.current.density
+    LaunchedEffect(density) { viewModel.setDensity(density) }
 
     var activeAnimationTheme by remember {
         mutableStateOf<String?>(null)
@@ -165,7 +169,9 @@ fun GameDrawingScreen(
                         strokeWidth = currentPatternResult?.config?.patternThicknessDp ?: 10.dp.scaled(),
                         showStartingPoint = (gameState.learningStepResult?.testMode == false && gameState.learningStepResult?.showStartingPoint == true),
                         patternVariety = currentPatternResult?.config?.patternVariety ?: false,
-                        varietyKey = gameState.currentPattern
+                        varietyKey = gameState.currentPattern,
+                        scaleMultiplier = gameState.patternScale,
+                        rotationDegrees = gameState.patternRotation
                     )
                 }
 

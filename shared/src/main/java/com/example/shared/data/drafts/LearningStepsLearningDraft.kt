@@ -1,9 +1,9 @@
 package com.example.shared.data.drafts
 
-enum class AccuracyLevel {
-    EASY,
-    MEDIUM,
-    HARD
+enum class AccuracyLevel(val toleranceMarginPx: Float) {
+    EASY(20f),
+    MEDIUM(10f),
+    HARD(5f)
 }
 
 data class LearningStepsLearningDraft(

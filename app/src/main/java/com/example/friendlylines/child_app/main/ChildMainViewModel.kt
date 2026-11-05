@@ -1,9 +1,9 @@
 package com.example.friendlylines.child_app.main
 
-import android.util.Log
 import androidx.compose.ui.geometry.Offset
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.friendlylines.child_app.assessment.AreaComparison
 import com.example.friendlylines.child_app.assessment.ShapeCorrectness
 import com.example.friendlylines.child_app.reinforcements.ReinforcementEvent
 import com.example.friendlylines.child_app.ui.LearningStepResult
@@ -28,7 +28,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import androidx.compose.ui.unit.IntSize
+import com.example.friendlylines.child_app.assessment.toCanvasPixelStrokes
 import com.example.friendlylines.therapist_app.ui.materials.geometry.toNormalized
+import com.example.shared.data.drafts.AccuracyLevel
 
 @HiltViewModel
 class ChildViewModel  @Inject constructor(
@@ -36,16 +38,16 @@ class ChildViewModel  @Inject constructor(
     private val patternRepository: PatternRepository
 )  : ViewModel() {
 
+    /**
+     * PARAMETERS, STATES
+     */
     private val _state = MutableStateFlow(GameState())
     val state: StateFlow<GameState> = _state.asStateFlow()
 
     private val _effects = Channel<ReinforcementEvent>(Channel.BUFFERED)
     val effects = _effects.receiveAsFlow()
 
-    private val shapeCorrectness = ShapeCorrectness(
-        sampleCount = 32,
-        correctThreshold = 0.80f
-    )
+    private val shapeCorrectness = ShapeCorrectness()
 
     private var gameTimerJob: Job? = null
     private var finishTimerJob: Job? = null
@@ -54,7 +56,13 @@ class ChildViewModel  @Inject constructor(
     private var timerStartedAt: Long = 0L
     private var isFinishTimerActive = false
     private var canvasSize: IntSize = IntSize.Zero
+    private var currentAccuracyLevel: AccuracyLevel = AccuracyLevel.MEDIUM
 
+    private var density: Float = 1f
+
+    /**
+     * INITIALIZATION
+     */
     init {
     viewModelScope.launch {
         learningStepRepository.observeActiveStep().collect { step ->
@@ -64,6 +72,11 @@ class ChildViewModel  @Inject constructor(
         }
     }
 }
+
+    /**
+     * EVENT HANDLING
+     */
+    fun setDensity(value: Float) { density = value }
 
     fun onEvent(event: ChildMainEvent) {
         when (event) {
@@ -78,6 +91,10 @@ class ChildViewModel  @Inject constructor(
             }
         }
     }
+
+    /**
+     * DRAWING INPUT HANDLING
+     */
 
     // Finger actions functions
     private fun handlePointerDown(position: Offset) {
@@ -101,39 +118,103 @@ class ChildViewModel  @Inject constructor(
     }
 
     private fun handlePointerUp() {
+        evaluateCurrentDrawing()
+        startFinishTimer()  // timer after trace is finished, in case user continues drawing
+    }
+
+    /**
+     * DRAWING ASSESSMENT
+     */
+    private fun evaluateCurrentDrawing() {
         val currentState = _state.value
         val referenceDrawing = currentState.currentPatternDrawing
 
-        val result = if (referenceDrawing != null) {
+        // shape assessment
+        val patternResult = currentState.patternResults.getOrNull(currentState.currentPattern)
+        val shapeResult = if (referenceDrawing != null && patternResult != null) {
             val userPoints = currentState.userStrokes.map { stroke ->
                 stroke.map { point ->
                     Offset(point.x, point.y).toNormalized(canvasSize)
                 }
             }
 
-            shapeCorrectness.evaluate(
+            val referencePoints = referenceDrawing.toCanvasPixelStrokes(
+                canvasSize = canvasSize,
+                density = density,
+                scaleMultiplier = currentState.patternScale,
+                rotationDegrees = currentState.patternRotation,
+                smoothing = patternResult.config.smoothingEnabled
+            ).map { stroke ->
+                stroke.map { point ->
+                    Offset(point.x, point.y).toNormalized(canvasSize)
+                }
+            }
+
+            shapeCorrectness.evaluateShape(
                 userStrokes = userPoints,
-                referenceStrokes = referenceDrawing.strokes,
-                canvasSize = canvasSize
+                referenceStrokes = referencePoints
             )
         } else {
             null
         }
+
+        // area assessment
+        val areaResult = if (referenceDrawing != null && patternResult != null) {
+            val thicknessPx = patternResult.config.patternThicknessDp.value * density
+            AreaComparison.evaluatePatternDrawing(
+                userStrokes = currentState.userStrokes,
+                patternDrawing = referenceDrawing,
+                canvasSize = canvasSize,
+                accuracyLevel = currentAccuracyLevel,
+                patternThicknessPx = thicknessPx,
+                userThicknessPx = thicknessPx,
+                density = density,
+                scaleMultiplier = currentState.patternScale,
+                rotationDegrees = currentState.patternRotation,
+                smoothing = patternResult.config.smoothingEnabled
+            )
+        } else null
+
         _state.update {
-            it.copy(shapeAssessmentResult = result)
+            it.copy(shapeAssessmentResult = shapeResult)
         }
 
-        if (result != null) {
-            _state.value.patternResults
-                .getOrNull(_state.value.currentPattern)
-                ?.let { patternResult ->
-                    patternResult.shapeMatch = (result.score * 100).toInt()
-                }
-        }
+        // update pattern results
+        val currentPatternResult = _state.value.patternResults.getOrNull(_state.value.currentPattern)
+        if (currentPatternResult != null) {
+            if (shapeResult != null) {
+                currentPatternResult.shapeMatch = (shapeResult.score * 100).toInt()
+            }
+            if (areaResult != null) {
+                val coverage = areaResult.patternCoveragePercent.toDouble()
+                val outside = areaResult.drawingOutsidePercent.toDouble()
 
-        startFinishTimer()  // timer after trace is finished, in case user continues drawing
+                currentPatternResult.insideArea = coverage.toInt()
+                currentPatternResult.outsideArea = outside.toInt()
+            }
+        }
+        updateLearningStepResults()
     }
 
+    private fun updateLearningStepResults() {
+        val currentState = _state.value
+        val results = currentState.patternResults
+        val stepResult = currentState.learningStepResult ?: return
+
+        if (results.isEmpty()) return
+
+        val updatedStepResult = stepResult.copy(
+            correctCoverage = results.map {it.insideArea}.average().toInt(),
+            lineOutOfBounds = results.map {it.outsideArea}.average().toInt(),
+            shapeMatch = results.map {it.shapeMatch}.average().toInt(),
+        )
+
+        _state.update { it.copy(learningStepResult = updatedStepResult) }
+    }
+
+    /**
+     * TIMER HANDLING
+     */
     // TIMER functions (time limit)
     private fun startFinishTimer() {
         finishTimerJob?.cancel()
@@ -183,6 +264,9 @@ class ChildViewModel  @Inject constructor(
         startTimeLimitTimer(_state.value.learningStepResult?.timeLimit ?: 0)
     }
 
+    /**
+     * MENU AND NAVIGATION
+     */
     private fun handleToggleMenu() {
         val currentlyOpen = _state.value.isMenuOpen
         if (!currentlyOpen) {
@@ -246,6 +330,14 @@ class ChildViewModel  @Inject constructor(
                 loadPatternDrawing(nextIndex, newState)
                 newState
             } else {
+                val results = currentState.patternResults
+                if (results.isNotEmpty()) {
+                    val avgShape = results.map { it.shapeMatch }.average().toInt()
+
+                    currentState.learningStepResult?.apply {
+                        shapeMatch = avgShape
+                    }
+                }
                 currentState.copy(screenState = "end")
             }
         }
@@ -285,6 +377,9 @@ class ChildViewModel  @Inject constructor(
         }
     }
 
+    /**
+     * PATTERN LOADING AND PREPARATION
+     */
     private fun loadPatternDrawing(index: Int, state: GameState) {
         val patternResult = state.patternResults.getOrNull(index) ?: return
 
@@ -295,7 +390,14 @@ class ChildViewModel  @Inject constructor(
             try {
                 val patternWithStrokes = patternRepository.getPattern(patternResult.patternId)
                 val drawing = patternWithStrokes?.toPatternDrawing()
-                _state.update { it.copy(currentPatternDrawing = drawing) }
+                val variety = patternResult.config.patternVariety
+                _state.update {
+                    it.copy(
+                        currentPatternDrawing = drawing,
+                        patternScale = if (variety) kotlin.random.Random.nextFloat() * 0.4f + 0.8f else 1f,
+                        patternRotation = if (variety) kotlin.random.Random.nextFloat() * 40f - 20f else 0f
+                    )
+                }
             } catch (_: Exception) {}
         }
     }
@@ -311,6 +413,7 @@ class ChildViewModel  @Inject constructor(
 
                 if (activePatterns.isEmpty()) return@launch
 
+                currentAccuracyLevel = step.learning.accuracyLevel
                 var patternResults = mutableListOf<PatternResult>()
                 val testMode = step.isTest
                 val repetitions = if (testMode) step.test.repetitions else step.learning.repetitions
@@ -333,8 +436,6 @@ class ChildViewModel  @Inject constructor(
                     for (i in 0 until repetitions) {
                         val patternEntity = patternRepository.getPattern(p.patternId)?.pattern
 
-                        Log.e("PatternConfig", "${p.patternColor}, ${p.writingColor}, ${p.backgroundColor}")
-
                         if (patternEntity != null) {
                             val widthEnum = try {
                                 PatternWidth.valueOf(p.width)
@@ -351,8 +452,6 @@ class ChildViewModel  @Inject constructor(
                                 smoothingEnabled = patternEntity.smoothingEnabled,
                                 patternVariety = p.patternVariety
                             )
-
-                            Log.e("PatternConfig", "${config.patternColor}, ${config.traceColor}, ${config.backgroundColor}")
 
                             patternResults.add(
                                 PatternResult(
@@ -404,6 +503,9 @@ class ChildViewModel  @Inject constructor(
         return prepared
     }
 
+    /**
+     * REINFORCEMENT HANDLING
+     */
     private fun playPraise(): Boolean {
         val state = _state.value
 
@@ -453,4 +555,3 @@ class ChildViewModel  @Inject constructor(
         goToNextPattern()
     }
 }
-

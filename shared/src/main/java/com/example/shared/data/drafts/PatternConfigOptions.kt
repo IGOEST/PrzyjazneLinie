@@ -40,6 +40,7 @@ enum class PatternWidth {
     THICK
 }
 
+
 fun PatternWidth.toDp(): Dp {
     return when (this) {
         PatternWidth.THIN -> 12.dp

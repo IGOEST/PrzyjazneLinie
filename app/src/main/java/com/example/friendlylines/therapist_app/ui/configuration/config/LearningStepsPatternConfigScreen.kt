@@ -92,18 +92,6 @@ fun LearningStepPatternConfigScreen(
         }
     }
 
-    var patternColor by remember {
-        mutableStateOf<ColorOption?>(null)
-    }
-
-    var writingColor by remember {
-        mutableStateOf<ColorOption?>(null)
-    }
-
-    var backgroundColor by remember {
-        mutableStateOf<ColorOption?>(null)
-    }
-
     var patternVariety by remember {
         mutableStateOf(false)
     }
@@ -122,6 +110,22 @@ fun LearningStepPatternConfigScreen(
 
     val patternAndWritingColors = PatternConfigColors.patternAndWriting()
     val backgroundColors = PatternConfigColors.background()
+
+    val defaultPatternColor = patternAndWritingColors.first()
+    val defaultWritingColor = patternAndWritingColors.first{ it != defaultPatternColor}
+    val defaultBackgroundColor = backgroundColors.first()
+
+    var patternColor by remember {
+        mutableStateOf<ColorOption?>(defaultPatternColor)
+    }
+
+    var writingColor by remember {
+        mutableStateOf<ColorOption?>(defaultWritingColor)
+    }
+
+    var backgroundColor by remember {
+        mutableStateOf<ColorOption?>(defaultBackgroundColor)
+    }
 
     val colorNames = patternAndWritingColors
         .plus(backgroundColors)
@@ -161,8 +165,8 @@ fun LearningStepPatternConfigScreen(
     LaunchedEffect(existingConfig?.id) {
         existingConfig?.let { config ->
             selectedWidth = config.width
-            patternColor = config.patternColor
-            writingColor = config.writingColor
+            patternColor = config.patternColor ?: defaultPatternColor
+            writingColor = config.writingColor ?: defaultWritingColor
             backgroundColor = config.backgroundColor
             patternVariety = config.patternVariety
         }

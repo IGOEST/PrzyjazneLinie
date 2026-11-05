@@ -219,6 +219,7 @@ internal fun String.animationThemeLabelRes(): Int =
         "balloons" -> R.string.reinforcements_theme_balloons
         "cars" -> R.string.reinforcements_theme_cars
         "balls" -> R.string.reinforcements_theme_balls
+        "sea_creatures" -> R.string.reinforcements_theme_sea
         else -> R.string.reinforcements_theme_flowers
     }
 

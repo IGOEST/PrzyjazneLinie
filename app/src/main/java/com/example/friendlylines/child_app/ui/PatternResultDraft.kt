@@ -15,9 +15,9 @@ data class PatternConfig(
 
 data class LearningStepResult(
     val name: String,
-    val correctCoverage: Int = 0,
-    val lineOutOfBounds: Int = 0,
-    val shapeMatch: Int = 0,
+    var correctCoverage: Int = 0,
+    var lineOutOfBounds: Int = 0,
+    var shapeMatch: Int = 0,
     val showStartingPoint: Boolean,
     val testMode: Boolean,
     val timeLimit: Int,
@@ -38,13 +38,13 @@ data class PatternResult(
     var patternName: String,
     var originalName: String,
     val config: PatternConfig,
-    val correctCoverage: Int = 0,
-    val lineOutOfBounds: Int = 0,
     var shapeMatch: Int = 0,
     val correctStartingPoint: Boolean = true,
     var lastAttemptTime: Double = 0.0,
     var totalTime: Double = 0.0,
     var attempts: Int,
     val exampleKey: String? = null,
-    var displayNumber: Int = 1
+    var displayNumber: Int = 1,
+    var insideArea: Int = 0,
+    var outsideArea: Int = 0
 )
