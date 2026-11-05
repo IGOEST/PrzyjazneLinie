@@ -20,60 +20,89 @@ private fun interpolate(
     )
 }
 
-fun chaikinIteration(
-    points: List<Offset>
+private fun distance(
+    a: Offset,
+    b: Offset
+): Float {
+    return (b - a).getDistance()
+}
+
+private fun clamp(
+    value: Float,
+    min: Float = 0f,
+    max: Float = 1f
+): Float {
+    return value.coerceIn(min, max)
+}
+
+fun smoothPoints(
+    points: List<Offset>,
+    iterations: Int = 3,
+    strength: Float = 0.35f
 ): List<Offset> {
+
     if (points.size < 3) {
         return points
     }
 
-    val result = mutableListOf<Offset>()
-
-    result.add(points.first())
-
-    for (i in 0 until points.lastIndex) {
-        val current = points[i]
-        val next = points[i + 1]
-
-        val q = interpolate(
-            a = current,
-            b = next,
-            factor = 0.25f
-        )
-
-        val r = interpolate(
-            a = current,
-            b = next,
-            factor = 0.75f
-        )
-
-        result.add(q)
-        result.add(r)
-    }
-
-    result.add(points.last())
-
-    return result
-}
-
-fun chaikinSmooth(
-    points: List<Offset>,
-    iterations: Int = 2
-): List<Offset> {
-
-    var result = points
+    var result = points.toList()
 
     repeat(iterations) {
-        result = chaikinIteration(result)
+
+        val smoothed = result.toMutableList()
+
+        for (i in 1 until result.lastIndex) {
+
+            val previous = result[i - 1]
+            val current = result[i]
+            val next = result[i + 1]
+
+            val midpoint = Offset(
+                x = (previous.x + next.x) / 2f,
+                y = (previous.y + next.y) / 2f
+            )
+
+            val incoming = current - previous
+            val outgoing = next - current
+
+            val incomingLength = incoming.getDistance()
+            val outgoingLength = outgoing.getDistance()
+
+            if (incomingLength < 0.001f ||
+                outgoingLength < 0.001f
+            ) {
+                continue
+            }
+
+            val dot = (
+                    incoming.x * outgoing.x +
+                            incoming.y * outgoing.y
+                    ) / (incomingLength * outgoingLength)
+
+            val curvature = 1f - clamp(dot, -1f, 1f)
+
+            val adaptiveStrength = strength *
+                    (1f - curvature * 0.85f)
+
+            smoothed[i] = interpolate(
+                current,
+                midpoint,
+                adaptiveStrength
+            )
+        }
+
+        result = smoothed
     }
 
     return result
 }
 
-fun createChaikinPath(
+fun createSmoothPath(
     points: List<Offset>,
-    iterations: Int = 2
+    iterations: Int = 3,
+    strength: Float = 0.35f
 ): Path {
+
     val path = Path()
 
     if (points.isEmpty()) {
@@ -81,25 +110,44 @@ fun createChaikinPath(
     }
 
     if (points.size == 1) {
+        path.moveTo(points.first().x, points.first().y)
         return path
     }
 
-    val smoothPoints = chaikinSmooth(
+    val smooth = smoothPoints(
         points = points,
-        iterations = iterations
+        iterations = iterations,
+        strength = strength
     )
 
     path.moveTo(
-        smoothPoints.first().x,
-        smoothPoints.first().y
+        smooth.first().x,
+        smooth.first().y
     )
 
-    for (i in 1 until smoothPoints.size) {
-        path.lineTo(
-            smoothPoints[i].x,
-            smoothPoints[i].y
+    for (i in 1 until smooth.lastIndex) {
+
+        val current = smooth[i]
+        val next = smooth[i + 1]
+
+        val midpoint = interpolate(
+            current,
+            next,
+            0.5f
+        )
+
+        path.quadraticTo(
+            current.x,
+            current.y,
+            midpoint.x,
+            midpoint.y
         )
     }
+
+    path.lineTo(
+        smooth.last().x,
+        smooth.last().y
+    )
 
     return path
 }
@@ -111,6 +159,7 @@ fun DrawScope.drawPoints(
     singlePointRadius: Float,
     strokeColor: Color = FriendlyLinesColors.Shades.Black
 ) {
+
     if (points.isEmpty()) {
         return
     }
@@ -121,27 +170,35 @@ fun DrawScope.drawPoints(
             radius = singlePointRadius,
             center = points.first()
         )
-
         return
     }
 
     if (!smoothingEnabled) {
-        for (i in 0 until points.lastIndex) {
-            drawLine(
-                color = strokeColor,
-                start = points[i],
-                end = points[i + 1],
-                strokeWidth = strokeWidth,
-                cap = StrokeCap.Round
-            )
+        val path = Path().apply {
+            moveTo(points.first().x, points.first().y)
+
+            for (i in 1 until points.size) {
+                lineTo(points[i].x, points[i].y)
+            }
         }
+
+        drawPath(
+            path = path,
+            color = strokeColor,
+            style = Stroke(
+                width = strokeWidth,
+                cap = StrokeCap.Round,
+                join = StrokeJoin.Round
+            )
+        )
 
         return
     }
 
-    val path = createChaikinPath(
+    val path = createSmoothPath(
         points = points,
-        iterations = 2
+        iterations = 3,
+        strength = 0.35f
     )
 
     drawPath(
