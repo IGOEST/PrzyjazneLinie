@@ -10,7 +10,8 @@ data class PatternConfig(
     val patternThickness: String,
     val patternThicknessDp: Dp,
     val smoothingEnabled: Boolean,
-    val patternVariety: Boolean
+    val patternVariety: Boolean,
+    val order: Int
 )
 
 data class LearningStepResult(

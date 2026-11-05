@@ -8,7 +8,7 @@ import android.graphics.Path
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.IntSize
 import com.example.friendlylines.therapist_app.ui.materials.geometry.calculateNormalizedBounds
-import com.example.friendlylines.therapist_app.ui.materials.create_new.componenets.chaikinSmooth
+import com.example.friendlylines.therapist_app.ui.materials.create_new.componenets.smoothPoints
 import com.example.shared.data.drafts.AccuracyLevel
 import com.example.shared.data.models.PatternDrawing
 import kotlin.math.max
@@ -271,7 +271,7 @@ fun PatternDrawing.toCanvasPixelStrokes(
                 y = (point.y - bounds.minY) * scale + offsetY
             )
         }
-        val shaped = if (smoothing) chaikinSmooth(local, iterations = 2) else local
+        val shaped = if (smoothing) smoothPoints(local, iterations = 2) else local
         shaped.map { p ->
             val dx = p.x - pivotX
             val dy = p.y - pivotY

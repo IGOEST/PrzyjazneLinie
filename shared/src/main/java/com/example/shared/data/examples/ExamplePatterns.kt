@@ -130,7 +130,7 @@ object ExamplePatterns {
         val numberOfPoints = 48
 
         for (i in 0..numberOfPoints) {
-            val angle = Math.PI.toFloat() * i / numberOfPoints
+            val angle = Math.PI.toFloat() - Math.PI.toFloat() * i / numberOfPoints
 
             points.add(
                 Point(
@@ -188,7 +188,7 @@ object ExamplePatterns {
         val numberOfPoints = 64
 
         for (i in 0..numberOfPoints) {
-            val angle = 2f * Math.PI.toFloat() * i / numberOfPoints
+            val angle = (-Math.PI.toFloat() / 2f) + (2f * Math.PI.toFloat() * i / numberOfPoints)
 
             points.add(
                 Point(
@@ -212,7 +212,7 @@ object ExamplePatterns {
         val numberOfPoints = 64
 
         for (i in 0..numberOfPoints) {
-            val angle = 2f * Math.PI.toFloat() * i / numberOfPoints
+            val angle = Math.PI.toFloat() + 2f * Math.PI.toFloat() * i / numberOfPoints
 
             points.add(
                 Point(

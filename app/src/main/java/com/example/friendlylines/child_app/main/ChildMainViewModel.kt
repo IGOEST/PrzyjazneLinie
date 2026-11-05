@@ -1,5 +1,6 @@
 package com.example.friendlylines.child_app.main
 
+import android.util.Log
 import androidx.compose.ui.geometry.Offset
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -358,7 +359,7 @@ class ChildViewModel  @Inject constructor(
                     // Reset to first pattern and load it
                     val prepared = preparePatterns(
                         state.patternResults.toMutableList(),
-                        state.learningStepResult?.testMode == false,
+                        state.learningStepResult?.randomPatternOrder == true,
                         state.learningStepResult?.testMode ?: false
                     )
                     val resetState = state.copy(
@@ -450,7 +451,8 @@ class ChildViewModel  @Inject constructor(
                                 patternThickness = p.width,
                                 patternThicknessDp = widthEnum.toDp(),
                                 smoothingEnabled = patternEntity.smoothingEnabled,
-                                patternVariety = p.patternVariety
+                                patternVariety = p.patternVariety,
+                                order = p.order
                             )
 
                             patternResults.add(
@@ -469,6 +471,8 @@ class ChildViewModel  @Inject constructor(
 
                 val preparedResults = preparePatterns(patternResults, step.learning.randomPatternOrder, testMode)
 
+                Log.e("Patterns order", "$preparedResults")
+
                 _state.update { it.copy(
                     patternResults = preparedResults,
                     learningStepResult = learningStepResult,
@@ -485,7 +489,7 @@ class ChildViewModel  @Inject constructor(
         val prepared = if (shouldShuffle && !isTestMode) {
             patterns.shuffled()
         } else {
-            patterns
+            patterns.sortedBy { it.config.order }
         }
 
         // assigning numbers
