@@ -2,6 +2,7 @@ package com.example.friendlylines.child_app.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -43,76 +44,90 @@ fun MainMenuScreen(
     onPlayClick: () -> Unit,
 ) {
     ChildGameStartBackground {
-        Column(
-            modifier =
-                Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 48.dp.scaled(), vertical = 32.dp.scaled()),
-            horizontalAlignment = Alignment.CenterHorizontally,
+        BoxWithConstraints(
+            modifier = Modifier.fillMaxSize()
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(24.dp.scaled())
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.app_icon),
-                    contentDescription = null,
-                    modifier = Modifier.size(LOGO_SIZE.scaled())
-                )
-                Text(
-                    text = stringResource(R.string.app_name),
-                    color = FriendlyLinesColors.PrimaryFriendlyLines.P1000,
-                    style = FriendlyLinesTextStyles.displayD1
-                )
-            }
-            Spacer(modifier = Modifier.height(16.dp.scaled()))
+            val availableHeight = maxHeight
+            val fontScale = (availableHeight/800.dp).coerceIn(0.75f, 1.2f)
+            val horizontalPadding = maxWidth*0.06f
+            val verticalPadding = availableHeight*0.04f
+            val logoSize = (availableHeight*0.13f).coerceIn(64.dp, 140.dp)
+            val playButtonSize = (availableHeight*0.3f).coerceIn(120.dp, 300.dp)
+
             Column(
-                modifier = Modifier.padding(8.dp.scaled()),
-                verticalArrangement = Arrangement.spacedBy(8.dp.scaled()),
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = horizontalPadding, vertical = verticalPadding),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                InfoRow(
-                    icon = Icons.Filled.AssignmentTurnedIn,
-                    label = stringResource(R.string.active_learning_step),
-                    value = activeStep
-                )
-                InfoRow(
-                    icon = Icons.Filled.Settings,
-                    label = stringResource(R.string.chosen_mode),
-                    value = mode
-                )
-            }
-            Spacer(
-                modifier = Modifier
-                    .weight(1f, fill = false)
-                    .heightIn(min = 50.dp.scaled()),
-            )
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(16.dp.scaled()),
-            ) {
-                TemplateChildButton(
-                    icon = IconType.Play,
-                    onClick = onPlayClick,
-                    size = PLAY_BUTTON_SIZE.scaled(),
-                    enabled = canPlay
-                )
-                if (!canPlay) {
-                    Text(
-                        text = stringResource(R.string.child_home_cannot_play_message),
-                        style = FriendlyLinesTextStyles.bodyRegular,
-                        color = FriendlyLinesColors.PrimaryFriendlyLines.P1000,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth(),
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(24.dp.scaled())
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.app_icon),
+                        contentDescription = null,
+                        modifier = Modifier.size(logoSize)
                     )
+                    Text(
+                        text = stringResource(R.string.app_name),
+                        color = FriendlyLinesColors.PrimaryFriendlyLines.P1000,
+                        style = FriendlyLinesTextStyles.displayD1.copy(fontSize = FriendlyLinesTextStyles.displayD1.fontSize*fontScale)
+                    )
+                }
+                Spacer(modifier = Modifier.height(availableHeight*0.02f))
+                Column(
+                    modifier = Modifier.padding(8.dp.scaled()),
+                    verticalArrangement = Arrangement.spacedBy(8.dp.scaled()),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    InfoRow(
+                        icon = Icons.Filled.AssignmentTurnedIn,
+                        label = stringResource(R.string.active_learning_step),
+                        value = activeStep,
+                        fontScale = fontScale
+                    )
+                    InfoRow(
+                        icon = Icons.Filled.Settings,
+                        label = stringResource(R.string.chosen_mode),
+                        value = mode,
+                        fontScale = fontScale
+                    )
+                }
+                Spacer(
+                    modifier = Modifier
+                        .weight(1f, fill = false)
+                        .heightIn(min = 50.dp.scaled()),
+                )
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(16.dp.scaled()),
+                ) {
+                    TemplateChildButton(
+                        icon = IconType.Play,
+                        onClick = onPlayClick,
+                        size = playButtonSize,
+                        enabled = canPlay
+                    )
+                    if (!canPlay) {
+                        Text(
+                            text = stringResource(R.string.child_home_cannot_play_message),
+                            style = FriendlyLinesTextStyles.bodyRegular,
+                            color = FriendlyLinesColors.PrimaryFriendlyLines.P1000,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
                 }
             }
         }
+
     }
 }
 
 @Composable
-private fun InfoRow(icon: ImageVector, label: String, value: String) {
+private fun InfoRow(icon: ImageVector, label: String, value: String, fontScale: Float) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(16.dp.scaled())
@@ -126,12 +141,12 @@ private fun InfoRow(icon: ImageVector, label: String, value: String) {
         Text(
             text = label,
             color = FriendlyLinesColors.PrimaryFriendlyLines.P1000,
-            style = FriendlyLinesTextStyles.headingH3Medium
+            style = FriendlyLinesTextStyles.headingH3Medium.copy(fontSize = FriendlyLinesTextStyles.headingH3Medium.fontSize*fontScale)
         )
         Text(
             text = value,
             color = FriendlyLinesColors.PrimaryFriendlyLines.P1000,
-            style = FriendlyLinesTextStyles.headingH3Regular
+            style = FriendlyLinesTextStyles.headingH3Regular.copy(fontSize = FriendlyLinesTextStyles.headingH3Regular.fontSize*fontScale)
         )
     }
 }

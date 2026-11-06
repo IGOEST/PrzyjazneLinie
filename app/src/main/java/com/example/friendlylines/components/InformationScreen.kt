@@ -1,5 +1,6 @@
 package com.example.friendlylines.components
 
+import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -7,6 +8,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -22,6 +24,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,6 +43,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withLink
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import coil3.size.Scale
 import com.example.friendlylines.R
 import com.example.friendlylines.theme.*
 
@@ -53,7 +57,7 @@ fun InfoSplashScreen(
     onContinue: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Box(
+    BoxWithConstraints(
         modifier =
             modifier
                 .fillMaxSize()
@@ -64,6 +68,18 @@ fun InfoSplashScreen(
                     onClick = onContinue,
                 ),
     ) {
+        val scale = minOf(
+            maxWidth/1280.dp,
+            maxHeight/800.dp
+        ).coerceIn(0.65f,1f)
+
+        LaunchedEffect(maxWidth, maxHeight, scale) {
+            Log.d(
+                "SplashScreen",
+                "width=$maxWidth, height=$maxHeight, scale=$scale"
+            )
+        }
+
         Image(
             painter = painterResource(R.drawable.background_ellipse),
             contentDescription = null,
@@ -71,10 +87,10 @@ fun InfoSplashScreen(
                 Modifier
                     .align(Alignment.BottomEnd)
                     .offset(
-                        x = 90.dp.scaled(),
-                        y = 370.dp.scaled(),
+                        x = 90.dp * scale,
+                        y = 370.dp * scale,
                     )
-                    .size(550.dp.scaled()),
+                    .size(550.dp * scale),
         )
         Image(
             painter = painterResource(R.drawable.rybka3),
@@ -82,33 +98,34 @@ fun InfoSplashScreen(
             modifier =
                 Modifier
                     .align(Alignment.BottomEnd)
-                    .padding(end = 70.dp.scaled(), bottom = 140.dp.scaled())
-                    .size(200.dp.scaled()),
+                    .padding(end = 70.dp * scale, bottom = 140.dp * scale)
+                    .size(200.dp * scale),
         )
         SpeechBubble(
             modifier =
                 Modifier
                     .align(Alignment.BottomEnd)
-                    .padding(end = 70.dp.scaled(), bottom = 350.dp.scaled())
-                    .widthIn(max = 200.dp.scaled()),
+                    .padding(end = 70.dp * scale, bottom = 350.dp * scale)
+                    .widthIn(max = 200.dp * scale),
+            scale = scale
         )
 
-        Column(verticalArrangement = Arrangement.spacedBy(20.dp.scaled())) {
+        Column(verticalArrangement = Arrangement.spacedBy(20.dp * scale)) {
             Column(
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 48.dp.scaled(), vertical = 40.dp.scaled()),
+                        .padding(horizontal = 48.dp * scale, vertical = 40.dp * scale),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(16.dp.scaled()),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp * scale),
                 ) {
                     Image(
                         painter = painterResource(appIconRes),
                         contentDescription = null,
-                        modifier = Modifier.size(90.dp.scaled()),
+                        modifier = Modifier.size(90.dp * scale),
                     )
                     Text(
                         text = appTitle,
@@ -116,7 +133,7 @@ fun InfoSplashScreen(
                         color = Primary1000,
                     )
                 }
-                Spacer(modifier = Modifier.height(16.dp.scaled()))
+                Spacer(modifier = Modifier.height(16.dp * scale))
                 Text(
                     text = stringResource(R.string.core_ui_splash_subtitle),
                     style = FriendlyLinesTextStyles.headingH5Regular,
@@ -128,15 +145,15 @@ fun InfoSplashScreen(
             Column(
                 modifier =
                     Modifier
-                        .padding(start = 70.dp.scaled())
-                        .widthIn(max = 800.dp.scaled())
+                        .padding(start = 70.dp * scale)
+                        .widthIn(max = 800.dp * scale)
                         .background(Color.White, RoundedCornerShape(10.dp))
-                        .padding(16.dp.scaled())
+                        .padding(16.dp * scale)
                         .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(16.dp.scaled()),
+                verticalArrangement = Arrangement.spacedBy(16.dp * scale),
             ) {
                 SPLASH_BULLETS.forEach { bullet ->
-                    BulletRow(bullet.emojiRes, bullet.labelRes, bullet.bodyRes)
+                    BulletRow(bullet.emojiRes, bullet.labelRes, bullet.bodyRes, scale = scale)
                 }
             }
 
@@ -146,21 +163,21 @@ fun InfoSplashScreen(
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .height(130.dp.scaled())
+                        .height(130.dp * scale)
                         .background(Color.White.copy(alpha = 0.5f)),
-                horizontalArrangement = Arrangement.spacedBy(64.dp.scaled(), Alignment.CenterHorizontally),
+                horizontalArrangement = Arrangement.spacedBy(64.dp * scale, Alignment.CenterHorizontally),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Image(
                     painter = painterResource(R.drawable.pg_eti_logo),
                     contentDescription = null,
-                    modifier = Modifier.height(80.dp.scaled()),
+                    modifier = Modifier.height(80.dp * scale),
                     contentScale = ContentScale.FillHeight,
                 )
                 Image(
                     painter = painterResource(R.drawable.iwrd_logo),
                     contentDescription = null,
-                    modifier = Modifier.height(80.dp.scaled()),
+                    modifier = Modifier.height(80.dp * scale),
                     contentScale = ContentScale.FillHeight,
                 )
             }
@@ -169,12 +186,12 @@ fun InfoSplashScreen(
 }
 
 @Composable
-private fun SpeechBubble(modifier: Modifier = Modifier) {
+private fun SpeechBubble(modifier: Modifier = Modifier, scale: Float) {
     Box(
         modifier =
             modifier
-                .background(Primary300, RoundedCornerShape(10.dp.scaled()))
-                .padding(12.dp.scaled()),
+                .background(Primary300, RoundedCornerShape(10.dp * scale))
+                .padding(12.dp * scale),
     ) {
         Text(
             text = stringResource(R.string.core_ui_splash_continue_hint),
@@ -209,15 +226,16 @@ private fun BulletRow(
     @DrawableRes emojiRes: Int,
     labelRes: Int,
     bodyRes: Int,
+    scale: Float
 ) {
     Row(
-        horizontalArrangement = Arrangement.spacedBy(10.dp.scaled()),
+        horizontalArrangement = Arrangement.spacedBy(10.dp * scale),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Image(
             painter = painterResource(emojiRes),
             contentDescription = null,
-            modifier = Modifier.size(36.dp.scaled()),
+            modifier = Modifier.size(36.dp * scale),
         )
         Text(
             text = bulletText(labelRes, bodyRes),
