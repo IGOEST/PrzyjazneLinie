@@ -31,6 +31,8 @@ import javax.inject.Inject
 import androidx.compose.ui.unit.IntSize
 import com.example.friendlylines.child_app.assessment.toCanvasPixelStrokes
 import com.example.friendlylines.therapist_app.ui.materials.geometry.toNormalized
+import com.example.friendlylines.child_app.assessment.AssessmentCriteria
+import com.example.friendlylines.child_app.ui.AttemptResult
 import com.example.shared.data.drafts.AccuracyLevel
 
 @HiltViewModel
@@ -57,9 +59,15 @@ class ChildViewModel  @Inject constructor(
     private var timerStartedAt: Long = 0L
     private var isFinishTimerActive = false
     private var canvasSize: IntSize = IntSize.Zero
-    private var currentAccuracyLevel: AccuracyLevel = AccuracyLevel.MEDIUM
+    private var currentAccuracyLevel = AccuracyLevel.MEDIUM
+
+    private val waitTime: Double = 0.7
 
     private var density: Float = 1f
+
+    private var currentAttemptNumber = 1
+
+    private data class AttemptScores(val shapeMatch: Int, val insideArea: Int, val outsideArea: Int)
 
     /**
      * INITIALIZATION
@@ -119,14 +127,13 @@ class ChildViewModel  @Inject constructor(
     }
 
     private fun handlePointerUp() {
-        evaluateCurrentDrawing()
         startFinishTimer()  // timer after trace is finished, in case user continues drawing
     }
 
     /**
      * DRAWING ASSESSMENT
      */
-    private fun evaluateCurrentDrawing() {
+    private fun evaluateCurrentDrawing(): AttemptScores {
         val currentState = _state.value
         val referenceDrawing = currentState.currentPatternDrawing
 
@@ -181,20 +188,12 @@ class ChildViewModel  @Inject constructor(
         }
 
         // update pattern results
-        val currentPatternResult = _state.value.patternResults.getOrNull(_state.value.currentPattern)
-        if (currentPatternResult != null) {
-            if (shapeResult != null) {
-                currentPatternResult.shapeMatch = (shapeResult.score * 100).toInt()
-            }
-            if (areaResult != null) {
-                val coverage = areaResult.patternCoveragePercent.toDouble()
-                val outside = areaResult.drawingOutsidePercent.toDouble()
-
-                currentPatternResult.insideArea = coverage.toInt()
-                currentPatternResult.outsideArea = outside.toInt()
-            }
-        }
         updateLearningStepResults()
+        return AttemptScores(
+            shapeMatch = shapeResult?.let { (it.score * 100).toInt() } ?: 0,
+            insideArea = areaResult?.patternCoveragePercent?.toInt() ?: 0,
+            outsideArea = areaResult?.drawingOutsidePercent?.toInt() ?: 0
+        )
     }
 
     private fun updateLearningStepResults() {
@@ -216,12 +215,11 @@ class ChildViewModel  @Inject constructor(
     /**
      * TIMER HANDLING
      */
-    // TIMER functions (time limit)
     private fun startFinishTimer() {
         finishTimerJob?.cancel()
         finishTimerJob = viewModelScope.launch {
-            delay(1500L)
-            continueAfterDrawing()
+            delay((waitTime * 1000).toLong())
+            onDrawingFinished()
         }
     }
 
@@ -239,30 +237,80 @@ class ChildViewModel  @Inject constructor(
         timerStartedAt = System.currentTimeMillis()
         gameTimerJob = viewModelScope.launch {
             delay(millis)
-            goToNextPattern()
+            onTimeLimitReached()
         }
     }
 
+    /**
+     * ATTEMPT HANDLING
+     */
     // Time is counted for whole pattern and last (or successful) attempt
-    private fun finishAttempt() {
-        val limitMillis = (_state.value.learningStepResult?.timeLimit ?: return) * 1000L
-        val remaining = (timeLimitRemainingMillis ?: return) -
+    private fun finishAttempt(): Double {
+        val limitMillis = (_state.value.learningStepResult?.timeLimit ?: return 0.0) * 1000L
+        val remaining = (timeLimitRemainingMillis ?: return 0.0) -
                 (System.currentTimeMillis() - timerStartedAt)
-        val s = (limitMillis - remaining).coerceIn(0L, limitMillis) / 1000.0
+        val s = ((limitMillis - remaining).coerceIn(0L, limitMillis) / 1000.0 - waitTime)
+            .coerceAtLeast(0.0)
 
         val result = _state.value.patternResults
-            .getOrNull(_state.value.currentPattern) ?: return
-        result.totalTime += s - 1.5   // substract finish timer
-        result.lastAttemptTime = s - 1.5
+            .getOrNull(_state.value.currentPattern) ?: return 0.0
+        result.totalTime += s
+        result.lastAttemptTime = s
+        return s
     }
 
-    // TODO: Restarts if pattern is wrong and there are attempts left
     private fun restartAttempt() {
-        finishAttempt()
-        finishTimerJob?.cancel()
-        _state.update { it.copy(userStrokes = emptyList()) }
-        //new time limit
+        currentAttemptNumber++
+        _state.update { it.copy(userStrokes = emptyList(), shapeAssessmentResult = null) }
         startTimeLimitTimer(_state.value.learningStepResult?.timeLimit ?: 0)
+    }
+
+    private fun completeAttempt(): Boolean {
+        gameTimerJob?.cancel()
+        finishTimerJob?.cancel()
+
+        val state = _state.value
+        val patternResult = state.patternResults.getOrNull(state.currentPattern) ?: return false
+
+        val scores = if (state.userStrokes.isNotEmpty()) evaluateCurrentDrawing()
+        else AttemptScores(0, 0, 0)
+        val seconds = finishAttempt()
+        val success = AssessmentCriteria.isSuccessful(
+            currentAccuracyLevel,
+            scores.shapeMatch,
+            scores.insideArea,
+            scores.outsideArea)
+
+        patternResult.attemptResults += AttemptResult(
+                    attemptNumber = currentAttemptNumber,
+                    shapeMatch = scores.shapeMatch,
+                    insideArea = scores.insideArea,
+                    outsideArea = scores.outsideArea,
+                    timeSeconds = seconds,
+                    isSuccessful = success
+                )
+        patternResult.attempts = patternResult.attemptResults.size
+        patternResult.shapeMatch = scores.shapeMatch
+        patternResult.insideArea = scores.insideArea
+        patternResult.outsideArea = scores.outsideArea
+
+        updateLearningStepResults()
+        return success
+    }
+
+    private fun hasAttemptsLeft(): Boolean =
+        currentAttemptNumber < (_state.value.learningStepResult?.attempts ?: 1)
+
+    // when child stopped drawing
+    private fun onDrawingFinished() {
+        val success = completeAttempt()
+        if (success || !hasAttemptsLeft()) continueAfterDrawing(success) else restartAttempt()
+    }
+
+    // time limit ran out
+    private fun onTimeLimitReached() {
+        val success = completeAttempt()
+        if (success || !hasAttemptsLeft()) goToNextPattern() else restartAttempt()
     }
 
     /**
@@ -312,7 +360,6 @@ class ChildViewModel  @Inject constructor(
     }
 
     private fun goToNextPattern() {
-        finishAttempt()
         gameTimerJob?.cancel()
         finishTimerJob?.cancel()
         timeLimitRemainingMillis = null
@@ -392,6 +439,7 @@ class ChildViewModel  @Inject constructor(
                 val patternWithStrokes = patternRepository.getPattern(patternResult.patternId)
                 val drawing = patternWithStrokes?.toPatternDrawing()
                 val variety = patternResult.config.patternVariety
+                currentAttemptNumber = 1
                 _state.update {
                     it.copy(
                         currentPatternDrawing = drawing,
@@ -414,7 +462,7 @@ class ChildViewModel  @Inject constructor(
 
                 if (activePatterns.isEmpty()) return@launch
 
-                currentAccuracyLevel = step.learning.accuracyLevel
+                currentAccuracyLevel = if (step.isTest) step.test.accuracyLevel else step.learning.accuracyLevel
                 var patternResults = mutableListOf<PatternResult>()
                 val testMode = step.isTest
                 val repetitions = if (testMode) step.test.repetitions else step.learning.repetitions
@@ -502,6 +550,12 @@ class ChildViewModel  @Inject constructor(
             p.displayNumber = number
             p.patternName = "${p.originalName} $number"
             p.totalTime = 0.0
+            p.lastAttemptTime = 0.0
+            p.attemptResults = emptyList()
+            p.attempts = 1
+            p.shapeMatch = 0
+            p.insideArea = 0
+            p.outsideArea = 0
         }
 
         return prepared
@@ -549,13 +603,9 @@ class ChildViewModel  @Inject constructor(
         goToNextPattern()
     }
 
-    private fun continueAfterDrawing() {
-        if (playPraise()) {
-            return
-        }
-        if (playAnimation()) {
-            return
-        }
+    private fun continueAfterDrawing(success: Boolean) {
+        if (success && playPraise()) return
+        if (success && playAnimation()) return
         goToNextPattern()
     }
 }

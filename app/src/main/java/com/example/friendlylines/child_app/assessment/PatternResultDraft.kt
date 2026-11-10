@@ -47,5 +47,15 @@ data class PatternResult(
     val exampleKey: String? = null,
     var displayNumber: Int = 1,
     var insideArea: Int = 0,
-    var outsideArea: Int = 0
+    var outsideArea: Int = 0,
+    var attemptResults: List<AttemptResult> = emptyList()
+)
+
+data class AttemptResult(
+    val attemptNumber: Int,
+    val shapeMatch: Int,
+    val insideArea: Int,
+    val outsideArea: Int,
+    val timeSeconds: Double,
+    val isSuccessful: Boolean
 )
