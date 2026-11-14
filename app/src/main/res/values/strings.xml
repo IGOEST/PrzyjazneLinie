@@ -261,6 +261,11 @@
     <string name="core_ui_splash_bullet5_label">To learn more:</string>
     <string name="core_ui_splash_bullet5_body">Visit the project website: https://tiapps.org/</string>
 
+    <string name="report_name">report_Friendly_Lines_</string>
+    <string name="saved_report_message">Report saved</string>
+    <string name="not_saved_report_message">Cannot save report</string>
+
+
 </resources>
 
 

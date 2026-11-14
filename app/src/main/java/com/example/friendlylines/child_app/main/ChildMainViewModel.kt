@@ -34,6 +34,7 @@ import com.example.friendlylines.therapist_app.ui.materials.geometry.toNormalize
 import com.example.friendlylines.child_app.assessment.AssessmentCriteria
 import com.example.friendlylines.child_app.ui.AttemptResult
 import com.example.shared.data.drafts.AccuracyLevel
+import com.example.shared.data.models.Point
 
 @HiltViewModel
 class ChildViewModel  @Inject constructor(
@@ -67,7 +68,13 @@ class ChildViewModel  @Inject constructor(
 
     private var currentAttemptNumber = 1
 
-    private data class AttemptScores(val shapeMatch: Int, val insideArea: Int, val outsideArea: Int)
+    private data class AttemptScores(
+        val shapeMatch: Int,
+        val insideArea: Int,
+        val outsideArea: Int,
+        val shapeDistance: Float?,
+        val shapeIsValid: Boolean?
+    )
 
     /**
      * INITIALIZATION
@@ -192,7 +199,9 @@ class ChildViewModel  @Inject constructor(
         return AttemptScores(
             shapeMatch = shapeResult?.let { (it.score * 100).toInt() } ?: 0,
             insideArea = areaResult?.patternCoveragePercent?.toInt() ?: 0,
-            outsideArea = areaResult?.drawingOutsidePercent?.toInt() ?: 0
+            outsideArea = areaResult?.drawingOutsidePercent?.toInt() ?: 0,
+            shapeDistance = shapeResult?.distance,
+            shapeIsValid = shapeResult?.isValid
         )
     }
 
@@ -210,6 +219,50 @@ class ChildViewModel  @Inject constructor(
         )
 
         _state.update { it.copy(learningStepResult = updatedStepResult) }
+    }
+
+    private fun saveStrokesTrajectory(
+        strokes: List<List<Offset>>,
+    ): List<List<Point>> {
+        if (canvasSize == IntSize.Zero) return emptyList()
+        val intervalPx = (2f * 160f / 25.4f) * density // 2mm
+
+        return strokes.mapNotNull { stroke ->
+            if (stroke.isEmpty()) return@mapNotNull null
+
+            val sampledPoints = mutableListOf<Offset>()
+            sampledPoints.add(stroke.first())
+            var distanceSinceLastSaved = 0f
+
+            for (i in 1 until stroke.size) {
+                val previousPoint = stroke[i - 1]
+                val currentPoint = stroke[i]
+
+                val dx = currentPoint.x - previousPoint.x
+                val dy = currentPoint.y - previousPoint.y
+                val distance = kotlin.math.sqrt(dx * dx + dy * dy)
+
+                distanceSinceLastSaved += distance
+
+                if (distanceSinceLastSaved >= intervalPx) {
+                    sampledPoints.add(currentPoint)
+                    distanceSinceLastSaved = 0f
+                }
+            }
+
+            if (sampledPoints.last() != stroke.last()) {
+                sampledPoints.add(stroke.last())
+            }
+
+            sampledPoints.map { point ->
+                val normalized = point.toNormalized(canvasSize)
+
+                Point(
+                    x = normalized.x,
+                    y = normalized.y
+                )
+            }
+        }
     }
 
     /**
@@ -273,7 +326,9 @@ class ChildViewModel  @Inject constructor(
         val patternResult = state.patternResults.getOrNull(state.currentPattern) ?: return false
 
         val scores = if (state.userStrokes.isNotEmpty()) evaluateCurrentDrawing()
-        else AttemptScores(0, 0, 0)
+        else AttemptScores(0, 0, 0, shapeDistance = null, shapeIsValid = null)
+        val trajectory = saveStrokesTrajectory(state.userStrokes)
+
         val seconds = finishAttempt()
         val success = AssessmentCriteria.isSuccessful(
             currentAccuracyLevel,
@@ -282,13 +337,17 @@ class ChildViewModel  @Inject constructor(
             scores.outsideArea)
 
         patternResult.attemptResults += AttemptResult(
-                    attemptNumber = currentAttemptNumber,
-                    shapeMatch = scores.shapeMatch,
-                    insideArea = scores.insideArea,
-                    outsideArea = scores.outsideArea,
-                    timeSeconds = seconds,
-                    isSuccessful = success
-                )
+            attemptNumber = currentAttemptNumber,
+            shapeMatch = scores.shapeMatch,
+            insideArea = scores.insideArea,
+            outsideArea = scores.outsideArea,
+            timeSeconds = seconds,
+            isSuccessful = success,
+            trajectory = trajectory,
+            shapeDistance = scores.shapeDistance,
+            shapeIsValid = scores.shapeIsValid
+        )
+
         patternResult.attempts = patternResult.attemptResults.size
         patternResult.shapeMatch = scores.shapeMatch
         patternResult.insideArea = scores.insideArea

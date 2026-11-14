@@ -39,6 +39,22 @@ import com.example.friendlylines.theme.scaled
 import com.example.friendlylines.therapist_app.ui.components.TemplateButton
 import com.example.friendlylines.therapist_app.ui.components.TemplateDropdown
 import com.example.friendlylines.therapist_app.ui.configuration.config.PatternConfigColors
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import kotlin.time.Duration.Companion.milliseconds
+import android.graphics.pdf.PdfDocument
+import android.graphics.Paint
+import androidx.compose.ui.platform.LocalConfiguration
 
 @Composable
 fun ResultsScreen(
@@ -48,6 +64,41 @@ fun ResultsScreen(
 ) {
     var selectedPattern by remember(patterns) { mutableStateOf(patterns.first()) }
     val config = selectedPattern.config
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
+    var saveMessage by remember { mutableStateOf<Int?>(null) }
+
+    val configuration = LocalConfiguration.current
+    val locale = configuration.locales[0]
+
+    LaunchedEffect(saveMessage) {
+        if(saveMessage != null) {
+            delay(2000.milliseconds)
+            saveMessage = null
+        }
+    }
+
+    val timestamp = remember { SimpleDateFormat("dd-MM-yyyy_HH-mm", Locale.ROOT).format(Date()) }
+    val fileName: String? = "${stringResource(R.string.report_name)}$timestamp.pdf"
+
+    val reportLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument("application/pdf")
+    ) { uri ->
+        if (uri != null) {
+            val report = buildSessionReport(
+                learningStepResult = learningStepResult,
+                patterns = patterns
+            )
+
+            scope.launch {
+                val saved = withContext(Dispatchers.IO) {
+                    runCatching { saveTextAsPdf(context, uri, report) }.isSuccess }
+
+                saveMessage = if (saved) R.string.saved_report_message else R.string.not_saved_report_message
+            }
+        }
+    }
 
     ChildGameEmptyBackground {
         Column(
@@ -57,6 +108,14 @@ fun ResultsScreen(
             verticalArrangement = Arrangement.spacedBy(32.dp.scaled()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            saveMessage?.let { messageId ->
+                Text(
+                    text = stringResource(messageId),
+                    color = FriendlyLinesColors.PrimaryFriendlyLines.P1000,
+                    style = FriendlyLinesTextStyles.headingH4Medium
+                )
+            }
+
             Row(
                 modifier = Modifier
                     .padding(16.dp.scaled())
@@ -72,7 +131,7 @@ fun ResultsScreen(
                             .align(Alignment.CenterStart)
                             .padding(16.dp.scaled()),
                         enabled = true,
-                        onClick = { },  //TODO: ADD REPORT
+                        onClick = { reportLauncher.launch(fileName) },
                         text = stringResource(id = R.string.results_download_button_1) + "\n" + stringResource(
                             id = R.string.results_download_button_2
                         ),
@@ -280,6 +339,189 @@ private fun ResultInfoRow(
                 tint = FriendlyLinesColors.PrimaryFriendlyLines.P700,
                 modifier = Modifier.size(32.dp.scaled())
             )
+        }
+    }
+}
+
+private fun saveTextAsPdf(
+    context: android.content.Context,
+    uri: android.net.Uri,
+    content: String
+) {
+    val document = PdfDocument()
+    val pageWidth = 595
+    val pageHeight = 842
+    val margin = 40f
+
+    val paint = Paint()
+
+    val lineHeight = 15f
+    val maxWidth = pageWidth - 2 * margin
+
+    var pageNumber = 1
+    var page = document.startPage(
+        PdfDocument.PageInfo.Builder(pageWidth, pageHeight, pageNumber).create()
+    )
+
+    var canvas = page.canvas
+    var y = margin
+
+    fun newPage() {
+        document.finishPage(page)
+        pageNumber++
+
+        page = document.startPage(
+            PdfDocument.PageInfo.Builder(pageWidth, pageHeight, pageNumber).create()
+        )
+
+        canvas = page.canvas
+        y = margin
+    }
+
+    content.lines().forEach { originalLine ->
+        if (originalLine.isEmpty()) {
+            y += lineHeight
+        } else {
+            var remaining = originalLine
+
+            while (remaining.isNotEmpty()) {
+                if (y + lineHeight > pageHeight - margin) {
+                    newPage()
+                }
+
+                val count = paint.breakText(remaining,true, maxWidth,null)
+
+                canvas.drawText(remaining.substring(0, count), margin, y, paint)
+
+                remaining = remaining.substring(count)
+                y += lineHeight
+            }
+        }
+        if (y + lineHeight > pageHeight - margin) newPage()
+    }
+
+    document.finishPage(page)
+
+    try {
+        context.contentResolver.openOutputStream(uri)?.use {
+            document.writeTo(it)
+        } ?: error("Cannot open file")
+    } finally {
+        document.close()
+    }
+}
+
+private fun buildSessionReport(
+    learningStepResult: LearningStepResult,
+    patterns: List<PatternResult>
+): String = buildString {
+
+    fun section(title: String) {
+        appendLine()
+        appendLine(title)
+        appendLine()
+    }
+
+    fun field(name: String, value: Any?) {
+        appendLine("$name: ${value ?: "N/A"}")
+    }
+
+    fun decimal(value: Float?): String =
+        value?.let { "%.4f".format(Locale.US, it) } ?: "N/A"
+
+    appendLine("FRIENDLY LINES - REPORT")
+    appendLine()
+    section("PARAMETERS EXPLANATION")
+    appendLine("shapeMatch - percentage of shape similarity")
+    appendLine("insideArea - percentage of drawing inside the pattern area")
+    appendLine("outsideArea - percentage of drawing outside the pattern area")
+    appendLine("shapeDistance - distance value returned by ShapeCorrectness")
+    appendLine("shapeIsValid - whether the shape passed validity checks")
+    appendLine("timeSeconds - attempt duration in seconds")
+    appendLine("isSuccessful - whether the attempt was successful")
+    appendLine("trajectory - recorded finger positions")
+    appendLine("Coordinates x and y are normalized to the 0-1 range")
+    appendLine("Each STROKE represents a separate finger movement")
+    appendLine()
+
+    section("1. LEARNING STEP")
+
+    field("Name", learningStepResult.name)
+    field("Correct coverage", "${learningStepResult.correctCoverage}%")
+    field("Line out of bounds", "${learningStepResult.lineOutOfBounds}%")
+    field("Shape match", "${learningStepResult.shapeMatch}%")
+    field("Show starting point", learningStepResult.showStartingPoint)
+    field("Test mode", learningStepResult.testMode)
+    field("Time limit", "${learningStepResult.timeLimit} s")
+    field("Attempts", learningStepResult.attempts)
+    field("Random pattern order", learningStepResult.randomPatternOrder)
+    appendLine()
+
+    section("2. PATTERN RESULTS")
+
+    field("Number of patterns", patterns.size)
+
+    patterns.forEachIndexed { index, pattern ->
+
+        section("PATTERN ${index + 1}: ${pattern.patternName}")
+
+        appendLine()
+        appendLine("Configuration")
+        field("Pattern color", pattern.config.patternColor.key)
+        field("Trace color", pattern.config.traceColor.key)
+        field("Background color", pattern.config.backgroundColor.key)
+        field("Thickness", pattern.config.patternThickness)
+        field("Thickness dp", pattern.config.patternThicknessDp.value)
+        field("Pattern variety", pattern.config.patternVariety)
+        field("Order", pattern.config.order)
+
+        appendLine()
+        appendLine("Results")
+
+        field("Shape match", "${pattern.shapeMatch}%")
+        field("Inside area", "${pattern.insideArea}%")
+        field("Outside area", "${pattern.outsideArea}%")
+        field("Correct starting point", pattern.correctStartingPoint)
+        field("Attempts", pattern.attempts)
+        field("Last attempt time", "${decimal(pattern.lastAttemptTime.toFloat())} s")
+        field("Total time", "${decimal(pattern.totalTime.toFloat())} s")
+
+        appendLine()
+        appendLine("Individual attempts")
+
+        pattern.attemptResults.forEach { attempt ->
+
+            appendLine()
+            appendLine("ATTEMPT ${attempt.attemptNumber}")
+            appendLine()
+
+            field("Shape match", "${attempt.shapeMatch}%")
+            field("Inside area", "${attempt.insideArea}%")
+            field("Outside area", "${attempt.outsideArea}%")
+            field("Time", "${decimal(attempt.timeSeconds.toFloat())} s")
+            field("Successful", attempt.isSuccessful)
+
+            field("ShapeDistance", decimal(attempt.shapeDistance))
+            field("ShapeIsValid", attempt.shapeIsValid)
+
+            appendLine()
+            appendLine("Finger trajectory")
+
+            field("Number of strokes", attempt.trajectory.size)
+
+            attempt.trajectory.forEachIndexed { strokeIndex, stroke ->
+
+                appendLine()
+                appendLine("STROKE ${strokeIndex + 1}")
+                field("Number of points", stroke.size)
+
+                stroke.forEachIndexed { pointIndex, point ->
+                    appendLine(
+                        "point_${pointIndex + 1}: " +
+                                "x=${decimal(point.x)}, y=${decimal(point.y)}"
+                    )
+                }
+            }
         }
     }
 }

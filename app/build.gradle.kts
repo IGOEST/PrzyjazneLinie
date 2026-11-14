@@ -47,6 +47,7 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.constraintlayout)
+    implementation(libs.ui.graphics)
 
     val composeBom = platform(libs.androidx.compose.bom)
     implementation(composeBom)

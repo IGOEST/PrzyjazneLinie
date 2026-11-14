@@ -21,6 +21,8 @@ ui = "1.12.0"
 uiUnit = "1.12.0"
 uiVersion = "1.12.1"
 coilCompose = "3.0.4"
+pdfCore = "1.0.0-beta01"
+uiGraphicsVersion = "1.12.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -46,6 +48,8 @@ androidx-compose-ui = { group = "androidx.compose.ui", name = "ui", version.ref 
 androidx-compose-ui-unit = { group = "androidx.compose.ui", name = "ui-unit", version.ref = "uiUnit" }
 ui = { group = "androidx.compose.ui", name = "ui", version.ref = "uiVersion" }
 coil-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coilCompose" }
+androidx-pdf-core = { group = "androidx.pdf", name = "pdf-core", version.ref = "pdfCore" }
+ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics", version.ref = "uiGraphicsVersion" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

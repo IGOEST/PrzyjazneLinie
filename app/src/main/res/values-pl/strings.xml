@@ -276,4 +276,8 @@
     <string name="core_ui_splash_bullet5_label">Aby dowiedzieć się więcej:</string>
     <string name="core_ui_splash_bullet5_body">odwiedź stronę projektu: https://tiapps.org/</string>
 
+    <string name="report_name">raport_Przyjazne_Linie_</string>
+    <string name="saved_report_message">Raport został zapisany</string>
+    <string name="not_saved_report_message">Nie udało się zapisać raportu</string>
+
 </resources>
