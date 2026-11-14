@@ -1,7 +1,9 @@
 package com.example.friendlylines.child_app.assessment
 
 import com.example.shared.data.models.Point
+import kotlin.math.abs
 import kotlin.math.acos
+import kotlin.math.pow
 import kotlin.math.sqrt
 
 data class ShapeAssessmentResult(
@@ -23,7 +25,7 @@ class ShapeCorrectness (
     private val maxSampleCount: Int = 1024,
     private val sampleCountMultiplier: Double = 100.0,
     private val maxStrokesToMatch: Int = 8,
-    private val turnImportance: Double = 0.5
+    private val turnImportance: Double = 1.5
 ) {
     init {
         require(maxStrokesToMatch >= 1)
@@ -90,13 +92,23 @@ class ShapeCorrectness (
 
         val score = (1.0 - bestDistance / referenceScale)
             .coerceIn(0.0, 1.0)
-            .toFloat()
+
+        val finalScore = transformScore(score)
 
         return ShapeAssessmentResult(
-            score = score,
+            score = finalScore,
             distance = bestDistance.toFloat(),
             isValid = true
         )
+    }
+
+    private fun transformScore(rawScore: Double): Float {
+        val scoreExponent = 2.0
+
+        return rawScore
+            .coerceIn(0.0, 1.0)
+            .pow(scoreExponent)
+            .toFloat()
     }
 
     /**
@@ -245,7 +257,6 @@ class ShapeCorrectness (
     /**
      * STROKE MATCHING
      */
-
     // trying every possible assignment of strokes
     private fun findBestAssignment(
         user: List<List<Point>>,
@@ -334,8 +345,7 @@ class ShapeCorrectness (
         referenceStroke: List<Point>,
         userIndex: Int,
         referenceIndex: Int,
-        closed: Boolean,
-        turnScale: Double
+        closed: Boolean
     ): Double {
         val userTurn = calculateTurn(
             stroke = userStroke,
@@ -350,12 +360,9 @@ class ShapeCorrectness (
         )
 
         // normalizing to range 0-1
-        val normalizedTurnError = (userTurn - referenceTurn)/ Math.PI
+        val difference = abs(userTurn - referenceTurn)/ Math.PI
 
-        // recalculating with scale
-        val turnError = turnScale*normalizedTurnError
-
-        return turnError*turnError
+        return difference * difference * turnImportance
     }
 
     private fun calculatePositionError(
@@ -395,8 +402,7 @@ class ShapeCorrectness (
                 referenceStroke = referenceStroke,
                 userIndex = i,
                 referenceIndex = referenceIndex,
-                closed = closed,
-                turnScale = turnImportance
+                closed = closed
             )
 
             totalError += positionError + turnError
@@ -430,12 +436,14 @@ class ShapeCorrectness (
         }
 
         // for close patterns we have to test all possible starting points
-        for (shift in 0 until n) {
-            bestError = minOf(
-                bestError,
-                combineErrors(shift, reversed = false, closed = true, userStroke, referenceStroke),
-                combineErrors(shift, reversed = true, closed = true, userStroke, referenceStroke)
-            )
+        if (userClosed) {
+            for (shift in 0 until n) {
+                bestError = minOf(
+                    bestError,
+                    combineErrors(shift, reversed = false, closed = true, userStroke, referenceStroke),
+                    combineErrors(shift, reversed = true, closed = true, userStroke, referenceStroke)
+                )
+            }
         }
 
         return bestError
