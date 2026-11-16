@@ -487,8 +487,19 @@ class ChildViewModel  @Inject constructor(
     /**
      * PATTERN LOADING AND PREPARATION
      */
+    private fun applyColorVariety(patternResult: PatternResult) {
+        if (!patternResult.config.colorVariety) return
+        val colors = PatternConfigOptions.randomColorSet()
+        patternResult.config = patternResult.config.copy(
+            patternColor = colors.pattern,
+            traceColor = colors.trace,
+            backgroundColor = colors.background
+        )
+    }
+
     private fun loadPatternDrawing(index: Int, state: GameState) {
         val patternResult = state.patternResults.getOrNull(index) ?: return
+        applyColorVariety(patternResult)
 
         // Start time limit for the new pattern
         startTimeLimitTimer(state.learningStepResult?.timeLimit ?: 0)
@@ -522,7 +533,7 @@ class ChildViewModel  @Inject constructor(
                 if (activePatterns.isEmpty()) return@launch
 
                 currentAccuracyLevel = if (step.isTest) step.test.accuracyLevel else step.learning.accuracyLevel
-                var patternResults = mutableListOf<PatternResult>()
+                val patternResults = mutableListOf<PatternResult>()
                 val testMode = step.isTest
                 val repetitions = if (testMode) step.test.repetitions else step.learning.repetitions
                 val learningStepResult = LearningStepResult(
@@ -559,7 +570,8 @@ class ChildViewModel  @Inject constructor(
                                 patternThicknessDp = widthEnum.toDp(),
                                 smoothingEnabled = patternEntity.smoothingEnabled,
                                 patternVariety = p.patternVariety,
-                                order = p.order
+                                order = p.order,
+                                colorVariety = p.colorVariety
                             )
 
                             patternResults.add(

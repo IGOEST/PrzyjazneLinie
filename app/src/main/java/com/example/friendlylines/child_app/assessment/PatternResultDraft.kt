@@ -12,7 +12,8 @@ data class PatternConfig(
     val patternThicknessDp: Dp,
     val smoothingEnabled: Boolean,
     val patternVariety: Boolean,
-    val order: Int
+    val order: Int,
+    val colorVariety: Boolean
 )
 
 data class LearningStepResult(
@@ -39,7 +40,7 @@ data class PatternResult(
     val patternId: Long,
     var patternName: String,
     var originalName: String,
-    val config: PatternConfig,
+    var config: PatternConfig,
     var shapeMatch: Int = 0,
     val correctStartingPoint: Boolean = true,
     var lastAttemptTime: Double = 0.0,

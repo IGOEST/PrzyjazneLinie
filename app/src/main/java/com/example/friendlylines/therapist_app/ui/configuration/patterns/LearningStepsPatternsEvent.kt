@@ -17,7 +17,8 @@ sealed class LearningStepsPatternsEvent {
         val patternColor: ColorOption?,
         val writingColor: ColorOption?,
         val backgroundColor: ColorOption?,
-        val patternVariety: Boolean
+        val patternVariety: Boolean,
+        val colorVariety: Boolean
     ) : LearningStepsPatternsEvent()
     data class UpdatePattern(
         val configId: Long,
@@ -26,7 +27,9 @@ sealed class LearningStepsPatternsEvent {
         val patternColor: ColorOption?,
         val writingColor: ColorOption?,
         val backgroundColor: ColorOption?,
-        val patternVariety: Boolean
+        val patternVariety: Boolean,
+        val colorVariety: Boolean
+
     ) : LearningStepsPatternsEvent()
     data object ScrollToConfigHandled : LearningStepsPatternsEvent()
 }

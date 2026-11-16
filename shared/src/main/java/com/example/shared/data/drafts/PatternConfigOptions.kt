@@ -80,4 +80,21 @@ object PatternConfigOptions {
     fun getBackgroundColor(name: String?): ColorOption {
         return background.find { it.key == name } ?: background.first()
     }
+
+    data class RandomColorSet(
+        val pattern: ColorOption,
+        val trace: ColorOption,
+        val background: ColorOption
+    )
+
+    /*
+    Chooses randomly from available colors,
+    with restriction that pattern and writing cannot be the same
+     */
+    fun randomColorSet(random: kotlin.random.Random = kotlin.random.Random): RandomColorSet {
+        val bg = background.random(random)
+        val pat = patternAndWriting.random(random)
+        val tr = patternAndWriting.filter { it.key != pat.key }.random(random)
+        return RandomColorSet(pattern = pat, trace = tr, background = bg)
+    }
 }

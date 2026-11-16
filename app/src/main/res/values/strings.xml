@@ -54,6 +54,8 @@
     <string name="background_color_text">Background color</string>
     <string name="pattern_variety_text">Pattern variety</string>
     <string name="pattern_variety_info">The pattern can vary in size, length, and slope.</string>
+    <string name="color_variety_text">Color variety</string>
+    <string name="color_variety_info">Colors will be chosen at random.</string>
     <string name="save_config_dialog_title">Save?</string>
     <string name="pattern_text">Pattern</string>
     <string name="pattern_color_text">Pattern color</string>

@@ -74,6 +74,8 @@
     <string name="background_color_text">Kolor tła</string>
     <string name="pattern_variety_text">Różnorodność wzoru</string>
     <string name="pattern_variety_info">Wzór może zmieniać warianty wielkości, długości i pochylenia.</string>
+    <string name="color_variety_text">Różnorodność koloru</string>
+    <string name="color_variety_info">Kolory będą dobierane losowo.</string>
     <string name="save_config_dialog_title">Zapisać?</string>
 
     <string name="pattern_text">Wzór</string>
