@@ -2,7 +2,7 @@ package com.example.friendlylines.child_app.ui
 
 import androidx.compose.ui.unit.Dp
 import com.example.shared.data.drafts.ColorOption
-import com.example.shared.data.models.Point
+import com.example.shared.data.models.PointWithTime
 
 data class PatternConfig(
     val patternColor: ColorOption,
@@ -60,7 +60,7 @@ data class AttemptResult(
     val outsideArea: Int,
     val timeSeconds: Double,
     val isSuccessful: Boolean,
-    val trajectory: List<List<Point>> = emptyList(),
+    val trajectory: List<List<PointWithTime>> = emptyList(),
     val shapeDistance: Float? = null,
     val shapeIsValid: Boolean? = null
 )

@@ -16,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AssignmentTurnedIn
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -25,6 +26,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.composeunstyled.ToggleSwitch
 import com.example.friendlylines.R
 import com.example.friendlylines.child_app.ui.components.IconType
 import com.example.friendlylines.child_app.ui.components.TemplateChildButton
@@ -42,6 +44,8 @@ fun MainMenuScreen(
     mode: String = "",
     canPlay: Boolean,
     onPlayClick: () -> Unit,
+    recordingEnabled: Boolean,
+    onRecordingEnabledChanged: (Boolean) -> Unit
 ) {
     ChildGameStartBackground {
         BoxWithConstraints(
@@ -94,6 +98,25 @@ fun MainMenuScreen(
                         value = mode,
                         fontScale = fontScale
                     )
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 8.dp.scaled()),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        Text(
+                            text = stringResource(R.string.enable_recording),
+                            color = FriendlyLinesColors.PrimaryFriendlyLines.P1000,
+                            style = FriendlyLinesTextStyles.bodyRegular.copy(
+                            fontSize = FriendlyLinesTextStyles.bodyRegular.fontSize * fontScale)
+                        )
+                        Spacer(modifier = Modifier.size(8.dp.scaled()))
+                        Switch(
+                            checked = recordingEnabled,
+                            onCheckedChange = onRecordingEnabledChanged
+                        )
+                    }
                 }
                 Spacer(
                     modifier = Modifier

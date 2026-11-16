@@ -17,6 +17,7 @@ import kotlinx.coroutines.delay
 @Composable
 fun ChildMainScreen(viewModel: ChildViewModel = hiltViewModel()) {
     val state by viewModel.state.collectAsState()
+    val recordingEnabled by viewModel.recordingEnabled.collectAsState()
 
     when (state.screenState) {
         "info" -> {
@@ -45,7 +46,9 @@ fun ChildMainScreen(viewModel: ChildViewModel = hiltViewModel()) {
                     else -> ""
                 },
                 canPlay = !(state.learningStepResult == null || state.patternResults.isEmpty()),
-                onPlayClick = { viewModel.onEvent(ChildMainEvent.GoToNextScreen) }
+                onPlayClick = { viewModel.onEvent(ChildMainEvent.GoToNextScreen)},
+                recordingEnabled = recordingEnabled,
+                onRecordingEnabledChanged = viewModel::setRecordingEnabled
             )
         }
         "game" -> {

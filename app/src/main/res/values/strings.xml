@@ -267,6 +267,8 @@
     <string name="saved_report_message">Report saved</string>
     <string name="not_saved_report_message">Cannot save report</string>
 
+    <string name="enable_recording">Enable recording</string>
+
 
 </resources>
 

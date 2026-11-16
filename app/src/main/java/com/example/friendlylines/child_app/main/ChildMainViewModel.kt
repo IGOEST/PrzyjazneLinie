@@ -1,7 +1,10 @@
 package com.example.friendlylines.child_app.main
 
+import android.content.Context
+import android.os.SystemClock
 import android.util.Log
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.friendlylines.child_app.assessment.AreaComparison
@@ -29,17 +32,25 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import androidx.compose.ui.unit.IntSize
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.friendlylines.R
 import com.example.friendlylines.child_app.assessment.toCanvasPixelStrokes
 import com.example.friendlylines.therapist_app.ui.materials.geometry.toNormalized
 import com.example.friendlylines.child_app.assessment.AssessmentCriteria
+import com.example.friendlylines.child_app.reports.CsvExporter
+import com.example.friendlylines.child_app.reports.ReportBuilder
 import com.example.friendlylines.child_app.ui.AttemptResult
 import com.example.shared.data.drafts.AccuracyLevel
 import com.example.shared.data.models.Point
+import com.example.shared.data.models.PointWithTime
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
 
 @HiltViewModel
 class ChildViewModel  @Inject constructor(
     private val learningStepRepository: LearningStepsRepository,
-    private val patternRepository: PatternRepository
+    private val patternRepository: PatternRepository,
+    @ApplicationContext private val context: Context
 )  : ViewModel() {
 
     /**
@@ -59,6 +70,8 @@ class ChildViewModel  @Inject constructor(
     private var timeLimitRemainingMillis: Long? = null
     private var timerStartedAt: Long = 0L
     private var isFinishTimerActive = false
+    private val recordedStrokes = mutableListOf<MutableList<PointWithTime>>()
+    private var attemptStartedAt = 0L
     private var canvasSize: IntSize = IntSize.Zero
     private var currentAccuracyLevel = AccuracyLevel.MEDIUM
 
@@ -75,6 +88,13 @@ class ChildViewModel  @Inject constructor(
         val shapeDistance: Float?,
         val shapeIsValid: Boolean?
     )
+
+    private val _recordingEnabled = MutableStateFlow(false)
+    val recordingEnabled: StateFlow<Boolean> = _recordingEnabled.asStateFlow()
+
+    fun setRecordingEnabled(enabled: Boolean) {
+        _recordingEnabled.value = enabled
+    }
 
     /**
      * INITIALIZATION
@@ -111,11 +131,19 @@ class ChildViewModel  @Inject constructor(
     /**
      * DRAWING INPUT HANDLING
      */
-
-    // Finger actions functions
     private fun handlePointerDown(position: Offset) {
         if (_state.value.isReinforcementPlaying) return
         finishTimerJob?.cancel()
+
+        val timeReached = (SystemClock.elapsedRealtime() - attemptStartedAt)/1000f
+        recordedStrokes.add(
+            mutableListOf(
+                PointWithTime(
+                    point = Point(x=position.x, y=position.y),
+                    timeReached = timeReached
+                )
+            )
+        )
         _state.update { currentState ->
             val newStrokes = currentState.userStrokes + listOf(listOf(position))
             currentState.copy(userStrokes = newStrokes)
@@ -124,6 +152,14 @@ class ChildViewModel  @Inject constructor(
 
     private fun handlePointerMove(position: Offset) {
         if (_state.value.isReinforcementPlaying) return
+
+        val timeReached = (SystemClock.elapsedRealtime() - attemptStartedAt)/1000f
+        recordedStrokes.lastOrNull()?.add(
+            PointWithTime(
+                point = Point(x=position.x, y=position.y),
+                timeReached = timeReached
+            )
+        )
         _state.update { currentState ->
             if (currentState.userStrokes.isEmpty()) return@update currentState
             
@@ -225,31 +261,21 @@ class ChildViewModel  @Inject constructor(
     }
 
     private fun saveStrokesTrajectory(
-        strokes: List<List<Offset>>,
-    ): List<List<Point>> {
+    ): List<List<PointWithTime>> {
         if (canvasSize == IntSize.Zero) return emptyList()
-        val intervalPx = (2f * 160f / 25.4f) * density // 2mm
+        val timeInterval = 0.1f
 
-        return strokes.mapNotNull { stroke ->
+        return recordedStrokes.mapNotNull { stroke ->
             if (stroke.isEmpty()) return@mapNotNull null
 
-            val sampledPoints = mutableListOf<Offset>()
+            val sampledPoints = mutableListOf<PointWithTime>()
             sampledPoints.add(stroke.first())
-            var distanceSinceLastSaved = 0f
+            var lastSavedTime = stroke.first().timeReached
 
-            for (i in 1 until stroke.size) {
-                val previousPoint = stroke[i - 1]
-                val currentPoint = stroke[i]
-
-                val dx = currentPoint.x - previousPoint.x
-                val dy = currentPoint.y - previousPoint.y
-                val distance = kotlin.math.sqrt(dx * dx + dy * dy)
-
-                distanceSinceLastSaved += distance
-
-                if (distanceSinceLastSaved >= intervalPx) {
-                    sampledPoints.add(currentPoint)
-                    distanceSinceLastSaved = 0f
+            for (point in stroke.drop(1)) {
+                if (point.timeReached - lastSavedTime >= timeInterval) {
+                    sampledPoints.add(point)
+                    lastSavedTime = point.timeReached
                 }
             }
 
@@ -257,12 +283,18 @@ class ChildViewModel  @Inject constructor(
                 sampledPoints.add(stroke.last())
             }
 
-            sampledPoints.map { point ->
-                val normalized = point.toNormalized(canvasSize)
+            sampledPoints.map { timedPoint ->
+                val normalized = Offset(
+                    timedPoint.point.x,
+                    timedPoint.point.y
+                ).toNormalized(canvasSize)
 
-                Point(
-                    x = normalized.x,
-                    y = normalized.y
+                PointWithTime(
+                    point = Point(
+                        x = normalized.x,
+                        y = normalized.y
+                    ),
+                    timeReached = timedPoint.timeReached
                 )
             }
         }
@@ -280,6 +312,9 @@ class ChildViewModel  @Inject constructor(
     }
 
     private fun startTimeLimitTimer(limitSeconds: Int) {
+        attemptStartedAt = SystemClock.elapsedRealtime()
+        recordedStrokes.clear()
+
         if (limitSeconds <= 0) {
             timeLimitRemainingMillis = null
             return
@@ -330,7 +365,7 @@ class ChildViewModel  @Inject constructor(
 
         val scores = if (state.userStrokes.isNotEmpty()) evaluateCurrentDrawing()
         else AttemptScores(0, 0, 0, shapeDistance = null, shapeIsValid = null)
-        val trajectory = saveStrokesTrajectory(state.userStrokes)
+        val trajectory = saveStrokesTrajectory()
 
         val seconds = finishAttempt()
         val success = AssessmentCriteria.isSuccessful(
@@ -428,10 +463,10 @@ class ChildViewModel  @Inject constructor(
         timeLimitRemainingMillis = null
         isFinishTimerActive = false
 
-        _state.update { currentState ->
-            val nextIndex = currentState.currentPattern + 1
-            if (nextIndex < currentState.patternResults.size) {
-                // Clear strokes and load next pattern
+        val currentState = _state.value
+        val nextIndex = currentState.currentPattern + 1
+        if (nextIndex < currentState.patternResults.size) {
+            _state.update { state ->
                 val newState = currentState.copy(
                     currentPattern = nextIndex,
                     userStrokes = emptyList(),
@@ -441,17 +476,30 @@ class ChildViewModel  @Inject constructor(
                 )
                 loadPatternDrawing(nextIndex, newState)
                 newState
-            } else {
-                val results = currentState.patternResults
-                if (results.isNotEmpty()) {
-                    val avgShape = results.map { it.shapeMatch }.average().toInt()
+            }
+        } else {
+            val results = currentState.patternResults
+            if (results.isNotEmpty()) {
+                val avgShape = results.map { it.shapeMatch }.average().toInt()
 
-                    currentState.learningStepResult?.apply {
-                        shapeMatch = avgShape
+                currentState.learningStepResult?.apply {
+                    shapeMatch = avgShape
+                }
+            }
+            if (_recordingEnabled.value) {
+                val csvContent = ReportBuilder.buildTrajectoryCsv(results)
+
+                viewModelScope.launch(Dispatchers.IO) {
+                    try {
+                        CsvExporter.save(context, csvContent)
+                        Log.i("CSV_EXPORT", "File saved successfully")
+                    } catch (exception: Exception) {
+                        Log.e("CSV_EXPORT", "Could not save file", exception)
                     }
                 }
-                currentState.copy(screenState = "end", isReinforcementPlaying = false)
             }
+             _recordingEnabled.value = false
+            _state.update { it.copy(screenState = "end", isReinforcementPlaying = false) }
         }
     }
 

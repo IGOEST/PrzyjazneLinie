@@ -282,4 +282,6 @@
     <string name="saved_report_message">Raport został zapisany</string>
     <string name="not_saved_report_message">Nie udało się zapisać raportu</string>
 
+    <string name="enable_recording">Włącz nagrywanie</string>
+
 </resources>
