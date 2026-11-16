@@ -114,6 +114,7 @@ class ChildViewModel  @Inject constructor(
 
     // Finger actions functions
     private fun handlePointerDown(position: Offset) {
+        if (_state.value.isReinforcementPlaying) return
         finishTimerJob?.cancel()
         _state.update { currentState ->
             val newStrokes = currentState.userStrokes + listOf(listOf(position))
@@ -122,6 +123,7 @@ class ChildViewModel  @Inject constructor(
     }
 
     private fun handlePointerMove(position: Offset) {
+        if (_state.value.isReinforcementPlaying) return
         _state.update { currentState ->
             if (currentState.userStrokes.isEmpty()) return@update currentState
             
@@ -134,6 +136,7 @@ class ChildViewModel  @Inject constructor(
     }
 
     private fun handlePointerUp() {
+        if (_state.value.isReinforcementPlaying) return
         startFinishTimer()  // timer after trace is finished, in case user continues drawing
     }
 
@@ -414,7 +417,8 @@ class ChildViewModel  @Inject constructor(
         _state.update { it.copy(
             screenState = "main",
             userStrokes = emptyList(),
-            isMenuOpen = false
+            isMenuOpen = false,
+            isReinforcementPlaying = false
         ) }
     }
 
@@ -432,7 +436,8 @@ class ChildViewModel  @Inject constructor(
                     currentPattern = nextIndex,
                     userStrokes = emptyList(),
                     currentPatternDrawing = null,
-                    shapeAssessmentResult = null
+                    shapeAssessmentResult = null,
+                    isReinforcementPlaying = false
                 )
                 loadPatternDrawing(nextIndex, newState)
                 newState
@@ -445,7 +450,7 @@ class ChildViewModel  @Inject constructor(
                         shapeMatch = avgShape
                     }
                 }
-                currentState.copy(screenState = "end")
+                currentState.copy(screenState = "end", isReinforcementPlaying = false)
             }
         }
     }
@@ -648,6 +653,7 @@ class ChildViewModel  @Inject constructor(
         val praiseWord = enabledPraiseWords.random()
 
         val result = _effects.trySend(ReinforcementEvent.PlayPraise(praiseWord))
+        if (result.isSuccess) _state.update { it.copy(isReinforcementPlaying = true) }
         return result.isSuccess
     }
 
@@ -667,6 +673,7 @@ class ChildViewModel  @Inject constructor(
 
         val theme = animationsThemes.random()
         val result = _effects.trySend(ReinforcementEvent.PlayAnimation(theme))
+        if (result.isSuccess) _state.update { it.copy(isReinforcementPlaying = true) }
         return result.isSuccess
     }
 

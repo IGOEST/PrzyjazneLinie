@@ -119,6 +119,7 @@ fun GameDrawingScreen(
 
     val gameState by viewModel.state.collectAsState()
     val isMenuOpen = gameState.isMenuOpen
+    val isReinforcementPlaying = gameState.isReinforcementPlaying
     val currentPatternResult = gameState.patternResults.getOrNull(gameState.currentPattern)
     val backgroundColor = currentPatternResult?.config?.backgroundColor?.color ?: FriendlyLinesColors.Shades.White
 
@@ -132,8 +133,8 @@ fun GameDrawingScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(backgroundColor)
-                    .pointerInput(isMenuOpen) {
-                        if (isMenuOpen) return@pointerInput
+                    .pointerInput(isMenuOpen, isReinforcementPlaying) {
+                        if (isMenuOpen || isReinforcementPlaying) return@pointerInput
                         detectDragGestures(
                             onDragStart = { offset ->
                                 viewModel.onEvent(ChildMainEvent.OnPointerDown(offset))

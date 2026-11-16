@@ -15,6 +15,7 @@ data class GameState(
     val currentPatternDrawing: PatternDrawing? = null,
     val userStrokes: List<List<Offset>> = emptyList(),
     val isMenuOpen: Boolean = false,
+    val isReinforcementPlaying: Boolean = false,
     val activeStepName: String = "",
     val activeStepLearning: Boolean = false,
     val activeStepTest: Boolean = false,
