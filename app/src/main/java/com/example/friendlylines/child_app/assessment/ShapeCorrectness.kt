@@ -5,6 +5,7 @@ import kotlin.math.abs
 import kotlin.math.acos
 import kotlin.math.pow
 import kotlin.math.sqrt
+import androidx.compose.ui.geometry.Offset
 
 data class ShapeAssessmentResult(
     val score: Float,   // 0.0 = very different, 1.0 = identical
@@ -526,5 +527,17 @@ class ShapeCorrectness (
             isValid = false
         )
     }
+}
 
+// checks whether child starting point is the same as one of the pattern
+object StartingPointCheck {
+    fun isCorrect(
+        userStrokes: List<List<Offset>>,
+        patternStrokes: List<List<Offset>>,
+        tolerancePx: Float = 10f
+    ): Boolean {
+        val userStart = userStrokes.firstOrNull()?.firstOrNull() ?: return false
+        val patternStart = patternStrokes.firstOrNull()?.firstOrNull() ?: return true
+        return (userStart - patternStart).getDistance() <= tolerancePx
+    }
 }

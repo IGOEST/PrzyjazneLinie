@@ -42,7 +42,7 @@ data class PatternResult(
     var originalName: String,
     var config: PatternConfig,
     var shapeMatch: Int = 0,
-    val correctStartingPoint: Boolean = true,
+    var correctStartingPoint: Boolean = true,
     var lastAttemptTime: Double = 0.0,
     var totalTime: Double = 0.0,
     var attempts: Int,
@@ -62,5 +62,6 @@ data class AttemptResult(
     val isSuccessful: Boolean,
     val trajectory: List<List<PointWithTime>> = emptyList(),
     val shapeDistance: Float? = null,
-    val shapeIsValid: Boolean? = null
+    val shapeIsValid: Boolean? = null,
+    val correctStartingPoint: Boolean = true
 )

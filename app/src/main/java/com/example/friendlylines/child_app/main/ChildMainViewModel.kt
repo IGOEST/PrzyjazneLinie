@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.SystemClock
 import android.util.Log
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.friendlylines.child_app.assessment.AreaComparison
@@ -32,8 +31,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import androidx.compose.ui.unit.IntSize
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.friendlylines.R
 import com.example.friendlylines.child_app.assessment.toCanvasPixelStrokes
 import com.example.friendlylines.therapist_app.ui.materials.geometry.toNormalized
 import com.example.friendlylines.child_app.assessment.AssessmentCriteria
@@ -45,6 +42,7 @@ import com.example.shared.data.models.Point
 import com.example.shared.data.models.PointWithTime
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
+import com.example.friendlylines.child_app.assessment.StartingPointCheck
 
 @HiltViewModel
 class ChildViewModel  @Inject constructor(
@@ -86,7 +84,8 @@ class ChildViewModel  @Inject constructor(
         val insideArea: Int,
         val outsideArea: Int,
         val shapeDistance: Float?,
-        val shapeIsValid: Boolean?
+        val shapeIsValid: Boolean?,
+        val correctStartingPoint: Boolean = false
     )
 
     private val _recordingEnabled = MutableStateFlow(false)
@@ -229,6 +228,22 @@ class ChildViewModel  @Inject constructor(
             )
         } else null
 
+        // starting point
+        val correctStartingPoint = if (referenceDrawing != null && patternResult != null) {
+            val patternPx = referenceDrawing.toCanvasPixelStrokes(
+                canvasSize = canvasSize,
+                density = density,
+                scaleMultiplier = currentState.patternScale,
+                rotationDegrees = currentState.patternRotation,
+                smoothing = patternResult.config.smoothingEnabled
+            )
+            StartingPointCheck.isCorrect(
+                userStrokes = currentState.userStrokes,
+                patternStrokes = patternPx,
+                tolerancePx = 48f * density   // margin
+            )
+        } else false
+
         _state.update {
             it.copy(shapeAssessmentResult = shapeResult)
         }
@@ -240,7 +255,8 @@ class ChildViewModel  @Inject constructor(
             insideArea = areaResult?.patternCoveragePercent?.toInt() ?: 0,
             outsideArea = areaResult?.drawingOutsidePercent?.toInt() ?: 0,
             shapeDistance = shapeResult?.distance,
-            shapeIsValid = shapeResult?.isValid
+            shapeIsValid = shapeResult?.isValid,
+            correctStartingPoint = correctStartingPoint
         )
     }
 
@@ -356,6 +372,7 @@ class ChildViewModel  @Inject constructor(
         startTimeLimitTimer(_state.value.learningStepResult?.timeLimit ?: 0)
     }
 
+    // saves attempt data
     private fun completeAttempt(): Boolean {
         gameTimerJob?.cancel()
         finishTimerJob?.cancel()
@@ -383,13 +400,15 @@ class ChildViewModel  @Inject constructor(
             isSuccessful = success,
             trajectory = trajectory,
             shapeDistance = scores.shapeDistance,
-            shapeIsValid = scores.shapeIsValid
+            shapeIsValid = scores.shapeIsValid,
+            correctStartingPoint = scores.correctStartingPoint
         )
 
         patternResult.attempts = patternResult.attemptResults.size
         patternResult.shapeMatch = scores.shapeMatch
         patternResult.insideArea = scores.insideArea
         patternResult.outsideArea = scores.outsideArea
+        patternResult.correctStartingPoint = scores.correctStartingPoint
 
         updateLearningStepResults()
         return success
