@@ -248,7 +248,7 @@ fun GameDrawingScreen(
                         ) {
                             TemplateChildButton(
                                 icon = IconType.StartAgain,
-                                onClick = { } //TODO: restart
+                                onClick = { viewModel.onEvent(ChildMainEvent.RestartPattern) }
                             )
                             TemplateChildButton(
                                 icon = IconType.Back,

@@ -11,4 +11,5 @@ sealed class ChildMainEvent {
     data class OnPointerMove(val position: Offset) : ChildMainEvent()
     object OnPointerUp : ChildMainEvent()
     object ToggleMenu : ChildMainEvent()
+    object RestartPattern : ChildMainEvent()
 }

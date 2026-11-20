@@ -70,6 +70,9 @@ class ChildViewModel  @Inject constructor(
     private var isFinishTimerActive = false
     private val recordedStrokes = mutableListOf<MutableList<PointWithTime>>()
     private var attemptStartedAt = 0L
+    private var attemptTimeAccumulatedMs = 0L
+    private var attemptTimeResumedAt = 0L
+    private var attemptTimeRunning = false
     private var canvasSize: IntSize = IntSize.Zero
     private var currentAccuracyLevel = AccuracyLevel.MEDIUM
 
@@ -120,6 +123,7 @@ class ChildViewModel  @Inject constructor(
             is ChildMainEvent.OnPointerUp -> handlePointerUp()
             is ChildMainEvent.OnCanvasSizeChanged -> {canvasSize = event.size}
             is ChildMainEvent.ToggleMenu -> handleToggleMenu()
+            is ChildMainEvent.RestartPattern -> handleRestartPattern()
             is ChildMainEvent.BackToMainMenu -> handleBackToMainMenu()
             else -> _state.update { currentState ->
                 reduce(currentState, event)
@@ -132,6 +136,7 @@ class ChildViewModel  @Inject constructor(
      */
     private fun handlePointerDown(position: Offset) {
         if (_state.value.isReinforcementPlaying) return
+        stopTimeLimitCountdown()
         finishTimerJob?.cancel()
 
         val timeReached = (SystemClock.elapsedRealtime() - attemptStartedAt)/1000f
@@ -172,7 +177,16 @@ class ChildViewModel  @Inject constructor(
 
     private fun handlePointerUp() {
         if (_state.value.isReinforcementPlaying) return
-        startFinishTimer()  // timer after trace is finished, in case user continues drawing
+
+        val state = _state.value
+        val patternStrokes = state.currentPatternDrawing?.strokes?.size ?: 1
+        val timeLimit = state.learningStepResult?.timeLimit ?: 0
+
+        if (state.userStrokes.size < patternStrokes && timeLimit > 0) {
+            startStrokeCountdown(timeLimit)   // waiting for the next pattern stroke
+        } else {
+            startFinishTimer()                // if all strokes drawn
+        }
     }
 
     /**
@@ -327,10 +341,15 @@ class ChildViewModel  @Inject constructor(
         }
     }
 
+    // new attempt: reset time measurement and recorded strokes
     private fun startTimeLimitTimer(limitSeconds: Int) {
+        startAttemptClock()
         attemptStartedAt = SystemClock.elapsedRealtime()
         recordedStrokes.clear()
+        startStrokeCountdown(limitSeconds)
+    }
 
+    private fun startStrokeCountdown(limitSeconds: Int) {
         if (limitSeconds <= 0) {
             timeLimitRemainingMillis = null
             return
@@ -338,6 +357,35 @@ class ChildViewModel  @Inject constructor(
         gameTimerJob?.cancel()
         timeLimitRemainingMillis = limitSeconds * 1000L
         startTimerWithMillis(timeLimitRemainingMillis!!)
+    }
+
+    // stop the countdown
+    private fun stopTimeLimitCountdown() {
+        gameTimerJob?.cancel()
+        timeLimitRemainingMillis = null
+    }
+
+    private fun startAttemptClock() {
+        attemptTimeAccumulatedMs = 0L
+        attemptTimeResumedAt = SystemClock.elapsedRealtime()
+        attemptTimeRunning = true
+    }
+
+    private fun pauseAttemptClock() {
+        if (!attemptTimeRunning) return
+        attemptTimeAccumulatedMs += SystemClock.elapsedRealtime() - attemptTimeResumedAt
+        attemptTimeRunning = false
+    }
+
+    private fun resumeAttemptClock() {
+        if (attemptTimeRunning) return
+        attemptTimeResumedAt = SystemClock.elapsedRealtime()
+        attemptTimeRunning = true
+    }
+
+    private fun attemptElapsedSeconds(): Double {
+        val running = if (attemptTimeRunning) SystemClock.elapsedRealtime() - attemptTimeResumedAt else 0L
+        return (attemptTimeAccumulatedMs + running) / 1000.0
     }
 
     private fun startTimerWithMillis(millis: Long) {
@@ -352,12 +400,8 @@ class ChildViewModel  @Inject constructor(
      * ATTEMPT HANDLING
      */
     // Time is counted for whole pattern and last (or successful) attempt
-    private fun finishAttempt(): Double {
-        val limitMillis = (_state.value.learningStepResult?.timeLimit ?: return 0.0) * 1000L
-        val remaining = (timeLimitRemainingMillis ?: return 0.0) -
-                (System.currentTimeMillis() - timerStartedAt)
-        val s = ((limitMillis - remaining).coerceIn(0L, limitMillis) / 1000.0 - waitTime)
-            .coerceAtLeast(0.0)
+    private fun finishAttempt(finishDelaySeconds: Double): Double {
+        val s = (attemptElapsedSeconds() - finishDelaySeconds).coerceAtLeast(0.0)
 
         val result = _state.value.patternResults
             .getOrNull(_state.value.currentPattern) ?: return 0.0
@@ -373,7 +417,7 @@ class ChildViewModel  @Inject constructor(
     }
 
     // saves attempt data
-    private fun completeAttempt(): Boolean {
+    private fun completeAttempt(finishDelaySeconds: Double = waitTime): Boolean {
         gameTimerJob?.cancel()
         finishTimerJob?.cancel()
 
@@ -384,7 +428,7 @@ class ChildViewModel  @Inject constructor(
         else AttemptScores(0, 0, 0, shapeDistance = null, shapeIsValid = null)
         val trajectory = saveStrokesTrajectory()
 
-        val seconds = finishAttempt()
+        val seconds = finishAttempt(finishDelaySeconds)
         val success = AssessmentCriteria.isSuccessful(
             currentAccuracyLevel,
             scores.shapeMatch,
@@ -425,7 +469,7 @@ class ChildViewModel  @Inject constructor(
 
     // time limit ran out
     private fun onTimeLimitReached() {
-        val success = completeAttempt()
+        val success = completeAttempt(finishDelaySeconds = 0.0)
         if (success || !hasAttemptsLeft()) goToNextPattern() else restartAttempt()
     }
 
@@ -436,6 +480,7 @@ class ChildViewModel  @Inject constructor(
         val currentlyOpen = _state.value.isMenuOpen
         if (!currentlyOpen) {
             // Opening menu - Pause
+            pauseAttemptClock()
             val elapsed = System.currentTimeMillis() - timerStartedAt
             timeLimitRemainingMillis = timeLimitRemainingMillis?.let { it - elapsed }
 
@@ -449,6 +494,7 @@ class ChildViewModel  @Inject constructor(
             }
         } else {
             // Closing menu - Resume
+            resumeAttemptClock()
             timeLimitRemainingMillis?.let {
                 if (it > 0) {
                     startTimerWithMillis(it)
@@ -461,6 +507,24 @@ class ChildViewModel  @Inject constructor(
         }
 
         _state.update { it.copy(isMenuOpen = !currentlyOpen) }
+    }
+
+    // Restart button: removes the strokes and starts the attempt again
+    private fun handleRestartPattern() {
+        if (_state.value.isReinforcementPlaying) return
+
+        gameTimerJob?.cancel()
+        finishTimerJob?.cancel()
+        isFinishTimerActive = false
+
+        _state.update {
+            it.copy(
+                userStrokes = emptyList(),
+                shapeAssessmentResult = null,
+                isMenuOpen = false
+            )
+        }
+        startTimeLimitTimer(_state.value.learningStepResult?.timeLimit ?: 0)
     }
 
     private fun handleBackToMainMenu() {
