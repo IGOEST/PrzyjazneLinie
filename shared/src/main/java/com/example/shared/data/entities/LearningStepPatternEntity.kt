@@ -40,6 +40,7 @@ data class LearningStepPatternEntity(
     val writingColor: String?,
     val backgroundColor: String?,
     val patternVariety: Boolean,
+    val colorVariety: Boolean,
 
     val order: Int,
     val isEnabled: Boolean,

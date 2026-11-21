@@ -49,6 +49,7 @@ class LearningStepsRepository @Inject constructor(
                 writingColor = patternDraft.writingColor?.key,
                 backgroundColor = patternDraft.backgroundColor?.key,
                 patternVariety = patternDraft.patternVariety,
+                colorVariety = patternDraft.colorVariety,
                 order = patternDraft.order,
                 isEnabled = patternDraft.isEnabled,
                 isLearning = patternDraft.isLearning,
@@ -90,6 +91,7 @@ class LearningStepsRepository @Inject constructor(
                         PatternConfigOptions.background.firstOrNull { it.key == name }
                     },
                     patternVariety = patternConfig.patternVariety,
+                    colorVariety = patternConfig.colorVariety,
                     order = patternConfig.order,
                     isEnabled = patternConfig.isEnabled,
                     isLearning = patternConfig.isLearning,
@@ -181,6 +183,7 @@ class LearningStepsRepository @Inject constructor(
                 writingColor = patternDraft.writingColor?.key,
                 backgroundColor = patternDraft.backgroundColor?.key,
                 patternVariety = patternDraft.patternVariety,
+                colorVariety = patternDraft.colorVariety,
                 order = patternDraft.order,
                 isEnabled = patternDraft.isEnabled,
                 isLearning = patternDraft.isLearning,

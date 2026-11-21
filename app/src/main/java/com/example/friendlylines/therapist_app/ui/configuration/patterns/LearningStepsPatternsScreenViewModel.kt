@@ -43,6 +43,7 @@ class LearningStepsPatternsScreenViewModel @Inject constructor() : ViewModel() {
                         writingColor = event.writingColor,
                         backgroundColor = event.backgroundColor,
                         patternVariety = event.patternVariety,
+                        colorVariety = event.colorVariety,
                         order = state.patterns.size
                     )
 
@@ -169,7 +170,8 @@ class LearningStepsPatternsScreenViewModel @Inject constructor() : ViewModel() {
                                     patternColor = event.patternColor,
                                     writingColor = event.writingColor,
                                     backgroundColor = event.backgroundColor,
-                                    patternVariety = event.patternVariety
+                                    patternVariety = event.patternVariety,
+                                    colorVariety = event.colorVariety
                                 )
                             } else {
                                 config

@@ -20,7 +20,7 @@ import com.example.shared.data.entities.PointEntity
         LearningStepEntity::class,
         LearningStepPatternEntity::class
     ],
-    version = 11,
+    version = 12,
     exportSchema = false
 )
 @ColumnTypeConverters(

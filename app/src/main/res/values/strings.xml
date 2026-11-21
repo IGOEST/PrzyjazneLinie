@@ -54,6 +54,8 @@
     <string name="background_color_text">Background color</string>
     <string name="pattern_variety_text">Pattern variety</string>
     <string name="pattern_variety_info">The pattern can vary in size, length, and slope.</string>
+    <string name="color_variety_text">Color variety</string>
+    <string name="color_variety_info">Colors will be chosen at random.</string>
     <string name="save_config_dialog_title">Save?</string>
     <string name="pattern_text">Pattern</string>
     <string name="pattern_color_text">Pattern color</string>
@@ -260,6 +262,13 @@
 
     <string name="core_ui_splash_bullet5_label">To learn more:</string>
     <string name="core_ui_splash_bullet5_body">Visit the project website: https://tiapps.org/</string>
+
+    <string name="report_name">report_Friendly_Lines_</string>
+    <string name="saved_report_message">Report saved</string>
+    <string name="not_saved_report_message">Cannot save report</string>
+
+    <string name="enable_recording">Enable recording</string>
+
 
 </resources>
 

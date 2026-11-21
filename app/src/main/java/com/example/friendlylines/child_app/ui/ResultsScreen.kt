@@ -39,6 +39,25 @@ import com.example.friendlylines.theme.scaled
 import com.example.friendlylines.therapist_app.ui.components.TemplateButton
 import com.example.friendlylines.therapist_app.ui.components.TemplateDropdown
 import com.example.friendlylines.therapist_app.ui.configuration.config.PatternConfigColors
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import kotlin.time.Duration.Companion.milliseconds
+import android.graphics.pdf.PdfDocument
+import android.graphics.Paint
+import androidx.compose.ui.platform.LocalConfiguration
+import com.example.friendlylines.child_app.reports.CsvExporter
+import com.example.friendlylines.child_app.reports.PdfExporter
+import com.example.friendlylines.child_app.reports.ReportBuilder
 
 @Composable
 fun ResultsScreen(
@@ -48,6 +67,42 @@ fun ResultsScreen(
 ) {
     var selectedPattern by remember(patterns) { mutableStateOf(patterns.first()) }
     val config = selectedPattern.config
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
+    var saveMessage by remember { mutableStateOf<Int?>(null) }
+
+    val timestamp = SimpleDateFormat("yyyy.MM.dd_HH.mm", Locale.ROOT).format(Date())
+
+    val fileName = "${stringResource(R.string.report_name)}_$timestamp.pdf"
+
+    LaunchedEffect(saveMessage) {
+        if(saveMessage != null) {
+            delay(2000.milliseconds)
+            saveMessage = null
+        }
+    }
+
+    val pdfLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument("application/pdf")
+    ) { uri ->
+        if (uri != null) {
+            scope.launch {
+                val saved = withContext(Dispatchers.IO) {
+                    runCatching {
+                        val report = ReportBuilder.buildPdfReport(learningStepResult, patterns)
+                        PdfExporter.save(context, uri, report)
+                    }.isSuccess
+                }
+
+                saveMessage = if (saved) {
+                    R.string.saved_report_message
+                } else {
+                    R.string.not_saved_report_message
+                }
+            }
+        }
+    }
 
     ChildGameEmptyBackground {
         Column(
@@ -57,6 +112,14 @@ fun ResultsScreen(
             verticalArrangement = Arrangement.spacedBy(32.dp.scaled()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            saveMessage?.let { messageId ->
+                Text(
+                    text = stringResource(messageId),
+                    color = FriendlyLinesColors.PrimaryFriendlyLines.P1000,
+                    style = FriendlyLinesTextStyles.headingH4Medium
+                )
+            }
+
             Row(
                 modifier = Modifier
                     .padding(16.dp.scaled())
@@ -72,7 +135,7 @@ fun ResultsScreen(
                             .align(Alignment.CenterStart)
                             .padding(16.dp.scaled()),
                         enabled = true,
-                        onClick = { },  //TODO: ADD REPORT
+                        onClick = { pdfLauncher.launch(fileName) },
                         text = stringResource(id = R.string.results_download_button_1) + "\n" + stringResource(
                             id = R.string.results_download_button_2
                         ),

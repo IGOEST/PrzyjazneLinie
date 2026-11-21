@@ -96,6 +96,10 @@ fun LearningStepPatternConfigScreen(
         mutableStateOf(false)
     }
 
+    var colorVariety by remember {
+        mutableStateOf(false)
+    }
+
     val thicknessValues = listOf(
         stringResource(R.string.thin_label_text),
         stringResource(R.string.medium_label_text),
@@ -169,6 +173,7 @@ fun LearningStepPatternConfigScreen(
             writingColor = config.writingColor ?: defaultWritingColor
             backgroundColor = config.backgroundColor
             patternVariety = config.patternVariety
+            colorVariety = config.colorVariety
         }
     }
 
@@ -210,8 +215,8 @@ fun LearningStepPatternConfigScreen(
                         modifier = Modifier
                             .weight(1f)
                             .fillMaxWidth()
-                            .padding(32.dp.scaled()),
-                        verticalArrangement = Arrangement.spacedBy(32.dp.scaled()),
+                            .padding(30.dp.scaled()),
+                        verticalArrangement = Arrangement.spacedBy(30.dp.scaled()),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         item {
@@ -313,6 +318,40 @@ fun LearningStepPatternConfigScreen(
                                 )
                             }
                         }
+
+                        item {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Row(
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp.scaled()),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    InfoIconButton(
+                                        infoTitle = stringResource(R.string.color_variety_text),
+                                        infoMessage = stringResource(R.string.color_variety_info),
+                                        modifier = Modifier.size(24.dp.scaled()),
+                                        defaultTint = FriendlyLinesColors.InfoIcon.InfoDefault,
+                                        activeTint = FriendlyLinesColors.InfoIcon.InfoActive,
+                                        disabledTint = FriendlyLinesColors.Neutral.N300
+                                    )
+                                    Text(
+                                        text = stringResource(R.string.color_variety_text),
+                                        style = FriendlyLinesTextStyles.headingH5Regular,
+                                        color = FriendlyLinesColors.PrimaryFriendlyLines.P900
+                                    )
+                                }
+
+                                TemplateToggleSwitch(
+                                    checked = colorVariety,
+                                    onCheckedChange = {
+                                        colorVariety = it
+                                    }
+                                )
+                            }
+                        }
                     }
 
                     Row(
@@ -397,7 +436,8 @@ fun LearningStepPatternConfigScreen(
                                     patternColor = patternColor,
                                     writingColor = writingColor,
                                     backgroundColor = backgroundColor,
-                                    patternVariety = patternVariety
+                                    patternVariety = patternVariety,
+                                    colorVariety = colorVariety
                                 )
                             )
                         )
@@ -411,7 +451,8 @@ fun LearningStepPatternConfigScreen(
                                     patternColor = patternColor,
                                     writingColor = writingColor,
                                     backgroundColor = backgroundColor,
-                                    patternVariety = patternVariety
+                                    patternVariety = patternVariety,
+                                    colorVariety = colorVariety
                                 )
                             )
                         )

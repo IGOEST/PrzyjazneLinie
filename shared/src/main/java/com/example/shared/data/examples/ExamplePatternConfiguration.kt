@@ -16,6 +16,7 @@ object ExamplePatternConfiguration {
             writingColor = "red",
             backgroundColor = "white",
             patternVariety = false,
+            colorVariety = false,
             order = order,
             isEnabled = true,
             isTest = true,
