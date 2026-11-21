@@ -171,7 +171,8 @@ fun GameDrawingScreen(
                         patternVariety = currentPatternResult?.config?.patternVariety ?: false,
                         varietyKey = gameState.currentPattern,
                         scaleMultiplier = gameState.patternScale,
-                        rotationDegrees = gameState.patternRotation
+                        rotationDegrees = gameState.patternRotation,
+                        patternKey = currentPatternResult?.exampleKey
                     )
                 }
 

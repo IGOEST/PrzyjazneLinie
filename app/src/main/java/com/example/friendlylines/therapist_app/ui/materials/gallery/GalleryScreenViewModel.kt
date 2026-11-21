@@ -109,31 +109,29 @@ class GalleryScreenViewModel @Inject constructor(
         }
     }
 
-    private fun loadPatterns() {
-        viewModelScope.launch {
+    private suspend fun loadPatterns() {
+        _state.update {
+            it.copy(
+                isLoading = true
+            )
+        }
+
+        try {
+            refreshGallery()
+
             _state.update {
                 it.copy(
-                    isLoading = true
+                    isLoading = false
+                )
+            }
+        } catch (e: Exception) {
+            _state.update {
+                it.copy(
+                    isLoading = false
                 )
             }
 
-            try {
-                refreshGallery()
-
-                _state.update {
-                    it.copy(
-                        isLoading = false
-                    )
-                }
-            } catch (e: Exception) {
-                _state.update {
-                    it.copy(
-                        isLoading = false
-                    )
-                }
-
-                throw e
-            }
+            throw e
         }
     }
 

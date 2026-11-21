@@ -74,15 +74,11 @@ fun smoothPoints(
                 continue
             }
 
-            val dot = (
-                    incoming.x * outgoing.x +
-                            incoming.y * outgoing.y
-                    ) / (incomingLength * outgoingLength)
+            val dot = (incoming.x * outgoing.x + incoming.y * outgoing.y) / (incomingLength * outgoingLength)
 
             val curvature = 1f - clamp(dot, -1f, 1f)
 
-            val adaptiveStrength = strength *
-                    (1f - curvature * 0.85f)
+            val adaptiveStrength = clamp(strength * (1f - curvature * 0.85f))
 
             smoothed[i] = interpolate(
                 current,

@@ -15,17 +15,13 @@ import com.example.friendlylines.theme.FriendlyLinesColors
 import com.example.friendlylines.theme.scaled
 import com.example.friendlylines.therapist_app.ui.materials.geometry.NormalizedBounds
 import com.example.friendlylines.therapist_app.ui.materials.geometry.calculateNormalizedBounds
+import com.example.shared.data.examples.ExamplePatterns
 import com.example.shared.data.models.PatternDrawing
 import com.example.shared.data.models.Point
 import kotlin.random.Random
 
 private val STROKE_WIDTH = 5.dp
 private val SINGLE_POINT_RADIUS = 4.dp
-
-private data class PatternTransform(
-    val scale: Float,
-    val rotation: Float
-)
 
 @Composable
 fun PatternPreview(
@@ -40,21 +36,37 @@ fun PatternPreview(
     patternVariety: Boolean = false,
     varietyKey: Int = 0,
     scaleMultiplier: Float? = null,
-    rotationDegrees: Float? = null
+    rotationDegrees: Float? = null,
+    patternKey: String? = null
 ) {
-    val transform = remember(drawing, patternVariety, varietyKey, scaleMultiplier, rotationDegrees) {
-        if (scaleMultiplier != null && rotationDegrees != null) {
-            PatternTransform(scale = scaleMultiplier, rotation = rotationDegrees)
-        } else if (patternVariety) {
-            PatternTransform(
-                scale = Random.nextFloat() * 0.4f + 0.8f,
-                rotation = Random.nextFloat() * 40f - 20f
-            )
+    val transform = remember(drawing, patternKey, patternVariety, varietyKey, scaleMultiplier, rotationDegrees) {
+        val scale = scaleMultiplier ?: if (patternVariety) {
+            Random.nextFloat() * 0.4f + 0.8f
         } else {
-            PatternTransform(
-                scale = 1f,
-                rotation = 0f
-            )
+            1f
+        }
+
+        val rotation = if (canRotate(patternKey) || patternKey?.isNullOrBlank() == true) {
+            rotationDegrees ?: if (patternVariety) {
+                Random.nextFloat() * 40f - 20f
+            } else {
+                0f
+            }
+        } else {
+            0f
+        }
+
+        PatternTransform(
+            scale = scale,
+            rotation = rotation
+        )
+    }
+
+    val previewStrokes = remember(drawing, patternKey, patternVariety, varietyKey) {
+        if (patternKey == "triangle" && patternVariety) {
+            createTriangle(type = getTriangleType(varietyKey))
+        } else {
+            drawing.strokes
         }
     }
 
@@ -62,7 +74,7 @@ fun PatternPreview(
         modifier = modifier
     ) {
         val bounds = calculateNormalizedBounds(
-            strokes = drawing.strokes
+            strokes = previewStrokes
         ) ?: return@Canvas
 
         if (bounds.width < 0f || bounds.height < 0f) {
@@ -110,7 +122,7 @@ fun PatternPreview(
             degrees = transform.rotation,
             pivot = center
         ) {
-            drawing.strokes.forEach { stroke ->
+            previewStrokes.forEach { stroke ->
                 drawNormalizedStroke(
                     points = stroke,
                     bounds = bounds,
@@ -124,7 +136,7 @@ fun PatternPreview(
             }
 
             if (showStartingPoint) {
-                val firstPoint = drawing.strokes
+                val firstPoint = previewStrokes
                     .firstOrNull()
                     ?.firstOrNull()
 
@@ -143,7 +155,7 @@ fun PatternPreview(
                     )
 
                     drawCircle(
-                        color = Color.White,
+                        color = FriendlyLinesColors.Shades.White,
                         radius = startRadius * 0.7f,
                         center = startPosition
                     )
@@ -155,7 +167,7 @@ fun PatternPreview(
                     )
 
                     drawCircle(
-                        color = Color.White,
+                        color = FriendlyLinesColors.Shades.White,
                         radius = startRadius * 0.2f,
                         center = startPosition
                     )
