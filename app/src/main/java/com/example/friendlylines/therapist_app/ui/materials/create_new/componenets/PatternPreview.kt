@@ -39,36 +39,14 @@ fun PatternPreview(
     rotationDegrees: Float? = null,
     patternKey: String? = null
 ) {
-    val transform = remember(drawing, patternKey, patternVariety, varietyKey, scaleMultiplier, rotationDegrees) {
-        val scale = scaleMultiplier ?: if (patternVariety) {
-            Random.nextFloat() * 0.4f + 0.8f
-        } else {
-            1f
-        }
-
-        val rotation = if (canRotate(patternKey) || patternKey?.isNullOrBlank() == true) {
-            rotationDegrees ?: if (patternVariety) {
-                Random.nextFloat() * 40f - 20f
-            } else {
-                0f
-            }
-        } else {
-            0f
-        }
-
+    val transform = remember(scaleMultiplier, rotationDegrees) {
         PatternTransform(
-            scale = scale,
-            rotation = rotation
+            scale = scaleMultiplier ?: 1f,
+            rotation = rotationDegrees ?: 0f
         )
     }
 
-    val previewStrokes = remember(drawing, patternKey, patternVariety, varietyKey) {
-        if (patternKey == "triangle" && patternVariety) {
-            createTriangle(type = getTriangleType(varietyKey))
-        } else {
-            drawing.strokes
-        }
-    }
+    val previewStrokes = drawing.strokes
 
     Canvas(
         modifier = modifier

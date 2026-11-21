@@ -203,8 +203,8 @@ private fun normalizeVertices(vertices: List<TriangleVertex>, random: Random): L
     }
 }
 
-fun createTriangle(type: TriangleType): List<List<Point>> {
-    val random = Random.Default
+fun createTriangle(type: TriangleType, varietyKey: Int = Random.nextInt()): List<List<Point>> {
+    val random = Random(varietyKey)
 
     val sides = generateTriangleSides(type = type, random = random)
 

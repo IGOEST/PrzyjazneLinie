@@ -44,6 +44,9 @@ import com.example.shared.data.models.PointWithTime
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import com.example.friendlylines.child_app.assessment.StartingPointCheck
+import com.example.friendlylines.therapist_app.ui.materials.create_new.componenets.canRotate
+import com.example.friendlylines.therapist_app.ui.materials.create_new.componenets.createTriangle
+import com.example.friendlylines.therapist_app.ui.materials.create_new.componenets.getTriangleType
 
 @HiltViewModel
 class ChildViewModel  @Inject constructor(
@@ -647,11 +650,36 @@ class ChildViewModel  @Inject constructor(
                 val patternWithStrokes = patternRepository.getPattern(patternResult.patternId)
                 val drawing = patternWithStrokes?.toPatternDrawing()
                 val variety = patternResult.config.patternVariety
+                val patternKey = patternResult.exampleKey
+
+                val activeDrawing = if (variety && patternResult.exampleKey == "triangle"
+                ) {
+                    drawing?.copy(strokes = createTriangle(type = getTriangleType(index)))
+                } else {
+                    drawing
+                }
+
+                val scale = if (variety) {
+                    kotlin.random.Random.nextFloat() * 0.4f + 0.8f
+                } else {
+                    1f
+                }
+
+                val rotation = if (canRotate(patternKey) || patternKey.isNullOrBlank()) {
+                    if (variety) {
+                        kotlin.random.Random.nextFloat() * 40f - 20f
+                    } else {
+                        0f
+                    }
+                } else {
+                    0f
+                }
+
                 _state.update {
                     it.copy(
-                        currentPatternDrawing = drawing,
-                        patternScale = if (variety) kotlin.random.Random.nextFloat() * 0.4f + 0.8f else 1f,
-                        patternRotation = if (variety) kotlin.random.Random.nextFloat() * 40f - 20f else 0f
+                        currentPatternDrawing = activeDrawing,
+                        patternScale = scale,
+                        patternRotation = rotation
                     )
                 }
             } catch (e : Exception) {
