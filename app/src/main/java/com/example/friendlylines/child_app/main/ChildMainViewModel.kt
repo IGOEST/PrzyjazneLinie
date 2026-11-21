@@ -3,6 +3,7 @@ package com.example.friendlylines.child_app.main
 import android.content.Context
 import android.os.SystemClock
 import android.util.Log
+import android.util.Log.e
 import androidx.compose.ui.geometry.Offset
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -636,6 +637,7 @@ class ChildViewModel  @Inject constructor(
     private fun loadPatternDrawing(index: Int, state: GameState) {
         val patternResult = state.patternResults.getOrNull(index) ?: return
         applyColorVariety(patternResult)
+        currentAttemptNumber = 1
 
         // Start time limit for the new pattern
         startTimeLimitTimer(state.learningStepResult?.timeLimit ?: 0)
@@ -645,7 +647,6 @@ class ChildViewModel  @Inject constructor(
                 val patternWithStrokes = patternRepository.getPattern(patternResult.patternId)
                 val drawing = patternWithStrokes?.toPatternDrawing()
                 val variety = patternResult.config.patternVariety
-                currentAttemptNumber = 1
                 _state.update {
                     it.copy(
                         currentPatternDrawing = drawing,
@@ -653,7 +654,9 @@ class ChildViewModel  @Inject constructor(
                         patternRotation = if (variety) kotlin.random.Random.nextFloat() * 40f - 20f else 0f
                     )
                 }
-            } catch (_: Exception) {}
+            } catch (e : Exception) {
+                Log.e("ChildViewModel", "Could not load pattern", e)
+            }
         }
     }
 
@@ -732,7 +735,9 @@ class ChildViewModel  @Inject constructor(
                     patternResults = preparedResults,
                     learningStepResult = learningStepResult,
                 ) }
-            } catch (_: Exception) {}
+            } catch (e : Exception) {
+                Log.e("ChildViewModel", "Could not load pattern", e)
+            }
         }
     }
 
