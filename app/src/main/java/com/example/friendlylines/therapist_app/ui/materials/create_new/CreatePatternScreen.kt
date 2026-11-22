@@ -355,11 +355,7 @@ fun CreatePatternScreen(
                                         viewModel.onEvent(
                                             CreatePatternScreenEvent.SmoothingEnabledChanged(it)
                                         )
-                                    },
-//                                modifier = Modifier.size(
-//                                    width = 38.dp,
-//                                    height = 24.dp
-//                                )
+                                    }
                                 )
 
                                 Spacer(modifier = Modifier.width(16.dp.scaled()))
@@ -385,11 +381,7 @@ fun CreatePatternScreen(
                                         viewModel.onEvent(
                                             CreatePatternScreenEvent.StraightLineEnabledChanged(it)
                                         )
-                                    },
-//                                modifier = Modifier.size(
-//                                    width = 38.dp,
-//                                    height = 24.dp
-//                                )
+                                    }
                                 )
 
                                 Spacer(modifier = Modifier.width(16.dp))

@@ -33,6 +33,7 @@ import com.example.friendlylines.child_app.ui.components.TemplateChildButton
 import com.example.friendlylines.theme.FriendlyLinesColors
 import com.example.friendlylines.theme.FriendlyLinesTextStyles
 import com.example.friendlylines.theme.scaled
+import com.example.friendlylines.therapist_app.ui.components.TemplateToggleSwitch
 import pg.autyzm.friendlyemotions.child.backgrounds.ChildGameStartBackground
 
 private val LOGO_SIZE = 140.dp
@@ -112,7 +113,7 @@ fun MainMenuScreen(
                             fontSize = FriendlyLinesTextStyles.bodyRegular.fontSize * fontScale)
                         )
                         Spacer(modifier = Modifier.size(8.dp.scaled()))
-                        Switch(
+                        TemplateToggleSwitch(
                             checked = recordingEnabled,
                             onCheckedChange = onRecordingEnabledChanged
                         )

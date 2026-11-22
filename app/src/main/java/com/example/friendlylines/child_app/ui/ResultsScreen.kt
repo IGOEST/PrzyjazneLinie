@@ -109,7 +109,7 @@ fun ResultsScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp.scaled()),
-            verticalArrangement = Arrangement.spacedBy(32.dp.scaled()),
+            verticalArrangement = Arrangement.spacedBy(8.dp.scaled()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             saveMessage?.let { messageId ->
@@ -156,34 +156,6 @@ fun ResultsScreen(
                 }
             }
             Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp.scaled())
-            ) {
-                Text(
-                    text = stringResource(id = R.string.results_choose_pattern) + ": ",
-                    color = FriendlyLinesColors.PrimaryFriendlyLines.P1000,
-                    style = FriendlyLinesTextStyles.bodyMedium
-                )
-                TemplateDropdown(
-                    value = selectedPattern,
-                    options = patterns,
-                    onOptionSelected = { picked ->
-                        selectedPattern = picked ?: patterns.first()
-                    },
-                    label = "",
-                    dropdownWidth = 350.dp.scaled(),
-                    optionLabel = { pattern ->
-                        pattern?.let {
-                            val name = it.exampleKey?.let { key ->
-                                ExamplePatternNames.examplePatternNameFor(key)
-                            } ?: it.originalName
-
-                            "$name ${it.displayNumber}"
-                        } ?: ""
-                    }
-                )
-            }
-            Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
@@ -205,6 +177,34 @@ fun ResultsScreen(
                         color = FriendlyLinesColors.PrimaryFriendlyLines.P1000,
                         style = FriendlyLinesTextStyles.headingH4Medium
                     )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp.scaled())
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.results_choose_pattern) + ": ",
+                            color = FriendlyLinesColors.PrimaryFriendlyLines.P1000,
+                            style = FriendlyLinesTextStyles.bodyMedium
+                        )
+                        TemplateDropdown(
+                            value = selectedPattern,
+                            options = patterns,
+                            onOptionSelected = { picked ->
+                                selectedPattern = picked ?: patterns.first()
+                            },
+                            label = "",
+                            dropdownWidth = 350.dp.scaled(),
+                            optionLabel = { pattern ->
+                                pattern?.let {
+                                    val name = it.exampleKey?.let { key ->
+                                        ExamplePatternNames.examplePatternNameFor(key)
+                                    } ?: it.originalName
+
+                                    "$name ${it.displayNumber}"
+                                } ?: ""
+                            }
+                        )
+                    }
                     Column(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -247,10 +247,14 @@ fun ResultsScreen(
                             label = stringResource(id = R.string.results_correct_starting_point_1) + " " + stringResource(
                                 id = R.string.results_correct_starting_point_2
                             ) + ": ",
-                            value = if (selectedPattern.correctStartingPoint)
-                                stringResource(id = R.string.results_yes)
-                            else
-                                stringResource(id = R.string.results_no)
+                            value = if (learningStepResult.showStartingPoint) {
+                                if (selectedPattern.correctStartingPoint)
+                                    stringResource(id = R.string.results_yes)
+                                else
+                                    stringResource(id = R.string.results_no)
+                            } else {
+                                stringResource(id = R.string.not_applicable)
+                            }
                         )
                     }
                 }
