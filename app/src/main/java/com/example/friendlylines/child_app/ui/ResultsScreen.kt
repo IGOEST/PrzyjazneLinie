@@ -247,14 +247,10 @@ fun ResultsScreen(
                             label = stringResource(id = R.string.results_correct_starting_point_1) + " " + stringResource(
                                 id = R.string.results_correct_starting_point_2
                             ) + ": ",
-                            value = if (learningStepResult.showStartingPoint) {
-                                if (selectedPattern.correctStartingPoint)
-                                    stringResource(id = R.string.results_yes)
-                                else
-                                    stringResource(id = R.string.results_no)
-                            } else {
-                                stringResource(id = R.string.not_applicable)
-                            }
+                            value = if (selectedPattern.correctStartingPoint)
+                                stringResource(id = R.string.results_yes)
+                            else
+                                stringResource(id = R.string.results_no)
                         )
                     }
                 }
