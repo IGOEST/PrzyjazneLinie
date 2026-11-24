@@ -46,6 +46,7 @@ import kotlinx.coroutines.Dispatchers
 import com.example.friendlylines.child_app.assessment.StartingPointCheck
 import com.example.friendlylines.therapist_app.ui.materials.create_new.componenets.canRotate
 import com.example.friendlylines.therapist_app.ui.materials.create_new.componenets.createTriangle
+import com.example.friendlylines.therapist_app.ui.materials.create_new.componenets.getStartingPoint
 import com.example.friendlylines.therapist_app.ui.materials.create_new.componenets.getTriangleType
 
 @HiltViewModel
@@ -83,6 +84,8 @@ class ChildViewModel  @Inject constructor(
     private val waitTime: Double = 0.7
 
     private var density: Float = 1f
+
+    private val tolerance: Float = 48f
 
     private var currentAttemptNumber = 1
 
@@ -140,6 +143,7 @@ class ChildViewModel  @Inject constructor(
      */
     private fun handlePointerDown(position: Offset) {
         if (_state.value.isReinforcementPlaying) return
+        if(!isValidStartingPosition(position)) return
         stopTimeLimitCountdown()
         finishTimerJob?.cancel()
 
@@ -191,6 +195,39 @@ class ChildViewModel  @Inject constructor(
         } else {
             startFinishTimer()                // if all strokes drawn
         }
+    }
+
+    private fun isValidStartingPosition(position: Offset): Boolean {
+        val state = _state.value
+
+        val startingPointEnabled = state.learningStepResult?.let { !it.testMode && it.showStartingPoint } ?: false
+
+        if (!startingPointEnabled) return true
+
+        val drawing = state.currentPatternDrawing ?: return false
+        val patternResult = state.patternResults.getOrNull(state.currentPattern) ?: return false
+
+        if (canvasSize == IntSize.Zero) return false
+
+        val startingPoint = drawing.getStartingPoint(patternResult.exampleKey)?: return false
+
+        val patternPoints = drawing.toCanvasPixelStrokes(
+            canvasSize = canvasSize,
+            density = density,
+            scaleMultiplier = state.patternScale,
+            rotationDegrees = state.patternRotation,
+            smoothing = patternResult.config.smoothingEnabled
+        )
+
+        val originalIndex = drawing.strokes.flatten().indexOf(startingPoint)
+        if (originalIndex < 0) return false
+        val canvasStartingPoint = patternPoints.flatten().getOrNull(originalIndex) ?: return false
+
+        val startOffset = Offset(x = canvasStartingPoint.x, y = canvasStartingPoint.y)
+
+        val tolerancePx = tolerance * density
+
+        return (position - startOffset).getDistance() <= tolerancePx
     }
 
     /**
@@ -258,7 +295,7 @@ class ChildViewModel  @Inject constructor(
             StartingPointCheck.isCorrect(
                 userStrokes = currentState.userStrokes,
                 patternStrokes = patternPx,
-                tolerancePx = 48f * density   // margin
+                tolerancePx = tolerance * density   // margin
             )
         } else false
 

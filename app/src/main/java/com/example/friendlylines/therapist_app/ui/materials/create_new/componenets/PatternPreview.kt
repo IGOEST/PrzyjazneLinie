@@ -32,7 +32,6 @@ fun PatternPreview(
     strokeColor: Color = FriendlyLinesColors.Shades.Black,
     singlePointRadius: Dp = SINGLE_POINT_RADIUS.scaled(),
     showStartingPoint: Boolean = false,
-    startingPointColor: Color = Color(0xFF00D97E),//FriendlyLinesColors.Shades.White,
     patternVariety: Boolean = false,
     varietyKey: Int = 0,
     scaleMultiplier: Float? = null,
@@ -114,9 +113,7 @@ fun PatternPreview(
             }
 
             if (showStartingPoint) {
-                val firstPoint = previewStrokes
-                    .firstOrNull()
-                    ?.firstOrNull()
+                val firstPoint = drawing.getStartingPoint(patternKey)
 
                 if (firstPoint != null) {
                     val startPosition = Offset(
@@ -127,26 +124,14 @@ fun PatternPreview(
                     val startRadius = (strokeWidth * 1.1f).toPx()
 
                     drawCircle(
-                        color = Color(0xFF263238),
-                        radius = startRadius * 0.9f,
+                        color = FriendlyLinesColors.Neutral.N400,
+                        radius = startRadius * 0.8f,
                         center = startPosition
                     )
 
                     drawCircle(
-                        color = FriendlyLinesColors.Shades.White,
-                        radius = startRadius * 0.7f,
-                        center = startPosition
-                    )
-
-                    drawCircle(
-                        color = startingPointColor,
-                        radius = startRadius * 0.5f,
-                        center = startPosition
-                    )
-
-                    drawCircle(
-                        color = FriendlyLinesColors.Shades.White,
-                        radius = startRadius * 0.2f,
+                        color = FriendlyLinesColors.Neutral.N100,
+                        radius = startRadius * 0.6f,
                         center = startPosition
                     )
                 }
@@ -183,4 +168,16 @@ fun DrawScope.drawNormalizedStroke(
         singlePointRadius = singlePointRadius.toPx(),
         strokeColor = strokeColor
     )
+}
+
+fun PatternDrawing.getStartingPoint(patternKey: String? = null): Point? {
+    val allPoints = strokes.flatten()
+
+    if (allPoints.isEmpty()) return null
+
+    return if (patternKey == "triangle") {
+        allPoints.minByOrNull { it.x }
+    } else {
+        strokes.firstOrNull()?.firstOrNull()
+    }
 }
