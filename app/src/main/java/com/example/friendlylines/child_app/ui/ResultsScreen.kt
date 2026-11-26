@@ -54,7 +54,10 @@ import java.util.Locale
 import kotlin.time.Duration.Companion.milliseconds
 import android.graphics.pdf.PdfDocument
 import android.graphics.Paint
+import android.media.MediaPlayer
 import androidx.compose.ui.platform.LocalConfiguration
+import com.example.friendlylines.child_app.reinforcements.ConfettiOverlay
+import com.example.friendlylines.child_app.reinforcements.ReinforcementEvent
 import com.example.friendlylines.child_app.reports.CsvExporter
 import com.example.friendlylines.child_app.reports.PdfExporter
 import com.example.friendlylines.child_app.reports.ReportBuilder
@@ -75,6 +78,20 @@ fun ResultsScreen(
     val timestamp = SimpleDateFormat("yyyy.MM.dd_HH.mm", Locale.ROOT).format(Date())
 
     val fileName = "${stringResource(R.string.report_name)}_$timestamp.pdf"
+
+    val playAnimation = learningStepResult.endAnimation
+    val playFanfare = learningStepResult.endFanfare
+
+    LaunchedEffect(playFanfare) {
+        if (playFanfare) {
+            val player = MediaPlayer.create(context, R.raw.fanfare)
+
+            player?.apply {
+                setOnCompletionListener { it.release() }
+                start()
+            }
+        }
+    }
 
     LaunchedEffect(saveMessage) {
         if(saveMessage != null) {
@@ -105,209 +122,217 @@ fun ResultsScreen(
     }
 
     ChildGameEmptyBackground {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp.scaled()),
-            verticalArrangement = Arrangement.spacedBy(8.dp.scaled()),
-            horizontalAlignment = Alignment.CenterHorizontally
+        Box(
+            modifier = Modifier.fillMaxSize()
         ) {
-            saveMessage?.let { messageId ->
-                Text(
-                    text = stringResource(messageId),
-                    color = FriendlyLinesColors.PrimaryFriendlyLines.P1000,
-                    style = FriendlyLinesTextStyles.headingH4Medium
-                )
-            }
-
-            Row(
+            Column(
                 modifier = Modifier
-                    .padding(16.dp.scaled())
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                    .fillMaxSize()
+                    .padding(16.dp.scaled()),
+                verticalArrangement = Arrangement.spacedBy(8.dp.scaled()),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Box(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    TemplateButton(
-                        modifier = Modifier
-                            .align(Alignment.CenterStart)
-                            .padding(16.dp.scaled()),
-                        enabled = true,
-                        onClick = { pdfLauncher.launch(fileName) },
-                        text = stringResource(id = R.string.results_download_button_1) + "\n" + stringResource(
-                            id = R.string.results_download_button_2
-                        ),
-                        icon = Icons.Filled.Checklist
-                    )
+                saveMessage?.let { messageId ->
                     Text(
-                        modifier = Modifier.align(Alignment.Center),
-                        text = stringResource(id = R.string.results),
-                        color = FriendlyLinesColors.PrimaryFriendlyLines.P1000,
-                        style = FriendlyLinesTextStyles.displayD2
-                    )
-                    TemplateChildButton(
-                        modifier = Modifier.align(Alignment.CenterEnd),
-                        icon = IconType.Play,
-                        onClick = onPlayClick,
-                        size = 100.dp.scaled()
-                    )
-                }
-            }
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .padding(24.dp.scaled()),
-                horizontalArrangement = Arrangement.spacedBy(16.dp.scaled()),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                val patternResultsScroll = rememberScrollState()
-                Column(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxHeight()
-                        .verticalScroll(patternResultsScroll),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(32.dp.scaled())
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.results_of_pattern),
+                        text = stringResource(messageId),
                         color = FriendlyLinesColors.PrimaryFriendlyLines.P1000,
                         style = FriendlyLinesTextStyles.headingH4Medium
                     )
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp.scaled())
+                }
+
+                Row(
+                    modifier = Modifier
+                        .padding(16.dp.scaled())
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        TemplateButton(
+                            modifier = Modifier
+                                .align(Alignment.CenterStart)
+                                .padding(16.dp.scaled()),
+                            enabled = true,
+                            onClick = { pdfLauncher.launch(fileName) },
+                            text = stringResource(id = R.string.results_download_button_1) + "\n" + stringResource(
+                                id = R.string.results_download_button_2
+                            ),
+                            icon = Icons.Filled.Checklist
+                        )
+                        Text(
+                            modifier = Modifier.align(Alignment.Center),
+                            text = stringResource(id = R.string.results),
+                            color = FriendlyLinesColors.PrimaryFriendlyLines.P1000,
+                            style = FriendlyLinesTextStyles.displayD2
+                        )
+                        TemplateChildButton(
+                            modifier = Modifier.align(Alignment.CenterEnd),
+                            icon = IconType.Play,
+                            onClick = onPlayClick,
+                            size = 100.dp.scaled()
+                        )
+                    }
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .padding(24.dp.scaled()),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp.scaled()),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    val patternResultsScroll = rememberScrollState()
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
+                            .verticalScroll(patternResultsScroll),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(32.dp.scaled())
                     ) {
                         Text(
-                            text = stringResource(id = R.string.results_choose_pattern) + ": ",
+                            text = stringResource(id = R.string.results_of_pattern),
                             color = FriendlyLinesColors.PrimaryFriendlyLines.P1000,
-                            style = FriendlyLinesTextStyles.bodyMedium
+                            style = FriendlyLinesTextStyles.headingH4Medium
                         )
-                        TemplateDropdown(
-                            value = selectedPattern,
-                            options = patterns,
-                            onOptionSelected = { picked ->
-                                selectedPattern = picked ?: patterns.first()
-                            },
-                            label = "",
-                            dropdownWidth = 350.dp.scaled(),
-                            optionLabel = { pattern ->
-                                pattern?.let {
-                                    val name = it.exampleKey?.let { key ->
-                                        ExamplePatternNames.examplePatternNameFor(key)
-                                    } ?: it.originalName
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp.scaled())
+                        ) {
+                            Text(
+                                text = stringResource(id = R.string.results_choose_pattern) + ": ",
+                                color = FriendlyLinesColors.PrimaryFriendlyLines.P1000,
+                                style = FriendlyLinesTextStyles.bodyMedium
+                            )
+                            TemplateDropdown(
+                                value = selectedPattern,
+                                options = patterns,
+                                onOptionSelected = { picked ->
+                                    selectedPattern = picked ?: patterns.first()
+                                },
+                                label = "",
+                                dropdownWidth = 350.dp.scaled(),
+                                optionLabel = { pattern ->
+                                    pattern?.let {
+                                        val name = it.exampleKey?.let { key ->
+                                            ExamplePatternNames.examplePatternNameFor(key)
+                                        } ?: it.originalName
 
-                                    "$name ${it.displayNumber}"
-                                } ?: ""
-                            }
-                        )
+                                        "$name ${it.displayNumber}"
+                                    } ?: ""
+                                }
+                            )
+                        }
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(16.dp.scaled())
+                        ) {
+                            ResultInfoRow(
+                                label = stringResource(id = R.string.pattern_color_text) + ": ",
+                                value = PatternConfigColors.nameFor(config.patternColor.key)
+                            )
+                            ResultInfoRow(
+                                label = stringResource(id = R.string.drawing_color_text) + ": ",
+                                value = PatternConfigColors.nameFor(config.traceColor.key)
+                            )
+                            ResultInfoRow(
+                                label = stringResource(id = R.string.background_color_text) + ": ",
+                                value = PatternConfigColors.nameFor(config.backgroundColor.key)
+                            )
+                            ResultInfoRow(
+                                label = stringResource(id = R.string.pattern_thickness_text) + ": ",
+                                value = when (config.patternThickness) {
+                                    "THIN" -> stringResource(R.string.thin_label_text)
+                                    "MEDIUM" -> stringResource(R.string.medium_label_text)
+                                    "THICK" -> stringResource(R.string.thick_label_text)
+                                    else -> config.patternThickness
+                                }
+                            )
+                            ResultInfoRow(
+                                label = stringResource(id = R.string.results_correct_covering) + ": ",
+                                value = "${selectedPattern.insideArea}%"
+                            )
+                            ResultInfoRow(
+                                label = stringResource(id = R.string.results_line_out_of_bounds) + ": ",
+                                value = "${selectedPattern.outsideArea}%"
+                            )
+                            ResultInfoRow(
+                                label = stringResource(id = R.string.results_correct_shape) + ": ",
+                                value = "${selectedPattern.shapeMatch}%"
+                            )
+                            ResultInfoRow(
+                                label = stringResource(id = R.string.results_correct_starting_point_1) + " " + stringResource(
+                                    id = R.string.results_correct_starting_point_2
+                                ) + ": ",
+                                value = if (selectedPattern.correctStartingPoint)
+                                    stringResource(id = R.string.results_yes)
+                                else
+                                    stringResource(id = R.string.results_no)
+                            )
+                        }
                     }
-                    Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(16.dp.scaled())
-                    ) {
-                        ResultInfoRow(
-                            label = stringResource(id = R.string.pattern_color_text) + ": ",
-                            value = PatternConfigColors.nameFor(config.patternColor.key)
-                        )
-                        ResultInfoRow(
-                            label = stringResource(id = R.string.drawing_color_text) + ": ",
-                            value = PatternConfigColors.nameFor(config.traceColor.key)
-                        )
-                        ResultInfoRow(
-                            label = stringResource(id = R.string.background_color_text) + ": ",
-                            value = PatternConfigColors.nameFor(config.backgroundColor.key)
-                        )
-                        ResultInfoRow(
-                            label = stringResource(id = R.string.pattern_thickness_text) + ": ",
-                            value = when (config.patternThickness) {
-                                "THIN" -> stringResource(R.string.thin_label_text)
-                                "MEDIUM" -> stringResource(R.string.medium_label_text)
-                                "THICK" -> stringResource(R.string.thick_label_text)
-                                else -> config.patternThickness
-                            }
-                        )
-                        ResultInfoRow(
-                            label = stringResource(id = R.string.results_correct_covering) + ": ",
-                            value = "${selectedPattern.insideArea}%"
-                        )
-                        ResultInfoRow(
-                            label = stringResource(id = R.string.results_line_out_of_bounds) + ": ",
-                            value = "${selectedPattern.outsideArea}%"
-                        )
-                        ResultInfoRow(
-                            label = stringResource(id = R.string.results_correct_shape) + ": ",
-                            value = "${selectedPattern.shapeMatch}%"
-                        )
-                        ResultInfoRow(
-                            label = stringResource(id = R.string.results_correct_starting_point_1) + " " + stringResource(
-                                id = R.string.results_correct_starting_point_2
-                            ) + ": ",
-                            value = if (selectedPattern.correctStartingPoint)
-                                stringResource(id = R.string.results_yes)
-                            else
-                                stringResource(id = R.string.results_no)
-                        )
-                    }
-                }
-                VerticalDivider(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .padding(horizontal = 16.dp.scaled()),
-                    thickness = 3.dp.scaled(),
-                    color = FriendlyLinesColors.PrimaryFriendlyLines.P700
-                )
-                val stepResultsScroll = rememberScrollState()
-                Column(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxHeight()
-                        .verticalScroll(stepResultsScroll),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(32.dp.scaled())
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.results_of_learning_step),
-                        color = FriendlyLinesColors.PrimaryFriendlyLines.P1000,
-                        style = FriendlyLinesTextStyles.headingH4Medium
+                    VerticalDivider(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .padding(horizontal = 16.dp.scaled()),
+                        thickness = 3.dp.scaled(),
+                        color = FriendlyLinesColors.PrimaryFriendlyLines.P700
                     )
+                    val stepResultsScroll = rememberScrollState()
                     Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalAlignment = Alignment.Start,
-                        verticalArrangement = Arrangement.spacedBy(16.dp.scaled())
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
+                            .verticalScroll(stepResultsScroll),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(32.dp.scaled())
                     ) {
-                        ResultInfoRow(
-                            label = stringResource(id = R.string.results_correct_covering) + ": ",
-                            value = "${learningStepResult.correctCoverage}%"
+                        Text(
+                            text = stringResource(id = R.string.results_of_learning_step),
+                            color = FriendlyLinesColors.PrimaryFriendlyLines.P1000,
+                            style = FriendlyLinesTextStyles.headingH4Medium
                         )
-                        ResultInfoRow(
-                            label = stringResource(id = R.string.results_line_out_of_bounds) + ": ",
-                            value = "${learningStepResult.lineOutOfBounds}%"
-                        )
-                        ResultInfoRow(
-                            label = stringResource(id = R.string.results_correct_shape) + ": ",
-                            value = "${learningStepResult.shapeMatch}%"
-                        )
-                        ResultInfoRow(
-                            label = stringResource(id = R.string.results_starting_point_1) + " " + stringResource(
-                                id = R.string.results_starting_point_2
-                            ) + ": ",
-                            icon = if (learningStepResult.showStartingPoint) Icons.Filled.CheckBox else Icons.Filled.CheckBoxOutlineBlank
-                        )
-                        ResultInfoRow(
-                            label = stringResource(id = R.string.results_test_mode) + ": ",
-                            icon = if (learningStepResult.testMode) Icons.Filled.CheckBox else Icons.Filled.CheckBoxOutlineBlank
-                        )
-                        ResultInfoRow(
-                            label = stringResource(id = R.string.time_limit) + ": ",
-                            value = "${learningStepResult.timeLimit} s"
-                        )
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalAlignment = Alignment.Start,
+                            verticalArrangement = Arrangement.spacedBy(16.dp.scaled())
+                        ) {
+                            ResultInfoRow(
+                                label = stringResource(id = R.string.results_correct_covering) + ": ",
+                                value = "${learningStepResult.correctCoverage}%"
+                            )
+                            ResultInfoRow(
+                                label = stringResource(id = R.string.results_line_out_of_bounds) + ": ",
+                                value = "${learningStepResult.lineOutOfBounds}%"
+                            )
+                            ResultInfoRow(
+                                label = stringResource(id = R.string.results_correct_shape) + ": ",
+                                value = "${learningStepResult.shapeMatch}%"
+                            )
+                            ResultInfoRow(
+                                label = stringResource(id = R.string.results_starting_point_1) + " " + stringResource(
+                                    id = R.string.results_starting_point_2
+                                ) + ": ",
+                                icon = if (learningStepResult.showStartingPoint) Icons.Filled.CheckBox else Icons.Filled.CheckBoxOutlineBlank
+                            )
+                            ResultInfoRow(
+                                label = stringResource(id = R.string.results_test_mode) + ": ",
+                                icon = if (learningStepResult.testMode) Icons.Filled.CheckBox else Icons.Filled.CheckBoxOutlineBlank
+                            )
+                            ResultInfoRow(
+                                label = stringResource(id = R.string.time_limit) + ": ",
+                                value = "${learningStepResult.timeLimit} s"
+                            )
+                        }
                     }
                 }
+            }
+
+            if (playAnimation) {
+                ConfettiOverlay(modifier = Modifier.fillMaxSize())
             }
         }
     }

@@ -262,8 +262,10 @@ fun LearningStepsTestScreen(
                         Column(
                             modifier =
                                 Modifier.weight(1f)
+                                    .fillMaxHeight()
                                     .alpha(if (draft.overridesLearning) OVERRIDING_ALPHA else NOT_OVERRIDING_ALPHA)
                                     .clickable(enabled = !draft.overridesLearning) { showOverrideHint = true }
+                                    .padding(start = CONTENT_PADDING.scaled())
                                     .verticalScroll(learningScrollState),
                             verticalArrangement = Arrangement.spacedBy(32.dp.scaled()),
                         ) {

@@ -268,6 +268,7 @@
     <string name="not_saved_report_message">Cannot save report</string>
 
     <string name="enable_recording">Enable recording</string>
+    <string name="back_button_text">BACK</string>
 
 
 </resources>
